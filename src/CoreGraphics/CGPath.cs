@@ -720,15 +720,15 @@ namespace MonoMac.CoreGraphics {
 		extern static IntPtr CGPathCreateMutableCopyByTransformingPath (IntPtr handle, ref CGAffineTransform transform);
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		extern static IntPtr CGPathCreateWithEllipse (NSRect boundingRect, ref CGAffineTransform transform);
+		extern static IntPtr CGPathCreateWithEllipseInRect (NSRect boundingRect, ref CGAffineTransform transform);
 
 		[Since (5,0)]
 		static public CGPath EllipseFromRect (RectangleF boundingRect, CGAffineTransform transform)
 		{
 #if MAC64
-			return MakeMutable (CGPathCreateWithEllipse (new NSRect(boundingRect), ref transform));
+			return MakeMutable (CGPathCreateWithEllipseInRect (new NSRect(boundingRect), ref transform));
 #else
-			return MakeMutable (CGPathCreateWithEllipse (boundingRect, ref transform));
+			return MakeMutable (CGPathCreateWithEllipseInRect (boundingRect, ref transform));
 #endif
 		}
 

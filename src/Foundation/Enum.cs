@@ -112,6 +112,13 @@ namespace MonoMac.Foundation  {
 		MutableContainersAndLeaves = 2
 	}
 
+	[Flags]
+	public enum NSMachPortRights {
+		None = 0,
+		SendRight = (1 << 0),
+		ReceiveRight = (1 << 1)
+	}
+
 	public enum NSNetServicesStatus {
 		UnknownError = -72000,
 		CollisionError = -72001,
@@ -372,7 +379,7 @@ namespace MonoMac.Foundation  {
 		EndsWith,
 		In,
 		CustomSelector,
-		Contains,
+		Contains = 99,
 		Between
 	}
 
@@ -382,9 +389,10 @@ namespace MonoMac.Foundation  {
 #else
 	public enum NSComparisonPredicateOptions {
 #endif
-		None=0x00,
-		CaseInsensitive=0x01,
-		DiacriticInsensitive=0x02
+		None                 = 0x00,
+		CaseInsensitive      = 1<<0,
+		DiacriticInsensitive = 1<<1,
+		Normalized           = 1<<2
 	}	
 	
 	public enum NSCompoundPredicateType {
@@ -721,4 +729,11 @@ namespace MonoMac.Foundation  {
 		Background,
 		Voice
 	}
+
+	[Flags]
+	public enum NSSortOptions {
+		Concurrent = 1 << 0,
+		Stable = 1 << 4
+	}
+	
 }

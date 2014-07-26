@@ -188,7 +188,7 @@ namespace MonoMac.Foundation {
 #endif
 		}
 		
-		internal void Release () {
+		public void Release () {
 #if MONOMAC
 			Messaging.void_objc_msgSend (handle, Selector.ReleaseHandle);
 #else
@@ -196,12 +196,23 @@ namespace MonoMac.Foundation {
 #endif
 		}
 		
-		internal void Retain () {
+		public NSObject Retain () {
 #if MONOMAC
 			Messaging.void_objc_msgSend (handle, Selector.RetainHandle);
 #else
 			Messaging.void_objc_msgSend (handle, Selector.GetHandle (Selector.Retain));
 #endif
+			return this;
+		}
+
+		public NSObject Autorelease ()
+		{
+#if MONOMAC
+			Messaging.void_objc_msgSend (handle, Selector.AutoreleaseHandle);
+#else
+			Messaging.void_objc_msgSend (handle, Selector.GetHandle (Selector.Autorelease));
+#endif
+			return this;
 		}
 		
 		public IntPtr SuperHandle {

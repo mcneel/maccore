@@ -255,7 +255,7 @@ namespace MonoMac.AVFoundation {
 	}
 
 	[Since (5,0)]
-	[Static, Internal]
+	[Static]
 	interface AVVideoScalingModeKey
 	{
 		[Field ("AVVideoScalingModeFit")]
@@ -962,6 +962,7 @@ namespace MonoMac.AVFoundation {
 		AVKeyValueStatus StatusOfValue (string key, out NSError error);
 
 		[Export ("loadValuesAsynchronouslyForKeys:completionHandler:")]
+		[Async ("LoadValuesTaskAsync")]
 		void LoadValuesAsynchronously (string [] keys, NSAction handler);
 #if !MONOMAC
 		[Since (6,0)]
@@ -1165,10 +1166,10 @@ namespace MonoMac.AVFoundation {
 		AVAssetReaderVideoCompositionOutput Create (AVAssetTrack [] videoTracks, [NullAllowed] CVPixelBufferAttributes settings);
 
 		[Export ("initWithVideoTracks:videoSettings:")]
-		IntPtr Constructor (AVAssetTrack [] videoTracks, NSDictionary videoSettings);
+		IntPtr Constructor (AVAssetTrack [] videoTracks, [NullAllowed] NSDictionary videoSettings);
 
 		[Wrap ("this (videoTracks, settings == null ? null : settings.Dictionary)")]
-		IntPtr Constructor (AVAssetTrack [] videoTracks, CVPixelBufferAttributes settings);		
+		IntPtr Constructor (AVAssetTrack [] videoTracks, [NullAllowed] CVPixelBufferAttributes settings);		
 
 		[Export ("videoSettings")]
 		NSDictionary WeakVideoSettings { get; }
@@ -1287,6 +1288,7 @@ namespace MonoMac.AVFoundation {
 #if !MONOMAC
 		[Since (6,0)]
 		[Export ("finishWritingWithCompletionHandler:")]
+		[Async]
 		void FinishWriting (NSAction completionHandler);
 #endif
 		[Export ("movieTimeScale")]
@@ -2443,6 +2445,7 @@ namespace MonoMac.AVFoundation {
 		AVKeyValueStatus StatusOfValueForKeyerror (string key, out NSError error);
 
 		[Export ("loadValuesAsynchronouslyForKeys:completionHandler:")]
+		[Async ("LoadValuesTaskAsync")]
 		void LoadValuesAsynchronously (string [] keys, NSAction handler);
 
 		[Since (6,0)]
@@ -2709,6 +2712,7 @@ namespace MonoMac.AVFoundation {
 		IntPtr Constructor (AVAsset asset, string presetName);
 
 		[Export ("exportAsynchronouslyWithCompletionHandler:")]
+		[Async ("ExportTaskAsync")]
 		void ExportAsynchronously (AVCompletionHandler handler);
 
 		[Export ("cancelExport")]
@@ -2750,10 +2754,12 @@ namespace MonoMac.AVFoundation {
 #if !MONOMAC
 		[Since (6,0)]
 		[Static, Export ("determineCompatibilityOfExportPreset:withAsset:outputFileType:completionHandler:")]
+		[Async]
 		void DetermineCompatibilityOfExportPreset (string presetName, AVAsset asset, string outputFileType, Action<bool> isCompatibleResult);
 
 		[Since (6,0)]
 		[Export ("determineCompatibleFileTypesWithCompletionHandler:")]
+		[Async]
 		void DetermineCompatibleFileTypes (Action<string []> compatibleFileTypesHandler);
 #endif
 	}
@@ -3463,6 +3469,7 @@ namespace MonoMac.AVFoundation {
 		AVVideoSettingsCompressed CompressedVideoSetting { get; set; }
 
 		[Export ("captureStillImageAsynchronouslyFromConnection:completionHandler:")]
+		[Async ("CaptureStillImageTaskAsync")]
 		void CaptureStillImageAsynchronously (AVCaptureConnection connection, AVCaptureCompletionHandler completionHandler);
 
 		[Static, Export ("jpegStillImageNSDataRepresentation:")]
@@ -3710,10 +3717,12 @@ namespace MonoMac.AVFoundation {
 #endif
 		[Since (5,0)]
 		[Export ("seekToTime:completionHandler:")]
+		[Async]
 		void Seek (CMTime time, AVCompletion completion);
 
 		[Since (5,0)]
 		[Export ("seekToTime:toleranceBefore:toleranceAfter:completionHandler:")]
+		[Async]
 		void Seek (CMTime time, CMTime toleranceBefore, CMTime toleranceAfter, AVCompletion completion);
 #if !MONOMAC
 		[Since (6,0)]
@@ -3722,6 +3731,7 @@ namespace MonoMac.AVFoundation {
 
 		[Since (6,0)]
 		[Export ("seekToDate:completionHandler:")]
+		[Async]
 		void Seek (NSDate date, AVCompletion onComplete);
 #endif
 		[Since (6,0)]
@@ -3730,6 +3740,7 @@ namespace MonoMac.AVFoundation {
 
 		[Since (6,0)]
 		[Export ("prerollAtRate:completionHandler:")]
+		[Async]
 		void Preroll (float rate, AVCompletion onComplete);
 
 		[Since (6,0)]
@@ -3966,6 +3977,7 @@ namespace MonoMac.AVFoundation {
 
 		[Since (5,0)]
 		[Export ("seekToTime:completionHandler:")]
+		[Async]
 		void Seek (CMTime time, AVCompletion completion);
 
 		[Since (5,0)]
@@ -3974,6 +3986,7 @@ namespace MonoMac.AVFoundation {
 
 		[Since (5,0)]
 		[Export ("seekToTime:toleranceBefore:toleranceAfter:completionHandler:")]
+		[Async]
 		void Seek (CMTime time, CMTime toleranceBefore, CMTime toleranceAfter, AVCompletion completion);
 #if !MONOMAC
 		[Since (5,0)]
@@ -4005,7 +4018,7 @@ namespace MonoMac.AVFoundation {
 		
 		[Since (6,0)]
 		[Export ("outputs")]
-		AVPlayerItemOutput Outputs { get;  }
+		AVPlayerItemOutput [] Outputs { get;  }
 
 		[Since (6,0)]
 		[Export ("addOutput:")]
@@ -4023,6 +4036,7 @@ namespace MonoMac.AVFoundation {
 #if !MONOMAC
 		[Since (6,0)]
 		[Export ("seekToDate:completionHandler:")]
+		[Async]
 		bool Seek (NSDate date, AVCompletion completion);
 
 		[Since (6,0)]
@@ -4084,8 +4098,9 @@ namespace MonoMac.AVFoundation {
 		[Export ("hasNewPixelBufferForItemTime:")]
 		bool HasNewPixelBufferForItemTime (CMTime itemTime);
 
+		[Protected]
 		[Export ("copyPixelBufferForItemTime:itemTimeForDisplay:")]
-		CVPixelBuffer CopyPixelBuffer (CMTime itemTime, ref CMTime outItemTimeForDisplay);
+		IntPtr WeakCopyPixelBuffer (CMTime itemTime, ref CMTime outItemTimeForDisplay);
 
 		[Export ("setDelegate:queue:")]
 		void SetDelegate (AVPlayerItemOutputPullDelegate delegateClass, DispatchQueue delegateQueue);

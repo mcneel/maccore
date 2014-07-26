@@ -666,6 +666,43 @@ public class CategoryAttribute : Attribute {
 }
 
 //
+// Apply this attribute to a method that you want an async version of a callback method.
+//
+// Use the ResultType or ResultTypeName attribute to describe any composite value to be by the Task object.
+// Use MethodName to customize the name of the generated method
+//
+// Note that this only supports the case where the callback is the last parameter of the method.
+//
+// Like this:
+//[Export ("saveAccount:withCompletionHandler:")] [Async]
+//void SaveAccount (ACAccount account, ACAccountStoreSaveCompletionHandler completionHandler);
+// }
+[AttributeUsage (AttributeTargets.Method, AllowMultiple=false)]
+public class AsyncAttribute : Attribute {
+
+	//This will automagically generate the async method.
+	//This works with 4 kinds of callbacks: (), (NSError), (result), (result, NSError)
+	public AsyncAttribute () {}
+
+	//This works with 2 kinds of callbacks: (...) and (..., NSError).
+	//Parameters are passed in order to a constructor in resultType
+	public AsyncAttribute (Type resultType) {
+		ResultType = resultType;
+	}
+
+	//This works with 2 kinds of callbacks: (...) and (..., NSError).
+	//Parameters are passed in order to a result type that is automatically created if size > 1
+	//The generated method is named after the @methodName
+	public AsyncAttribute (string methodName) {
+		MethodName = methodName;
+	}
+
+	public Type ResultType { get; set; }
+	public string MethodName { get; set; }
+	public string ResultTypeName { get; set; }
+}
+
+//
 // Used to encapsulate flags about types in either the parameter or the return value
 // For now, it only supports the [PlainString] attribute on strings.
 //
@@ -807,6 +844,112 @@ public class GeneratedType {
 	}
 }
 
+public class MemberInformation
+{
+	public readonly bool is_abstract, is_protected, is_internal, is_override, is_new, is_sealed, is_static, is_thread_static, is_autorelease, is_wrapper;
+	public readonly Generator.ThreadCheck threadCheck;
+	public bool is_unsafe, is_virtual_method, is_export, is_category_extension, is_variadic;
+	public string selector, wrap_method;
+
+	MemberInformation (MemberInfo mi, Type type)
+	{
+		is_abstract = Generator.HasAttribute (mi, typeof (AbstractAttribute)) && mi.DeclaringType == type;
+		is_protected = Generator.HasAttribute (mi, typeof (ProtectedAttribute));
+		is_internal = Generator.HasAttribute (mi, typeof (InternalAttribute));
+		is_override = Generator.HasAttribute (mi, typeof (OverrideAttribute)) || !Generator.MemberBelongsToType (mi.DeclaringType, type);
+		is_new = Generator.HasAttribute (mi, typeof (NewAttribute));
+		is_sealed = Generator.HasAttribute (mi, typeof (SealedAttribute));
+		is_static = Generator.HasAttribute (mi, typeof (StaticAttribute));
+		is_thread_static = Generator.HasAttribute (mi, typeof (IsThreadStaticAttribute));
+		is_autorelease = Generator.HasAttribute (mi, typeof (AutoreleaseAttribute));
+		is_wrapper = !Generator.HasAttribute (mi.DeclaringType, typeof(SyntheticAttribute));
+		threadCheck = Generator.HasAttribute (mi, typeof (ThreadSafeAttribute)) ? Generator.ThreadCheck.Off : Generator.ThreadCheck.On;
+
+	}
+
+	public MemberInformation (MethodInfo mi, Type type, Type category_extension_type) : this ((MemberInfo)mi, type)
+	{
+		foreach (ParameterInfo pi in mi.GetParameters ())
+			if (pi.ParameterType.IsSubclassOf (typeof (Delegate)))
+				is_unsafe = true;
+
+		object [] attr = mi.GetCustomAttributes (typeof (ExportAttribute), true);
+		if (attr.Length != 1){
+			attr = mi.GetCustomAttributes (typeof (BindAttribute), true);
+			if (attr.Length != 1) {
+				attr = mi.GetCustomAttributes (typeof (WrapAttribute), true);
+				if (attr.Length != 1)
+					throw new BindingException (1012, true, "No Export or Bind attribute defined on {0}.{1}", type, mi.Name);
+
+				wrap_method = ((WrapAttribute) attr [0]).MethodName;
+			} else {
+				BindAttribute ba = (BindAttribute) attr [0];
+				selector = ba.Selector;
+				is_virtual_method = ba.Virtual;
+			}
+		} else {
+			ExportAttribute ea = (ExportAttribute) attr [0];
+			selector = ea.Selector;
+			is_variadic = ea.IsVariadic;
+
+			if (!is_sealed || !is_wrapper) {
+				is_virtual_method = mi.Name != "Constructor";
+				is_export = true;
+			}
+		}
+
+		if (category_extension_type != null)
+			is_category_extension = true;
+
+		if (is_static || is_category_extension)
+			is_virtual_method = false;
+	}
+
+	public MemberInformation (PropertyInfo pi, Type type) : this ((MemberInfo)pi, type)
+	{
+		if (pi.PropertyType.IsSubclassOf (typeof (Delegate)))
+			is_unsafe = true;
+
+		var export = Generator.GetExportAttribute (pi, out wrap_method);
+		if (export != null)
+			selector = export.Selector;
+
+		if (wrap_method != null)
+			is_virtual_method = false;
+		else
+			is_virtual_method = !is_static;
+	}
+
+	public string GetVisibility ()
+	{
+		var mod = is_protected ? "protected" : null;
+		mod += is_internal ? "internal" : null;
+		if (string.IsNullOrEmpty (mod))
+			mod = "public";
+		return mod;
+	}
+
+	public string GetModifiers ()
+	{
+		string mods = "";
+
+		mods += is_unsafe ? "unsafe " : null;
+		mods += is_new ? "new " : "";
+
+		if (is_sealed) {
+			mods += "";
+		} else if (is_static || is_category_extension) {
+			mods += "static ";
+		} else if (is_abstract) {
+			mods += "abstract ";
+		} else if (is_virtual_method) {
+			mods += is_override ? "override " : "virtual ";
+		}
+
+	    return mods;
+	}
+}
+
 public class Generator {
 	internal static bool IsBtouch;
 
@@ -823,6 +966,9 @@ public class Generator {
 	Dictionary<Type,Type> delegates_emitted = new Dictionary<Type, Type> ();
 	Dictionary<Type,Type> notification_event_arg_types = new Dictionary<Type,Type> ();
 	List <string> libraries = new List <string> ();
+
+	List<Tuple<string, ParameterInfo[]>> async_result_types = new List<Tuple <string, ParameterInfo[]>> ();
+	HashSet<string> async_result_types_emitted = new HashSet<string> ();
 
 	//
 	// This contains delegates that are referenced in the source and need to be generated.
@@ -881,6 +1027,7 @@ public class Generator {
 	
 	public bool BindThirdPartyLibrary = false;
 	public bool InlineSelectors;
+	public bool NativeExceptionMarshalling = false;
 	public string BaseDir { get { return basedir; } set { basedir = value; }}
 	string basedir;
 	public List<string> GeneratedFiles = new List<string> ();
@@ -1302,7 +1449,7 @@ public class Generator {
 		return null;
 	}
 	
-	public T GetAttribute<T> (ICustomAttributeProvider mi) where T: class
+	public static T GetAttribute<T> (ICustomAttributeProvider mi) where T: class
 	{
 		object [] a = mi.GetCustomAttributes (typeof (T), true);
 		if (a.Length > 0)
@@ -1331,9 +1478,11 @@ public class Generator {
 	string MakeSig (string send, bool stret, MethodInfo mi)
 	{
 		var sb = new StringBuilder ();
-
-#if !MONOMAC
-		if (HasAttribute (mi, typeof (MarshalNativeExceptionsAttribute)))
+		
+		if (NativeExceptionMarshalling && HasAttribute (mi, typeof (MarshalNativeExceptionsAttribute)))
+#if MONOMAC
+			sb.Append ("monomac_");
+#else
 			sb.Append ("monotouch_");
 #endif
 		
@@ -1401,7 +1550,7 @@ public class Generator {
 			return;
 		}
 
-		if (method_name.StartsWith ("monotouch_")) {
+		if (method_name.StartsWith ("monotouch_") || method_name.StartsWith ("monomac_")) {
 			print (m, "\t\t[DllImport (\"__Internal\", EntryPoint=\"{0}\")]", method_name);
 		} else {
 			print (m, "\t\t[DllImport (LIBOBJC_DYLIB, EntryPoint=\"{0}\")]", entry_point);
@@ -1519,7 +1668,7 @@ public class Generator {
 		marshal_types.Add (new MarshalType (typeof (CGContext), "IntPtr", "{0}.Handle", "new CGContext ("));
 		marshal_types.Add (new MarshalType (typeof (CGImage), "IntPtr", "{0}.Handle", "new CGImage ("));
 		marshal_types.Add (new MarshalType (typeof (NSObject), "IntPtr", "{0}.Handle", "Runtime.GetNSObject ("));
-		marshal_types.Add (new MarshalType (typeof (Selector), "IntPtr", "{0}.Handle", "new Selector ("));
+		marshal_types.Add (new MarshalType (typeof (Selector), "IntPtr", "{0}.Handle", "Selector.FromHandle ("));
 		marshal_types.Add (new MarshalType (typeof (Class), "IntPtr", "{0}.Handle", "new Class ("));
 		marshal_types.Add (new MarshalType (typeof (NSString), "IntPtr", "{0}.Handle", "new NSString ("));
 		marshal_types.Add (new MarshalType (typeof (CFRunLoop), "IntPtr", "{0}.Handle", "new CFRunLoop ("));
@@ -1664,6 +1813,8 @@ public class Generator {
 					else if (attr is MarshalNativeExceptionsAttribute)
 						continue;
 					else if (attr is WrapAttribute)
+						continue;
+					else if (attr is AsyncAttribute)
 						continue;
 					else 
 						throw new BindingException (1007, true, "Unknown attribute {0} on {1}", attr.GetType (), t);
@@ -1840,7 +1991,7 @@ public class Generator {
 				continue;
 		
 			print ("namespace {0} {{", eventType.Namespace); indent++;
-			print ("public class {0} : NSNotificationEventArgs {{", eventType.Name); indent++;
+			print ("public partial class {0} : NSNotificationEventArgs {{", eventType.Name); indent++;
 			print ("public {0} (NSNotification notification) : base (notification) \n{{\n}}\n", eventType.Name);
 			int i = 0;
 			foreach (var prop in eventType.GetProperties (BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)){
@@ -1848,6 +1999,7 @@ public class Generator {
 				if (attrs.Length == 0)
 					throw new BindingException (1010, true, "No Export attribute on {0}.{1} property", eventType, prop.Name);
 
+				var @internal = prop.GetCustomAttributes (typeof (InternalAttribute), true).FirstOrDefault ();
 				var export = attrs [0] as ExportAttribute;
 				var use_export_as_string_constant = export.ArgumentSemantic != ArgumentSemantic.None;
 				var null_allowed = HasAttribute (prop, typeof (NullAllowedAttribute));
@@ -1858,7 +2010,11 @@ public class Generator {
 
 				string kn = "k" + (i++);
 				if (use_export_as_string_constant){
-					print ("public {0}{1} {2} {{\n\tget {{\n", propertyType, nullable_type ? "?" : "", prop.Name);
+					print ("{0} {1}{2} {3} {{\n\tget {{\n",
+						@internal == null ? "public" : "internal",
+						propertyType,
+						nullable_type ? "?" : "",
+						prop.Name);
 					indent += 2;
 					print ("IntPtr value;");
 					print ("using (var str = new NSString (\"{0}\")){{", export.Selector);
@@ -1867,8 +2023,16 @@ public class Generator {
 				} else {
 					var lib = propNamespace.Substring (propNamespace.IndexOf (".") + 1);
 					print ("static IntPtr {0};", kn);
-					print ("public {0}{1} {2} {{\n\tget {{\n", propertyType, nullable_type ? "?" : "", prop.Name); indent += 2;
-					print ("IntPtr value; if ({0} == IntPtr.Zero)\n\t{0} = {1}.ObjCRuntime.Dlfcn.SlowGetIntPtr (Constants.{2}Library, \"{3}\");", kn, MainPrefix, lib, export.Selector);
+					print ("{0} {1}{2} {3} {{\n\tget {{\n",
+						@internal == null ? "public" : "internal",
+						propertyType,
+						nullable_type ? "?" : "",
+						prop.Name);
+					indent += 2;
+					if (BindThirdPartyLibrary)
+						print ("IntPtr value; if ({0} == IntPtr.Zero)\n\t{0} = {1}.ObjCRuntime.Dlfcn.GetIntPtr (Libraries.__Internal.Handle, \"{2}\");", kn, MainPrefix, export.Selector);
+					else
+						print ("IntPtr value; if ({0} == IntPtr.Zero)\n\t{0} = {1}.ObjCRuntime.Dlfcn.GetIntPtr (Libraries.{2}.Handle, \"{3}\");", kn, MainPrefix, lib, export.Selector);
 				}
 				if (null_allowed || probe_presence){
 					if (probe_presence)
@@ -2087,13 +2251,26 @@ public class Generator {
 	//
 	public string MakeSignature (MethodInfo mi, out bool ctor, Type category_class)
 	{
+		return MakeSignature (mi, out ctor, false, category_class, mi.GetParameters ());
+	}
+
+	public string GetAsyncName (MethodInfo mi)
+	{
+		var attr = GetAttribute<AsyncAttribute> (mi);
+		if (attr.MethodName != null)
+			return attr.MethodName;
+		return mi.Name + "Async";
+	}
+
+	public string MakeSignature (MethodInfo mi, out bool ctor, bool is_async, Type category_class, ParameterInfo[] parameters)
+	{
 		StringBuilder sb = new StringBuilder ();
 		ctor = mi.Name == "Constructor";
-		string name =  ctor ? mi.DeclaringType.Name : mi.Name;
+		string name =  ctor ? mi.DeclaringType.Name : is_async ? GetAsyncName (mi) : mi.Name;
 
 		if (mi.Name == "AutocapitalizationType"){
 		}
-		if (!ctor){
+		if (!ctor && !is_async){
 			sb.Append (FormatType (mi.DeclaringType, mi.ReturnType));
 			sb.Append (" ");
 		}
@@ -2108,7 +2285,7 @@ public class Generator {
 			sb.Append (" This");
 			comma = true;
 		}
-		foreach (var pi in mi.GetParameters ()){
+		foreach (var pi in parameters){
 			if (comma)
 				sb.Append (", ");
 			comma = true;
@@ -2135,6 +2312,7 @@ public class Generator {
 		"System.Runtime.InteropServices",
 		"System.Diagnostics",
 		"System.ComponentModel",
+		"System.Threading.Tasks",
 #if MONOMAC
 		"MonoMac",
 		"MonoMac.CoreFoundation",
@@ -2432,11 +2610,11 @@ public class Generator {
 	// The NullAllowed can be applied on a property, to avoid the ugly syntax, we allow it on the property
 	// So we need to pass this as `null_allowed_override',   This should only be used by setters.
 	//
-	public void GenerateMethodBody (Type type, MethodInfo mi, bool virtual_method, bool is_static, string sel, bool null_allowed_override, string var_name, BodyOption body_options, ThreadCheck threadCheck, PropertyInfo propInfo = null, bool is_appearance = false, Type category_type = null)
+	public void GenerateMethodBody (Type type, MemberInformation minfo, MethodInfo mi, string sel, bool null_allowed_override, string var_name, BodyOption body_options, PropertyInfo propInfo = null, bool is_appearance = false, Type category_type = null)
 	{
 		CurrentMethod = String.Format ("{0}.{1}", type.Name, mi.Name);
-		
-		bool needs_thread_check = type_needs_thread_checks && threadCheck == ThreadCheck.On;
+
+		bool needs_thread_check = type_needs_thread_checks && minfo.threadCheck == ThreadCheck.On;
 		string selector = SelectorField (sel);
 		var args = new StringBuilder ();
 		var convs = new StringBuilder ();
@@ -2607,33 +2785,33 @@ public class Generator {
 		}
 		
 		bool needs_temp = use_temp_return || disposes.Length > 0;
-		if (virtual_method || mi.Name == "Constructor"){
+		if (minfo.is_virtual_method || mi.Name == "Constructor"){
 			//print ("if (this.GetType () == typeof ({0})) {{", type.Name);
 			if (external) {
-				GenerateInvoke (false, mi, selector, args.ToString (), needs_temp, is_static, category_type);
+				GenerateInvoke (false, mi, selector, args.ToString (), needs_temp, minfo.is_static, category_type);
 			} else {
 				if (BindThirdPartyLibrary && mi.Name == "Constructor"){
 					print (init_binding_type);
 				}
 				
-				var may_throw = HasAttribute (mi, typeof (MarshalNativeExceptionsAttribute));
-				
-				if (may_throw) {
+				var may_throw = NativeExceptionMarshalling && HasAttribute (mi, typeof (MarshalNativeExceptionsAttribute));
+				var null_handle = may_throw && mi.Name == "Constructor";
+				if (null_handle) {
 					print ("try {");
 					indent++;
 				}
 				
 				print ("if (IsDirectBinding) {{", type.Name);
 				indent++;
-				GenerateInvoke (false, mi, selector, args.ToString (), needs_temp, is_static, category_type);
+				GenerateInvoke (false, mi, selector, args.ToString (), needs_temp, minfo.is_static, category_type);
 				indent--;
 				print ("} else {");
 				indent++;
-				GenerateInvoke (true, mi, selector, args.ToString (), needs_temp, is_static, category_type);
+				GenerateInvoke (true, mi, selector, args.ToString (), needs_temp, minfo.is_static, category_type);
 				indent--;
 				print ("}");
 				
-				if (may_throw) {
+				if (null_handle) {
 					indent--;
 					print ("} catch {");
 					indent++;
@@ -2644,7 +2822,7 @@ public class Generator {
 				}
 			}
 		} else {
-			GenerateInvoke (false, mi, selector, args.ToString (), needs_temp, is_static, category_type);
+			GenerateInvoke (false, mi, selector, args.ToString (), needs_temp, minfo.is_static, category_type);
 		}
 		
 		if (release_return)
@@ -2745,7 +2923,7 @@ public class Generator {
 	// This is used to determine if the memberType is in the declaring type or in any of the
 	// inherited versions of the type.   We use this now, since we support inlining protocols
 	//
-	static bool MemberBelongsToType (Type memberType, Type hostType)
+	public static bool MemberBelongsToType (Type memberType, Type hostType)
 	{
 		if (memberType == hostType)
 			return true;
@@ -2798,33 +2976,16 @@ public class Generator {
 	{
 		string wrap;
 		var export = GetExportAttribute (pi, out wrap);
-		bool is_static = HasAttribute (pi, typeof (StaticAttribute));
-		bool is_thread_static = HasAttribute (pi, typeof (IsThreadStaticAttribute));
-		bool is_abstract = HasAttribute (pi, typeof (AbstractAttribute)) && pi.DeclaringType == type;
-		bool is_protected = HasAttribute (pi, typeof (ProtectedAttribute));
-		bool is_internal = HasAttribute (pi, typeof (InternalAttribute));
-		bool is_override = HasAttribute (pi, typeof (OverrideAttribute)) || !MemberBelongsToType (pi.DeclaringType,  type);
-		bool is_new = HasAttribute (pi, typeof (NewAttribute));
-		bool is_sealed = HasAttribute (pi, typeof (SealedAttribute));
-		bool is_wrapper = !HasAttribute (pi.DeclaringType, typeof(SyntheticAttribute));
-		bool is_unsafe = false;
-		
-		if (pi.PropertyType.IsSubclassOf (typeof (Delegate)))
-			is_unsafe = true;
+		var minfo = new MemberInformation (pi, type);
 
-		var mod = is_protected ? "protected" : null;
-		mod += is_internal ? "internal" : null;
-		if (string.IsNullOrEmpty (mod))
-			mod = "public";
+		var mod = minfo.GetVisibility ();
 
 		if (wrap != null){
 			print_generated_code ();
 			PrintPropertyAttributes (pi);
-			print ("{0} {1}{2}{3}{4} {5} {{",
+			print ("{0} {1}{2} {3} {{",
 			       mod,
-			       is_unsafe ? "unsafe " : "",
-			       is_new ? "new " : "",
-			       (is_static ? "static " : ""),
+			       minfo.GetModifiers (),
 			       FormatType (pi.DeclaringType,  pi.PropertyType),
 			       pi.Name);
 			indent++;
@@ -2862,36 +3023,30 @@ public class Generator {
 		}
 
 		string var_name = null;
-		string override_mod;
 		
 		if (wrap == null) {
 			// [Model] has properties that only throws, so there's no point in adding unused backing fields
 			if (!is_model && DoesPropertyNeedBackingField (pi)) {
-				var_name = string.Format ("__mt_{0}_var{1}", pi.Name, is_static ? "_static" : "");
+				var_name = string.Format ("__mt_{0}_var{1}", pi.Name, minfo.is_static ? "_static" : "");
 
 				print ("[CompilerGenerated]");
 
-				if (is_thread_static)
+				if (minfo.is_thread_static)
 					print ("[ThreadStatic]");
-				print ("{1}object {0};", var_name, is_static ? "static " : "");
+				print ("{1}object {0};", var_name, minfo.is_static ? "static " : "");
 
-				if (!is_static){
+				if (!minfo.is_static){
 					instance_fields_to_clear_on_dispose.Add (var_name);
 				}
 			}
-			override_mod = is_sealed ? "" : (is_static ? "static " : (is_abstract ? "abstract " : (is_override ? "override " : "virtual ")));
-		} else {
-			override_mod = is_static ? "static " : "";
 		}
 
 		print_generated_code ();
 		PrintPropertyAttributes (pi);
 
-		print ("{0} {1}{2}{3}{4} {5} {{",
+		print ("{0} {1}{2} {3} {{",
 		       mod,
-		       is_unsafe ? "unsafe " : "",
-		       is_new ? "new " : "",
-		       override_mod,
+		       minfo.GetModifiers (),
 		       FormatType (pi.DeclaringType,  pi.PropertyType),
 		       pi.Name);
 		indent++;
@@ -2910,7 +3065,6 @@ public class Generator {
 			return;			
 		}
 
-		ThreadCheck threadCheck = HasAttribute (pi, typeof (ThreadSafeAttribute)) ? ThreadCheck.Off : ThreadCheck.On;
 		if (pi.CanRead){
 			var getter = pi.GetGetMethod ();
 			var ba = GetBindAttribute (getter);
@@ -2918,13 +3072,13 @@ public class Generator {
 
 			PrintPlatformAttributes (pi);
 
-			if (!is_sealed || !is_wrapper) {
+			if (!minfo.is_sealed || !minfo.is_wrapper) {
 				if (export.ArgumentSemantic != ArgumentSemantic.None)
 					print ("[Export (\"{0}\", ArgumentSemantic.{1})]", sel, export.ArgumentSemantic);
 				else
 					print ("[Export (\"{0}\")]", sel);
 			}
-			if (is_abstract){
+			if (minfo.is_abstract){
 				print ("get; ");
 			} else {
 				print ("get {");
@@ -2933,15 +3087,23 @@ public class Generator {
 				if (is_model)
 					print ("\tthrow new ModelNotImplementedException ();");
 				else {
+					if (minfo.is_autorelease) {
+						indent++;
+						print ("using (var autorelease_pool = new NSAutoreleasePool ()) {");
+					}
 					if (!DoesPropertyNeedBackingField (pi)) {
-						GenerateMethodBody (type, getter, !is_static, is_static, sel, false, null, BodyOption.None, threadCheck, pi);
-					} else if (is_static) {
-						GenerateMethodBody (type, getter, !is_static, is_static, sel, false, var_name, BodyOption.StoreRet, threadCheck, pi);
+						GenerateMethodBody (type, minfo, getter, sel, false, null, BodyOption.None, pi);
+					} else if (minfo.is_static) {
+						GenerateMethodBody (type, minfo, getter, sel, false, var_name, BodyOption.StoreRet, pi);
 					} else {
 						if (DoesPropertyNeedDirtyCheck (pi, export))
-							GenerateMethodBody (type, getter, !is_static, is_static, sel, false, var_name, BodyOption.CondStoreRet, threadCheck, pi);
+							GenerateMethodBody (type, minfo, getter, sel, false, var_name, BodyOption.CondStoreRet, pi);
 						else
-							GenerateMethodBody (type, getter, !is_static, is_static, sel, false, var_name, BodyOption.MarkRetDirty, threadCheck, pi);
+							GenerateMethodBody (type, minfo, getter, sel, false, var_name, BodyOption.MarkRetDirty, pi);
+					}
+					if (minfo.is_autorelease) {
+						print ("}");
+						indent--;
 					}
 				}
 				print ("}\n");
@@ -2963,13 +3125,13 @@ public class Generator {
 
 			PrintPlatformAttributes (pi);
 
-			if (!not_implemented && (!is_sealed || !is_wrapper)){
+			if (!not_implemented && (!minfo.is_sealed || !minfo.is_wrapper)){
 				if (export.ArgumentSemantic != ArgumentSemantic.None)
 					print ("[Export (\"{0}\", ArgumentSemantic.{1})]", sel, export.ArgumentSemantic);
 				else
 					print ("[Export (\"{0}\")]", sel);
 			}
-			if (is_abstract){
+			if (minfo.is_abstract){
 				print ("set; ");
 			} else {
 				print ("set {");
@@ -2980,8 +3142,8 @@ public class Generator {
 				else if (is_model)
 					print ("\tthrow new ModelNotImplementedException ();");
 				else {
-					GenerateMethodBody (type, setter, !is_static, is_static, sel, null_allowed, null, BodyOption.None, threadCheck, pi);
-					if (!is_static && DoesPropertyNeedBackingField (pi)) {
+					GenerateMethodBody (type, minfo, setter, sel, null_allowed, null, BodyOption.None, pi);
+					if (!minfo.is_static && DoesPropertyNeedBackingField (pi)) {
 						if (DoesPropertyNeedDirtyCheck (pi, export)) {
 #if !MONOMAC
 							print ("\tif (!IsNewRefcountEnabled ())");
@@ -3002,45 +3164,148 @@ public class Generator {
 		print ("}}\n", pi.Name);
 	}
 
-	void GenerateMethod (Type type, MethodInfo mi, bool is_model, Type category_extension_type, bool is_appearance)
+	class AsyncMethodInfo : MemberInformation {
+		public Type type;
+		public MethodInfo mi;
+		public Type category_extension_type;
+		public ParameterInfo[] async_initial_params, async_completion_params;
+		public bool has_nserror, is_void_async, is_single_arg_async;
+
+		public AsyncMethodInfo (Type type, MethodInfo mi, Type category_extension_type) : base (mi, type, category_extension_type)
+		{
+			this.mi = mi;
+			this.type = type;
+			this.category_extension_type = category_extension_type;
+			this.async_initial_params = Generator.DropLast (mi.GetParameters ());
+
+			//FIXME do proper error handling if the last parameter is not a delegate
+			var cbParams = mi.GetParameters ().Last ().ParameterType.GetMethod ("Invoke").GetParameters ();
+			async_completion_params = cbParams;
+
+			//WTF this fails: cbParams.Last ().ParameterType.Name == typeof (NSError)
+			if (cbParams.Length > 0 && cbParams.Last ().ParameterType.Name == "NSError") {
+				has_nserror = true;
+				cbParams = Generator.DropLast (cbParams);
+			}
+			if (cbParams.Length == 0)
+				is_void_async = true;
+			if (cbParams.Length == 1)
+				is_single_arg_async = true;
+		}
+	}
+
+	public static T[] DropLast<T> (T[] arr)
 	{
-		foreach (ParameterInfo pi in mi.GetParameters ())
-			if (HasAttribute (pi, typeof (RetainAttribute))){
-				print ("#pragma warning disable 168");
-				print ("{0} __mt_{1}_{2};", pi.ParameterType, mi.Name, pi.Name);
-				print ("#pragma warning restore 168");
-			}
+		T[] res = new T [arr.Length - 1];
+		Array.Copy (arr, res, res.Length);
+		return res;
+	}
 
-		bool is_sealed = HasAttribute (mi, typeof (SealedAttribute));
-		bool is_wrapper = !HasAttribute (type, typeof(SyntheticAttribute));
-		string selector = null;
-		bool virtual_method = false;
-		string wrap_method = null;
-		object [] attr = mi.GetCustomAttributes (typeof (ExportAttribute), true);
-		if (attr.Length != 1){
-			attr = mi.GetCustomAttributes (typeof (BindAttribute), true);
-			if (attr.Length != 1) {
-				attr = mi.GetCustomAttributes (typeof (WrapAttribute), true);
-				if (attr.Length != 1)
-					throw new BindingException (1012, true, "No Export or Bind attribute defined on {0}.{1}", type, mi.Name);
+	string GetReturnType (AsyncMethodInfo minfo)
+	{
+		if (minfo.is_void_async)
+			return "Task";
+		return "Task<" + GetAsyncTaskType (minfo) + ">";
+	}
 
-				wrap_method = ((WrapAttribute) attr [0]).MethodName;
-			} else {
-				BindAttribute ba = (BindAttribute) attr [0];
-				selector = ba.Selector;
-				virtual_method = ba.Virtual;
-			}
-		} else {
-			ExportAttribute ea = (ExportAttribute) attr [0];
-			selector = ea.Selector;
-					
-			if (!is_sealed || !is_wrapper) {
-				var is_variadic = ea.IsVariadic ? ", IsVariadic = true" : string.Empty;
-				print ("[Export (\"{0}\"{1})]", ea.Selector, is_variadic);
-				virtual_method = mi.Name != "Constructor";
-			}
+	string GetAsyncTaskType (AsyncMethodInfo minfo)
+	{
+		if (minfo.is_single_arg_async)
+			return FormatType (minfo.type, minfo.async_completion_params [0].ParameterType);
+
+		var attr = GetAttribute<AsyncAttribute> (minfo.mi);
+		if (attr.ResultTypeName != null)
+			return attr.ResultTypeName;
+		if (attr.ResultType != null)
+			return FormatType (minfo.type, attr.ResultType);
+
+		throw new BindingException (1023, true, "Async method {0} with more than one result parameter in the callback by neither ResultTypeName or ResultType", minfo.mi);
+	}
+
+	string GetInvokeParamList (ParameterInfo[] parameters)
+	{
+		StringBuilder sb = new StringBuilder ();
+		bool comma = false;
+		foreach (var pi in parameters) {
+			if (comma)
+				sb.Append (", ");
+			comma = true;
+			sb.Append (pi.Name);
+		}
+		return sb.ToString ();
+	}
+
+	void PrintAsyncHeader (AsyncMethodInfo minfo)
+	{
+		bool ctor;
+
+		print_generated_code ();
+		print ("{0} {1}{2} {3}",
+			minfo.GetVisibility (),
+			minfo.GetModifiers (),
+			GetReturnType (minfo),
+			MakeSignature (minfo.mi, out ctor, true, minfo.category_extension_type, minfo.async_initial_params),
+		    minfo.is_abstract ? ";" : "");
+	}
+
+	void GenerateAsyncMethod (Type type, MethodInfo mi, Type category_extension_type)
+	{
+		var minfo = new AsyncMethodInfo (type, mi, category_extension_type);
+
+		PrintMethodAttributes (mi);
+
+		PrintAsyncHeader (minfo);
+		if (minfo.is_abstract)
+			return;
+
+		print ("{");
+		indent++;
+
+		if (minfo.is_void_async)
+			print ("var tcs = new TaskCompletionSource<bool> ();");
+		else
+			print ("var tcs = new TaskCompletionSource<{0}> ();", GetAsyncTaskType (minfo));
+		print ("{0}({1}{2}({3}) => {{",
+			mi.Name,
+			GetInvokeParamList (minfo.async_initial_params),
+			minfo.async_initial_params.Length > 0 ? ", " : "",
+			GetInvokeParamList (minfo.async_completion_params));
+		indent++;
+
+		int nesting_level = 1;
+		if (minfo.has_nserror) {
+			var var_name = minfo.async_completion_params.Last ().Name;
+			print ("if ({0} != null)", var_name);
+			print ("\ttcs.SetException (new NSErrorException({0}));", var_name);
+			print ("else");
+			++nesting_level; ++indent;
 		}
 
+		if (minfo.is_void_async)
+			print ("tcs.SetResult (true);");
+		else if (minfo.is_single_arg_async)
+			print ("tcs.SetResult ({0});", minfo.async_completion_params [0].Name);
+		else
+			print ("tcs.SetResult (new {0} ({1}));",
+				GetAsyncTaskType (minfo),
+				GetInvokeParamList (minfo.has_nserror ? DropLast (minfo.async_completion_params) : minfo.async_completion_params));
+		indent -= nesting_level;
+		print ("});");
+		print ("return tcs.Task;");
+		indent--;
+		print ("}\n");
+
+		var attr = GetAttribute<AsyncAttribute> (mi);
+		if (attr.ResultTypeName != null) {
+			if (minfo.has_nserror)
+				async_result_types.Add (new Tuple<string, ParameterInfo[]> (attr.ResultTypeName, DropLast (minfo.async_completion_params)));
+			else
+				async_result_types.Add (new Tuple<string, ParameterInfo[]> (attr.ResultTypeName, minfo.async_completion_params));
+		}
+	}
+
+	void PrintMethodAttributes (MethodInfo mi)
+	{
 		foreach (ObsoleteAttribute oa in mi.GetCustomAttributes (typeof (ObsoleteAttribute), false)) {
 			print ("[Obsolete (\"{0}\", {1})]",
 			       oa.Message, oa.IsError ? "true" : "false");
@@ -3056,45 +3321,39 @@ public class Generator {
 				print ("[EditorBrowsable (EditorBrowsableState.{0})]", ea.State);
 			}
 		}
+	}
 
+	void GenerateMethod (Type type, MethodInfo mi, bool is_model, Type category_extension_type, bool is_appearance)
+	{
+		foreach (ParameterInfo pi in mi.GetParameters ())
+			if (HasAttribute (pi, typeof (RetainAttribute))){
+				print ("#pragma warning disable 168");
+				print ("{0} __mt_{1}_{2};", pi.ParameterType, mi.Name, pi.Name);
+				print ("#pragma warning restore 168");
+			}
+
+
+		var minfo = new MemberInformation (mi, type, category_extension_type);
+		if (minfo.is_export)
+			print ("[Export (\"{0}\"{1})]", minfo.selector, minfo.is_variadic ? ", IsVariadic = true" : string.Empty);
+
+		PrintMethodAttributes (mi);
 		PrintPlatformAttributes (mi);
 
-		bool is_static = HasAttribute (mi, typeof (StaticAttribute));
-		if (is_static || category_extension_type != null)
-			virtual_method = false;
-
-		ThreadCheck threadCheck = HasAttribute (mi, typeof (ThreadSafeAttribute)) ? ThreadCheck.Off : ThreadCheck.On;
-		bool is_abstract = HasAttribute (mi, typeof (AbstractAttribute)) && mi.DeclaringType == type;
-		bool is_protected = HasAttribute (mi, typeof (ProtectedAttribute));
-		bool is_internal = HasAttribute (mi, typeof (InternalAttribute));
-		bool is_override = HasAttribute (mi, typeof (OverrideAttribute)) || !MemberBelongsToType (mi.DeclaringType, type);
-		bool is_new = HasAttribute (mi, typeof (NewAttribute));
-		bool is_unsafe = false;
-		bool is_autorelease = HasAttribute (mi, typeof (AutoreleaseAttribute));
-
-		foreach (ParameterInfo pi in mi.GetParameters ())
-			if (pi.ParameterType.IsSubclassOf (typeof (Delegate)))
-				is_unsafe = true;
-
-		var mod = is_protected ? "protected" : null;
-		mod += is_internal ? "internal" : null;
-		if (string.IsNullOrEmpty (mod))
-			mod = "public";
+		var mod = minfo.GetVisibility ();
 
 		bool ctor;
 		print_generated_code ();
-		print ("{0} {1}{2}{3}{4}{5}",
+		print ("{0} {1}{2}{3}",
 		       mod,
-		       is_unsafe ? "unsafe " : "",
-		       is_new ? "new " : "",
-		       is_sealed ? "" : (is_abstract ? "abstract " : (virtual_method ? (is_override ? "override " : "virtual ") : (is_static || category_extension_type != null ? "static " : ""))),
+		       minfo.GetModifiers (),
 		       MakeSignature (mi, out ctor, category_extension_type),
-		       is_abstract ? ";" : "");
+		       minfo.is_abstract ? ";" : "");
 
-		if (!is_abstract){
+		if (!minfo.is_abstract){
 			if (ctor) {
 				indent++;
-				print (": {0}", wrap_method == null ? "base (NSObjectFlag.Empty)" : wrap_method);
+				print (": {0}", minfo.wrap_method == null ? "base (NSObjectFlag.Empty)" : minfo.wrap_method);
 				indent--;
 			}
 
@@ -3104,27 +3363,31 @@ public class Generator {
 					
 			if (is_model)
 				print ("\tthrow new You_Should_Not_Call_base_In_This_Method ();");
-			else if (wrap_method != null) {
+			else if (minfo.wrap_method != null) {
 				if (!ctor) {
 					indent++;
 
 					string ret = mi.ReturnType == typeof (void) ? null : "return ";
-					print ("{0}{1};", ret, wrap_method);
+					print ("{0}{1};", ret, minfo.wrap_method);
 					indent--;
 				}
 			} else {
-				if (is_autorelease) {
+				if (minfo.is_autorelease) {
 					indent++;
 					print ("using (var autorelease_pool = new NSAutoreleasePool ()) {");
 				}
-				GenerateMethodBody (type, mi, virtual_method, is_static, selector, false, null, BodyOption.None, threadCheck, null, is_appearance, category_extension_type);
-				if (is_autorelease) {
+				GenerateMethodBody (type, minfo, mi, minfo.selector, false, null, BodyOption.None, null, is_appearance, category_extension_type);
+				if (minfo.is_autorelease) {
 					print ("}");
 					indent--;
 				}
 			}
 			print ("}\n");
 		}
+
+		if (mi.IsDefined (typeof (AsyncAttribute), false))
+			GenerateAsyncMethod (type, mi, category_extension_type);
+
 	}
 	
 	public string GetGeneratedTypeName (Type type)
@@ -3189,6 +3452,8 @@ public class Generator {
 			bool is_static_class = type.GetCustomAttributes (typeof (StaticAttribute), true).Length > 0 || is_category_class;
 			bool is_model = type.GetCustomAttributes (typeof (ModelAttribute), true).Length > 0;
 			bool is_protocol = HasAttribute (type, typeof (ProtocolAttribute));
+			string class_visibility = HasAttribute (type, typeof (InternalAttribute)) ? "internal" : "public";
+
 			var default_ctor_visibility = GetAttribute<DefaultCtorVisibilityAttribute> (type);
 			object [] btype = type.GetCustomAttributes (typeof (BaseTypeAttribute), true);
 			BaseTypeAttribute bta = btype.Length > 0 ? ((BaseTypeAttribute) btype [0]) : null;
@@ -3219,7 +3484,8 @@ public class Generator {
 
 			PrintPlatformAttributes (type);
 
-			print ("public unsafe {0}partial class {1} {2} {{",
+			print ("{0} unsafe {1}partial class {2} {3} {{",
+			       class_visibility,
 			       class_mod,
 			       TypeName,
 			       base_type != typeof (object) && TypeName != "NSObject" && !is_category_class ? ": " + FormatType (type, base_type) : "");
@@ -3241,12 +3507,13 @@ public class Generator {
 
 			// Regular bindings (those that are not-static) or categories need this
 			if (!is_static_class || is_category_class){
-				print ("[CompilerGenerated]");
-
 				if (is_category_class)
 					objc_type_name = FormatType (null, bta.BaseType);
 				
-				print ("static readonly IntPtr class_ptr = Class.GetHandle (\"{0}\");\n", is_model ? "NSObject" : objc_type_name);
+				if (!is_model && !external) {
+					print ("[CompilerGenerated]");
+					print ("static readonly IntPtr class_ptr = Class.GetHandle (\"{0}\");\n", objc_type_name);
+				}
 			}
 			
 			if (!is_static_class){
@@ -3676,10 +3943,10 @@ public class Generator {
 							selRespondsToSelector = "selRespondsToSelector";
 						}
 
-						print ("[Export (\"respondsToSelector:\")]");
-						print ("bool _RespondsToSelector (IntPtr selHandle)");
+						print ("public override bool RespondsToSelector (Selector sel)");
 						print ("{");
 						++indent;
+						print ("IntPtr selHandle = sel.Handle;");
 						foreach (var mi in noDefaultValue) {
 							if (InlineSelectors) {
 								var eattrs = mi.GetCustomAttributes (typeof (ExportAttribute), false);
@@ -3744,6 +4011,7 @@ public class Generator {
 			if (!is_static_class){
 				object [] disposeAttr = type.GetCustomAttributes (typeof (DisposeAttribute), true);
 				if (disposeAttr.Length > 0 || instance_fields_to_clear_on_dispose.Count > 0){
+					print ("[CompilerGenerated]");
 					print ("protected override void Dispose (bool disposing)");
 					print ("{");
 					indent++;
@@ -3933,9 +4201,52 @@ public class Generator {
 				indent--; print ("}\n");
 			}
 
+			if (async_result_types.Count > 0) {
+				print ("\n");
+				print ("//");
+				print ("// Async result classes");
+				print ("//");
+			}
+
+			foreach (var async_type in async_result_types) {
+				if (async_result_types_emitted.Contains (async_type.Item1))
+					continue;
+				async_result_types_emitted.Add (async_type.Item1);
+
+				print ("public class {0} {{", async_type.Item1); indent++;
+
+				StringBuilder ctor = new StringBuilder ();
+
+				bool comma = false;
+				foreach (var pi in async_type.Item2) {
+					print ("public {0} {1} {{ get; set; }}",
+						FormatType (type, pi.ParameterType),
+						Capitalize (pi.Name));
+
+					if (comma)
+						ctor.Append (", ");
+					comma = true;
+					ctor.Append (FormatType (type, pi.ParameterType)).Append (" ").Append (pi.Name);
+				}
+
+				print ("\npublic {0} ({1}) {{", async_type.Item1, ctor); indent++;
+				foreach (var pi in async_type.Item2) {
+					print ("this.{0} = {1};", Capitalize (pi.Name), pi.Name);
+				}
+				indent--; print ("}");
+
+				indent--; print ("}\n");
+			}
+			async_result_types.Clear ();
+
 			indent--;
 			print ("}");
 		}
+	}
+
+	static string Capitalize (string str)
+	{
+		return char.ToUpper (str[0]) + str.Substring (1);
 	}
 
 	string GetNotificationCenter (PropertyInfo pi)

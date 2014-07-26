@@ -81,6 +81,7 @@ namespace MonoMac.Foundation
 		NSArray FromObjects (IntPtr array, NSUInteger count);
 
 		[Export ("valueForKey:")]
+		[MarshalNativeExceptions]
 		NSObject ValueForKey (NSString key);
 
 		[Export ("setValue:forKey:")]
@@ -1463,13 +1464,13 @@ namespace MonoMac.Foundation
 
 	[BaseType (typeof (NSData))]
 	public interface NSMutableData {
-		[Static, Export ("dataWithCapacity:")]
+		[Static, Export ("dataWithCapacity:")] [Autorelease]
 		NSMutableData FromCapacity (NSUInteger capacity);
 
-		[Static, Export ("dataWithLength:")]
+		[Static, Export ("dataWithLength:")] [Autorelease]
 		NSMutableData FromLength (NSUInteger length);
 		
-		[Static, Export ("data")]
+		[Static, Export ("data")] [Autorelease]
 		NSMutableData Create ();
 		
 		[Export ("setLength:")]
@@ -1571,13 +1572,13 @@ namespace MonoMac.Foundation
 		[Export ("objectForKey:")]
 		NSObject ObjectForKey (NSObject key);
 
-		[Export ("allKeys")]
+		[Export ("allKeys")][Autorelease]
 		NSObject [] Keys { get; }
 
-		[Export ("allKeysForObject:")]
+		[Export ("allKeysForObject:")][Autorelease]
 		NSObject [] KeysForObject (NSObject obj);
 
-		[Export ("allValues")]
+		[Export ("allValues")][Autorelease]
 		NSObject [] Values { get; }
 
 		[Export ("descriptionInStringsFileFormat")]
@@ -1589,7 +1590,7 @@ namespace MonoMac.Foundation
 		[Export ("objectEnumerator")]
 		NSEnumerator ObjectEnumerator { get; }
 
-		[Export ("objectsForKeys:notFoundMarker:")]
+		[Export ("objectsForKeys:notFoundMarker:")][Autorelease]
 		NSObject [] ObjectsForKeys (NSArray keys, NSObject marker);
 		
 		[Export ("writeToFile:atomically:")]
@@ -2382,8 +2383,9 @@ namespace MonoMac.Foundation
 		[Export ("initWithUUIDString:")]
 		IntPtr Constructor (string str);
 
-		[Export ("initWithUUIDBytes:"), Internal]
-		IntPtr Constructor (IntPtr bytes, bool unused);
+		// bound manually to keep the managed/native signatures identical
+		//[Export ("initWithUUIDBytes:"), Internal]
+		//IntPtr Constructor (IntPtr bytes, bool unused);
 
 		[Export ("getUUIDBytes:"), Internal]
 		void GetUuidBytes (IntPtr uuid);
@@ -2497,7 +2499,15 @@ namespace MonoMac.Foundation
 	
 		[Export ("objectIsForcedForKey:inDomain:")]
 		bool ObjectIsForced (string key, string domain);
-	
+
+		[Field ("NSGlobalDomain")]
+		NSString GlobalDomain { get; }
+
+		[Field ("NSArgumentDomain")]
+		NSString ArgumentDomain { get; }
+
+		[Field ("NSRegistrationDomain")]
+		NSString RegistrationDomain { get; }
 	}
 	
 	[BaseType (typeof (NSObject), Name="NSURL")]
@@ -3075,6 +3085,7 @@ namespace MonoMac.Foundation
 		[Since (5,0)]
 		[Static]
 		[Export ("sendAsynchronousRequest:queue:completionHandler:")]
+		[Async (ResultTypeName = "NSUrlAsyncResult", MethodName="SendRequestAsync")]
 		void SendAsynchronousRequest (NSUrlRequest request, NSOperationQueue queue, NSUrlConnectionDataResponse completionHandler);
 		
 #if !MONOMAC
@@ -3176,8 +3187,9 @@ namespace MonoMac.Foundation
 		//[Export ("certificates")]
 		//IntPtr [] Certificates { get; }
 	
-		[Export ("initWithTrust:")]
-		IntPtr Constructor (IntPtr SecTrustRef_trust, bool ignored);
+		// bound manually to keep the managed/native signatures identical
+		//[Export ("initWithTrust:")]
+		//IntPtr Constructor (IntPtr SecTrustRef_trust, bool ignored);
 	
 		[Static]
 		[Export ("credentialForTrust:")]
@@ -3922,12 +3934,6 @@ namespace MonoMac.Foundation
 		[Static]
 		[Export ("inputStreamWithURL:")]
 		NSInputStream FromUrl (NSUrl url);
-
-		[Export ("_scheduleInCFRunLoop:forMode:")]
-		void ScheduleInCFRunLoop (CFRunLoop runloop, NSString mode);
-
-		[Export ("_unscheduleFromCFRunLoop:forMode:")]
-		void UnscheduleInCFRunLoop (CFRunLoop runloop, NSString mode);
 	}
 
 	//
@@ -3971,6 +3977,7 @@ namespace MonoMac.Foundation
 		bool AutomaticallyNotifiesObserversForKey (string key);
 
 		[Export ("valueForKey:")]
+		[MarshalNativeExceptions]
 		NSObject ValueForKey (NSString key);
 
 		[Export ("setValue:forKey:")]
@@ -4011,7 +4018,7 @@ namespace MonoMac.Foundation
 
 		[Field ("NSKeyValueChangeNotificationIsPriorKey")]
 		NSString ChangeNotificationIsPriorKey { get; }
-
+#if MONOMAC
 		// Cocoa Bindings added by Kenneth J. Pouncey 2010/11/17
 		[Export ("exposedBindings")]
 		NSString[] ExposedBindings ();
@@ -4030,7 +4037,7 @@ namespace MonoMac.Foundation
 
 		[Export ("optionDescriptionsForBinding:")]
 		NSObject[] BindingOptionDescriptions (string aBinding);
-#if MONOMAC
+
 		// NSPlaceholders (informal) protocol
 		[Static]
 		[Export ("defaultPlaceholderForMarker:withBinding:")]
@@ -4039,7 +4046,7 @@ namespace MonoMac.Foundation
 		[Static]
 		[Export ("setDefaultPlaceholder:forMarker:withBinding:")]
 		void SetDefaultPlaceholder (NSObject placeholder, NSObject marker, string binding);
-#endif
+
 		[Export ("objectDidEndEditing:")]
 		void ObjectDidEndEditing (NSObject editor);
 
@@ -4049,7 +4056,7 @@ namespace MonoMac.Foundation
 		[Export ("commitEditingWithDelegate:didCommitSelector:contextInfo:")]
 		//void CommitEditingWithDelegateDidCommitSelectorContextInfo (NSObject objDelegate, Selector didCommitSelector, IntPtr contextInfo);
 		void CommitEditing (NSObject objDelegate, Selector didCommitSelector, IntPtr contextInfo);
-
+#endif
 		[Export ("copy")]
 		NSObject Copy ();
 		
@@ -4185,6 +4192,147 @@ namespace MonoMac.Foundation
 		bool Suspended { [Bind ("isSuspended")]get; set; }
 	}
 
+	[BaseType (typeof (NSObject))]
+	public interface NSOrderedSet {
+		[Export ("initWithObject:")]
+		IntPtr Constructor (NSObject start);
+
+		[Export ("initWithArray:"), Internal]
+		IntPtr Constructor (NSArray array);
+
+		[Export ("initWithSet:")]
+		IntPtr Constructor (NSSet source);
+		
+		[Export ("initWithOrderedSet:")]
+		IntPtr Constructor (NSOrderedSet source);
+
+		[Export ("count")]
+		int Count { get; }
+
+		[Export ("objectAtIndex:"), Internal]
+		NSObject GetObject (int idx);
+
+		[Export ("array"), Internal]
+		IntPtr _ToArray ();
+
+		[Export ("indexOfObject:")]
+		int IndexOf (NSObject obj);
+		
+		[Export ("objectEnumerator"), Internal]
+		NSEnumerator _GetEnumerator ();
+
+		[Export ("set")]
+		NSSet AsSet ();
+
+		[Export ("containsObject:")]
+		bool Contains (NSObject obj);
+
+		[Export ("firstObject")]
+		NSObject FirstObject ();
+
+		[Export ("lastObject")]
+		NSObject LastObject ();
+
+		[Export ("isEqualToOrderedSet:")]
+		bool IsEqualToOrderedSet (NSOrderedSet other);
+
+		[Export ("intersectsOrderedSet:")]
+		bool Intersects (NSOrderedSet other);
+
+		[Export ("intersectsSet:")]
+		bool Intersects (NSSet other);
+		
+		[Export ("isSubsetOfOrderedSet:")]
+		bool IsSubset (NSOrderedSet other);
+		
+		[Export ("isSubsetOfSet:")]
+		bool IsSubset (NSSet other);
+
+		[Export ("reversedOrderedSet")]
+		NSOrderedSet GetReverseOrderedSet ();
+	}
+
+	[BaseType (typeof (NSOrderedSet))]
+	public interface NSMutableOrderedSet {
+		[Export ("initWithObject:")]
+		IntPtr Constructor (NSObject start);
+
+		[Export ("initWithSet:")]
+		IntPtr Constructor (NSSet source);
+
+		[Export ("initWithOrderedSet:")]
+		IntPtr Constructor (NSOrderedSet source);
+
+		[Export ("initWithCapacity:")]
+		IntPtr Constructor (int capacity);
+		
+		[Export ("initWithArray:"), Internal]
+		IntPtr Constructor (NSArray array);
+
+		[Export ("unionSet:"), Internal]
+		void UnionSet (NSSet other);
+
+		[Export ("minusSet:"), Internal]
+		void MinusSet (NSSet other);
+
+		[Export ("insertObject:atIndex:")]
+		void Insert (NSObject obj, int atIndex);
+
+		[Export ("removeObjectAtIndex:")]
+		void Remove (int index);
+
+		[Export ("replaceObjectAtIndex:withObject:")]
+		void Replace (int objectAtIndex, NSObject newObject);
+
+		[Export ("addObject:")]
+		void Add (NSObject obj);
+
+		[Export ("addObjectsFromArray:")]
+		void AddObjects (NSObject [] source);
+
+		[Export ("insertObjects:atIndexes:")]
+		void InsertObjects (NSObject [] objects, NSIndexSet atIndexes);
+
+		[Export ("removeObjectsAtIndexes:")]
+		void RemoveObjects (NSIndexSet indexSet);
+		
+		[Export ("exchangeObjectAtIndex:withObjectAtIndex:")]
+		void ExchangeObject (int first, int second);
+
+		[Export ("moveObjectsAtIndexes:toIndex:")]
+		void MoveObjects (NSIndexSet indexSet, int destination);
+
+		[Export ("setObject:atIndex:")]
+		void SetObject (NSObject obj, int index);
+
+		[Export ("replaceObjectsAtIndexes:withObjects:")]
+		void ReplaceObjects (NSIndexSet indexSet, NSObject [] replacementObjects);
+
+		[Export ("removeObjectsInRange:")]
+		void RemoveObjects (NSRange range);
+
+		[Export ("removeAllObjects")]
+		void RemoveAllObjects ();
+
+		[Export ("removeObject:")]
+		void RemoveObject (NSObject obj);
+
+		[Export ("removeObjectsInArray:")]
+		void RemoveObjects (NSObject [] objects);
+
+		[Export ("intersectOrderedSet:")]
+		void Intersect (NSOrderedSet intersectWith);
+
+		[Export ("sortUsingComparator:")]
+		void Sort (NSComparator comparator);
+
+		[Export ("sortWithOptions:usingComparator:")]
+		void Sort (NSSortOptions sortOptions, NSComparator comparator);
+
+		[Export ("sortRange:options:usingComparator:")]
+		void SortRange (NSRange range, NSSortOptions sortOptions, NSComparator comparator);
+	}
+	
 	[BaseType (typeof (NSObject))]
 	// Objective-C exception thrown.  Name: NSInvalidArgumentException Reason: *** -[__NSArrayM insertObject:atIndex:]: object cannot be nil
 	[DisableDefaultCtor]
@@ -4504,6 +4652,15 @@ namespace MonoMac.Foundation
 
 		[Export ("localizations")]
 		string [] Localizations { get; }
+
+		[Export ("pathsForResourcesOfType:inDirectory:")]
+		string [] PathsForResources (string fileExtension, [NullAllowed] string subDirectory);
+
+		[Export ("pathsForResourcesOfType:inDirectory:forLocalization:")]
+		string [] PathsForResources (string fileExtension, [NullAllowed] string subDirectory, [NullAllowed] string localizationName);
+
+		[Static, Export ("pathsForResourcesOfType:inDirectory:")]
+		string [] GetPathsForResources (string fileExtension, string bundlePath);
 	}
 
 	[BaseType (typeof (NSObject))]
@@ -4611,6 +4768,55 @@ namespace MonoMac.Foundation
 
 		[Export ("enumerateRangesInRange:options:usingBlock:")]
 		void EnumerateRanges (NSRange range, NSEnumerationOptions opts, NSRangeIterator iterator);
+	}
+
+	[BaseType (typeof (NSObject))]
+	[DisableDefaultCtor] // from the docs: " you should not create these objects using alloc and init."
+	public interface NSInvocation {
+
+		[Export ("selector")]
+		Selector Selector { get; set; }
+
+		[Export ("target")]
+		NSObject Target { get; set; }
+
+		// FIXME: We need some special marshaling support to handle these buffers...
+		[Internal, Export ("setArgument:atIndex:")]
+		void _SetArgument (IntPtr buffer, int index);
+
+		[Internal, Export ("getArgument:atIndex:")]
+		void _GetArgument (IntPtr buffer, int index);
+
+		[Internal, Export ("setReturnValue:")]
+		void _SetReturnValue (IntPtr buffer);
+
+		[Internal, Export ("getReturnValue:")]
+		void _GetReturnValue (IntPtr buffer);
+
+		[Export ("invoke")]
+		void Invoke ();
+
+		[Export ("invokeWithTarget:")]
+		void Invoke (NSObject target);
+
+		[Export ("methodSignature")]
+		NSMethodSignature MethodSignature { get; }
+	}
+
+	[BaseType (typeof (NSObject))]
+	[DisableDefaultCtor] // `init` returns a null handle
+	public interface NSMethodSignature {
+		[Export ("numberOfArguments")]
+		uint NumberOfArguments { get; }
+
+		[Export ("frameLength")]
+		uint FrameLength { get; }
+
+		[Export ("methodReturnLength")]
+		uint MethodReturnLength { get; }
+
+		[Export ("isOneway")]
+		bool IsOneway { get; }
 	}
 
 	[BaseType (typeof (NSObject), Name="NSJSONSerialization")]
@@ -5604,6 +5810,82 @@ namespace MonoMac.Foundation
 
 		[Export ("main")]
 		void Main ();
+	}
+
+	[BaseType (typeof (NSObject))]
+	[DisableDefaultCtor]
+	public interface NSPort {
+		[Static, Export ("port")]
+		NSPort Create ();
+
+		[Export ("invalidate")]
+		void Invalidate ();
+
+		[Export ("isValid")]
+		bool IsValid { get; }
+
+		[Export ("delegate"), NullAllowed]
+		NSObject WeakDelegate { get; set; }
+
+		[Wrap ("WeakDelegate"), NullAllowed]
+		NSPortDelegate Delegate { get; set; }
+	}
+
+	[Model, BaseType (typeof (NSObject))]
+	public interface NSPortDelegate {
+		[Export ("handlePortMessage:")]
+		void MessageReceived (NSPortMessage message);
+	}
+
+	[BaseType (typeof (NSObject))]
+	public interface NSPortMessage {
+		[Export ("initWithSendPort:receivePort:components:")]
+		IntPtr Constructor (NSPort sendPort, NSPort recvPort, NSArray components);
+
+		[Export ("sendBeforeDate:")]
+		bool SendBefore (NSDate date);
+
+		[Export ("components")]
+		NSArray Components { get; }
+
+		[Export ("receivePort")]
+		NSPort ReceivePort { get; }
+
+		[Export ("sendPort")]
+		NSPort SendPort { get; }
+
+		[Export ("msgid")]
+		uint MsgId { get; set; }
+	}
+
+	[BaseType (typeof (NSPort))]
+	public interface NSMachPort {
+		[Static, Export ("portWithMachPort:")]
+		NSPort FromMachPort (uint port);
+
+		[Static, Export ("portWithMachPort:options:")]
+		NSPort FromMachPort (uint port, NSMachPortRights options);
+
+		[Export ("machPort")]
+		uint MachPort { get; }
+
+		[Export ("removeFromRunLoop:forMode:")]
+		void RemoveFromRunLoop (NSRunLoop runLoop, NSString mode);
+
+		[Export ("scheduleInRunLoop:forMode:")]
+		void ScheduleInRunLoop (NSRunLoop runLoop, NSString mode);
+
+		[Export ("delegate"), NullAllowed]
+		NSObject WeakDelegate { get; set; }
+
+		[Wrap ("WeakDelegate"), NullAllowed]
+		NSMachPortDelegate Delegate { get; set; }
+	}
+
+	[Model, BaseType (typeof (NSPortDelegate))]
+	public interface NSMachPortDelegate {
+		[Export ("handleMachMessage:")]
+		void MachMessageReceived (IntPtr msgHeader);
 	}
 
 	[BaseType (typeof (NSObject))]

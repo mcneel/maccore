@@ -1,11 +1,8 @@
 //
-// AudioGraphEventArgs.cs: Audio graph callback event arguments
+// Authors:
+//   Rodrigo Kumpera
 //
-// Author:
-//   AKIHIRO Uehara (u-akihiro@reinforce-lab.com)
-//
-// Copyright 2010 Reinforce Lab.
-//
+// Copyright 2011 Xamarin Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -26,24 +23,35 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using MonoMac.AudioToolbox;
 
-namespace MonoMac.AudioUnit
-{
-	[Obsolete]
-    public class AudioGraphEventArgs : AudioUnitEventArgs {
-	    public AudioGraphEventArgs(AudioUnitRenderActionFlags actionFlags,
-				       MonoMac.AudioToolbox.AudioTimeStamp timeStamp,
-				       int busNumber,
-				       int numberFrames,
-				       AudioBufferList data)
-		    : base(actionFlags, timeStamp, busNumber, numberFrames, data)
-	    {
-	    }
-    }
+namespace MonoMac.Foundation {
+	public class NSErrorException : Exception {
+		NSError error;
+
+		public NSErrorException (NSError error)
+		{
+			this.error = error;
+		}
+		
+		public NSError Error
+		{
+			get { return error; }
+		}
+
+		public string Domain
+		{
+			get { return error.Domain; }
+		}
+
+		public int Code
+		{
+			get { return error.Code; }
+		}
+
+		public NSDictionary UserInfo
+		{
+			get {return error.UserInfo; }
+		}
+	}
 }
