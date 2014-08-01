@@ -30,6 +30,9 @@ using System.Runtime.InteropServices;
 namespace MonoMac.Foundation {
 	[StructLayout(LayoutKind.Sequential)]
 	public struct NSPoint {
+		
+		public static readonly NSPoint Empty;
+		
 		public NSPoint(System.Drawing.PointF point)
 		{
 			X = point.X;

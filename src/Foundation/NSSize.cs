@@ -30,6 +30,9 @@ using System.Runtime.InteropServices;
 namespace MonoMac.Foundation {
 	[StructLayout(LayoutKind.Sequential)]
 	public struct NSSize {
+	
+		public static readonly NSSize Empty;
+		
 		public NSSize(System.Drawing.SizeF size)
 		{
 			Width = size.Width;

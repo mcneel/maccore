@@ -30,6 +30,9 @@ using System.Runtime.InteropServices;
 namespace MonoMac.Foundation {
 	[StructLayout(LayoutKind.Sequential)]
 	public struct NSRect {
+		
+		public static readonly NSRect Empty;
+	
 		public NSRect(System.Drawing.RectangleF rect)
 		{
 			Origin.X = rect.Left;
