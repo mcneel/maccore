@@ -46,7 +46,11 @@ namespace MonoMac.Foundation {
 
 		public int Code
 		{
+#if MAC64
+			get { return (int)error.Code; }
+#else
 			get { return error.Code; }
+#endif
 		}
 
 		public NSDictionary UserInfo

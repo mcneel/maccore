@@ -274,7 +274,7 @@ namespace MonoMac.CoreGraphics {
 				throw new ArgumentException ("n");
 			CGFloat[] _lengths = new CGFloat[lengths.Length];
 			Array.Copy (lengths, _lengths, lengths.Length);
-			CGContextSetLineDash (handle, phase, lengths, n);
+			CGContextSetLineDash (handle, phase, _lengths, n);
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]

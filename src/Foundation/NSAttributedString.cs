@@ -40,13 +40,21 @@ namespace MonoMac.Foundation {
 
 		public CTStringAttributes GetCoreTextAttributes (int location, out NSRange effectiveRange)
 		{
+#if MAC64
+			var attr = GetAttributes ((ulong)location, out effectiveRange);
+#else
 			var attr = GetAttributes (location, out effectiveRange);
+#endif
 			return attr == null ? null : new CTStringAttributes (attr);
 		}
 
 		public CTStringAttributes GetCoreTextAttributes (int location, out NSRange longestEffectiveRange, NSRange rangeLimit)
 		{
+#if MAC64
+			var attr = GetAttributes ((ulong)location, out longestEffectiveRange, rangeLimit);
+#else
 			var attr = GetAttributes (location, out longestEffectiveRange, rangeLimit);
+#endif
 			return attr == null ? null : new CTStringAttributes (attr);			
 		}
 
