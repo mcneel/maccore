@@ -22,18 +22,31 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 using System;
+#if MAC64
+using NSUInteger = System.UInt64;
+#else
+using NSUInteger = System.Int32;
+#endif
 
 namespace MonoMac.Foundation {
 	public struct NSRange {
-		public Int32 Location;
-		public Int32 Length;
+		public NSUInteger Location;
+		public NSUInteger Length;
 
-		public const int NotFound = Int32.MaxValue;
+		public const NSUInteger NotFound = NSUInteger.MaxValue;
 		
-		public NSRange (int start, int len)
+		#if MAC64
+		public NSRange (NSUInteger start, NSUInteger len)
 		{
 			Location = start;
 			Length = len;
+		}
+		#endif
+		
+		public NSRange (int start, int len)
+		{
+			Location = (NSUInteger)start;
+			Length = (NSUInteger)len;
 		}
 
 		public override string ToString ()

@@ -33,15 +33,15 @@ using MonoMac.CoreGraphics;
 #endif
 
 #if MAC64
+using PointF = MonoMac.Foundation.NSPoint;
+using SizeF = MonoMac.Foundation.NSSize;
+using RectangleF = MonoMac.Foundation.NSRect;
 using NSInteger = System.Int64;
 using NSUInteger = System.UInt64;
 using CGFloat = System.Double;
 #else
 using NSInteger = System.Int32;
 using NSUInteger = System.UInt32;
-using NSPoint = System.Drawing.PointF;
-using NSSize = System.Drawing.SizeF;
-using NSRect = System.Drawing.RectangleF;
 using CGFloat = System.Single;
 #endif
 
@@ -150,7 +150,7 @@ namespace MonoMac.CoreImage {
 			return FromCGImage (image);
 		}
 		
-		internal static int CIFormatToInt (CIFormat format)
+		internal static NSInteger CIFormatToInt (CIFormat format)
 		{
 			switch (format) {
 #if MONOMAC

@@ -33,6 +33,19 @@ using MonoMac.Foundation;
 using MonoMac.CoreFoundation;
 using MonoMac.CoreGraphics;
 
+#if MAC64
+using NSInteger = System.Int64;
+using NSUInteger = System.UInt64;
+using CGFloat = System.Double;
+#else
+using NSInteger = System.Int32;
+using NSUInteger = System.UInt32;
+using NSPoint = System.Drawing.PointF;
+using NSSize = System.Drawing.SizeF;
+using NSRect = System.Drawing.RectangleF;
+using CGFloat = System.Single;
+#endif
+
 namespace MonoMac.CoreText {
 
 	[Since (3,2)]
@@ -106,12 +119,12 @@ namespace MonoMac.CoreText {
 		{
 			var glyphCount = GlyphCount;
 
-			if (buffer != null && range.Length != 0 && buffer.Length < range.Length)
+			if (buffer != null && range.Length != 0 && (NSUInteger)buffer.Length < range.Length)
 				throw new ArgumentException ("buffer.Length must be >= range.Length.", "buffer");
 			if (buffer != null && range.Length == 0 && buffer.Length < glyphCount)
 				throw new ArgumentException ("buffer.Length must be >= GlyphCount.", "buffer");
 
-			return buffer ?? new T [range.Length == 0 ? glyphCount : range.Length];
+			return buffer ?? new T [range.Length == 0 ? glyphCount : (int)range.Length];
 		}
 
 		public SizeF [] GetAdvances (NSRange range) {

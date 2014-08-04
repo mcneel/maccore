@@ -3752,13 +3752,13 @@ namespace MonoMac.Foundation
 	public interface NSString2 {
 #if MONOMAC
 		[Bind ("sizeWithAttributes:")]
-		SizeF StringSize ([NullAllowed] NSDictionary attributedStringAttributes);
+		NSSize StringSize ([NullAllowed] NSDictionary attributedStringAttributes);
 		
 		[Bind ("boundingRectWithSize:options:attributes:")]
 		NSRect BoundingRectWithSize (NSSize size, NSStringDrawingOptions options, NSDictionary attributes);
 		
 		[Bind ("drawAtPoint:withAttributes:")]
-		void DrawString (PointF point, NSDictionary attributes);
+		void DrawString (NSPoint point, NSDictionary attributes);
 		
 		[Bind ("drawInRect:withAttributes:")]
 		void DrawString (NSRect rect, NSDictionary attributes);

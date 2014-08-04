@@ -28,34 +28,47 @@
 //
 using System;
 
+#if MAC64
+using PointF = MonoMac.Foundation.NSPoint;
+using SizeF = MonoMac.Foundation.NSSize;
+using RectangleF = MonoMac.Foundation.NSRect;
+using NSInteger = System.Int64;
+using NSUInteger = System.UInt64;
+using CGFloat = System.Double;
+#else
+using NSInteger = System.Int32;
+using NSUInteger = System.UInt32;
+using CGFloat = System.Single;
+#endif
+
 namespace MonoMac.CoreImage {
 	public partial class CIVector {
-		float this [int index] {
+		CGFloat this [int index] {
 			get {
 				return ValueAtIndex (index);
 			}
 		}
 		
-		static IntPtr GetPtr (float [] values)
+		static IntPtr GetPtr (CGFloat [] values)
 		{
 			if (values == null)
 				throw new ArgumentNullException ("values");
 			unsafe {
-				fixed (float *ptr = &values [0])
+				fixed (CGFloat *ptr = &values [0])
 					return (IntPtr) ptr;
 			}
 		}
 		
-		public CIVector (float [] values) : this (GetPtr (values), values.Length)
+		public CIVector (CGFloat [] values) : this (GetPtr (values), values.Length)
 		{
 		}
 	
-		public static CIVector FromValues (float [] values)
+		public static CIVector FromValues (CGFloat [] values)
 		{
 			if (values == null)
 				throw new ArgumentNullException ("values");
 			unsafe {
-				fixed (float *ptr = &values [0])
+				fixed (CGFloat *ptr = &values [0])
 					return _FromValues ((IntPtr) ptr, values.Length);
 			}
 		}

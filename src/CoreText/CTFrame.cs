@@ -34,6 +34,20 @@ using MonoMac.Foundation;
 using MonoMac.CoreFoundation;
 using MonoMac.CoreGraphics;
 
+#if MAC64
+using NSInteger = System.Int64;
+using NSUInteger = System.UInt64;
+using CGFloat = System.Double;
+#else
+using NSInteger = System.Int32;
+using NSUInteger = System.UInt32;
+using NSPoint = System.Drawing.PointF;
+using NSSize = System.Drawing.SizeF;
+using NSRect = System.Drawing.RectangleF;
+using CGFloat = System.Single;
+#endif
+
+
 namespace MonoMac.CoreText {
 
 	[Since (3,2)]
@@ -195,12 +209,12 @@ namespace MonoMac.CoreText {
 		}
 
 		[DllImport (Constants.CoreTextLibrary)]
-		extern static void CTFrameGetLineOrigins(IntPtr handle, NSRange range, [Out] PointF[] origins);
-		public void GetLineOrigins (NSRange range, PointF[] origins)
+		extern static void CTFrameGetLineOrigins(IntPtr handle, NSRange range, [Out] NSPoint[] origins);
+		public void GetLineOrigins (NSRange range, NSPoint[] origins)
 		{
 			if (origins == null)
 				throw new ArgumentNullException ("origins");
-			if (range.Length != 0 && origins.Length < range.Length)
+			if (range.Length != 0 && (NSUInteger)origins.Length < range.Length)
 				throw new ArgumentException ("origins must contain at least range.Length elements.", "origins");
 			else if (origins.Length < CFArray.GetCount (CTFrameGetLines (handle)))
 				throw new ArgumentException ("origins must contain at least GetLines().Length elements.", "origins");
