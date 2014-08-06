@@ -56,12 +56,22 @@ namespace MonoMac.Foundation {
 		
 		public static NSPoint operator +(NSPoint pt, NSSize sz)
 		{
-			return new NSPoint(pt.X + sz.Width, pt.Y + sz.Height);
+			return new NSPoint (pt.X + sz.Width, pt.Y + sz.Height);
 		}
 
 		public static NSPoint operator -(NSPoint pt, NSSize sz)
 		{
-			return new NSPoint(pt.X - sz.Width, pt.Y - sz.Height);
+			return new NSPoint (pt.X - sz.Width, pt.Y - sz.Height);
+		}
+
+		public static implicit operator NSPoint (System.Drawing.PointF point)
+		{
+			return new NSPoint (point.X, point.Y);
+		}
+		
+		public static explicit operator System.Drawing.PointF (NSPoint point)
+		{
+			return new System.Drawing.PointF ((float)point.X, (float)point.Y);
 		}
 
 		public NSPoint(int x, int y)

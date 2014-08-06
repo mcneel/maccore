@@ -100,6 +100,16 @@ namespace MonoMac.Foundation {
 			return left.Origin != right.Origin || left.Size != right.Size;
 		}
 
+		public static implicit operator NSRect (System.Drawing.RectangleF rect)
+		{
+			return new NSRect (rect.Location, rect.Size);
+		}
+		
+		public static explicit operator System.Drawing.RectangleF (NSRect rect)
+		{
+			return new System.Drawing.RectangleF ((float)rect.X, (float)rect.Y, (float)rect.Width, (float)rect.Height);
+		}
+
 #if MAC64
 		public double X { get { return Origin.X; } set { Origin.X=value; } }
 		public double Y { get { return Origin.Y; } set { Origin.Y=value; } }

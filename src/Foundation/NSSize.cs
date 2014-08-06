@@ -77,12 +77,22 @@ namespace MonoMac.Foundation {
 
 		public static NSSize operator +(NSSize size1, NSSize size2)
 		{
-			return new NSSize(size1.Width + size2.Width, size1.Height + size2.Height);
+			return new NSSize (size1.Width + size2.Width, size1.Height + size2.Height);
 		}
 
 		public static NSSize operator -(NSSize size1, NSSize size2)
 		{
-			return new NSSize(size1.Width - size2.Width, size1.Height - size2.Height);
+			return new NSSize (size1.Width - size2.Width, size1.Height - size2.Height);
+		}
+		
+		public static implicit operator NSSize (System.Drawing.SizeF size)
+		{
+			return new NSSize (size.Width, size.Height);
+		}
+		
+		public static explicit operator System.Drawing.SizeF (NSSize size)
+		{
+			return new System.Drawing.SizeF ((float)size.Width, (float)size.Height);
 		}
 
 #if MAC64
