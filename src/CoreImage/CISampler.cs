@@ -28,6 +28,7 @@ using MonoMac.Foundation;
 using MonoMac.CoreGraphics;
 using System.Drawing;
 using MonoMac.CoreFoundation;
+
 namespace MonoMac.CoreImage {
 	public enum CIWrapMode {
 		Black,
@@ -52,12 +53,21 @@ namespace MonoMac.CoreImage {
 			if (AffineMatrix.HasValue){
 				var a = AffineMatrix.Value;
 				var affine = new NSNumber [6];
+				#if MAC64
+				affine [0] = NSNumber.FromDouble (a.xx);
+				affine [1] = NSNumber.FromDouble (a.yx);
+				affine [2] = NSNumber.FromDouble (a.xy);
+				affine [3] = NSNumber.FromDouble (a.yy);
+				affine [4] = NSNumber.FromDouble (a.x0);
+				affine [5] = NSNumber.FromDouble (a.y0);
+				#else
 				affine [0] = NSNumber.FromFloat (a.xx);
 				affine [1] = NSNumber.FromFloat (a.yx);
 				affine [2] = NSNumber.FromFloat (a.xy);
 				affine [3] = NSNumber.FromFloat (a.yy);
 				affine [4] = NSNumber.FromFloat (a.x0);
 				affine [5] = NSNumber.FromFloat (a.y0);
+				#endif
 				ret.SetObject (NSArray.FromNSObjects (affine), CISampler.AffineMatrix);
 			}
 			if (WrapMode.HasValue){

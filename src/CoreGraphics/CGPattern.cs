@@ -92,7 +92,7 @@ namespace MonoMac.CoreGraphics {
 		CGPatternCallbacks callbacks;
 		GCHandle gch;
 		
-		public CGPattern (RectangleF bounds, CGAffineTransform matrix, float xStep, float yStep, CGPatternTiling tiling, bool isColored, DrawPattern drawPattern)
+		public CGPattern (NSRect bounds, CGAffineTransform matrix, CGFloat xStep, CGFloat yStep, CGPatternTiling tiling, bool isColored, DrawPattern drawPattern)
 		{
 			if (drawPattern == null)
 				throw new ArgumentNullException ("drawPattern");
@@ -103,11 +103,7 @@ namespace MonoMac.CoreGraphics {
 			this.draw_pattern = drawPattern;
 
 			gch = GCHandle.Alloc (this);
-#if MAC64
-			handle = CGPatternCreate (GCHandle.ToIntPtr (gch) , new NSRect(bounds), matrix, xStep, yStep, tiling, isColored, ref callbacks);
-#else
 			handle = CGPatternCreate (GCHandle.ToIntPtr (gch) , bounds, matrix, xStep, yStep, tiling, isColored, ref callbacks);
-#endif
 		}
 
 		IntPtr last_cgcontext_ptr;

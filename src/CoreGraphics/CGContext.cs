@@ -314,28 +314,28 @@ namespace MonoMac.CoreGraphics {
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextMoveToPoint(IntPtr c, CGFloat x, CGFloat y);
-		public void MoveTo (float x, float y)
+		public void MoveTo (CGFloat x, CGFloat y)
 		{
 			CGContextMoveToPoint (handle, x, y);
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextAddLineToPoint(IntPtr c, CGFloat x, CGFloat y);
-		public void AddLineToPoint (float x, float y)
+		public void AddLineToPoint (CGFloat x, CGFloat y)
 		{
 			CGContextAddLineToPoint (handle, x, y);
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextAddCurveToPoint(IntPtr c, CGFloat cp1x, CGFloat cp1y, CGFloat cp2x, CGFloat cp2y, CGFloat x, CGFloat y);
-		public void AddCurveToPoint (float cp1x, float cp1y, float cp2x, float cp2y, float x, float y)
+		public void AddCurveToPoint (CGFloat cp1x, CGFloat cp1y, CGFloat cp2x, CGFloat cp2y, CGFloat x, CGFloat y)
 		{
 			CGContextAddCurveToPoint (handle, cp1x, cp1y, cp2x, cp2y, x, y);
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextAddQuadCurveToPoint(IntPtr c, CGFloat cpx, CGFloat cpy, CGFloat x, CGFloat y);
-		public void AddQuadCurveToPoint (float cpx, float cpy, float x, float y)
+		public void AddQuadCurveToPoint (CGFloat cpx, CGFloat cpy, CGFloat x, CGFloat y)
 		{
 			CGContextAddQuadCurveToPoint (handle, cpx, cpy, x, y);
 		}
@@ -349,64 +349,42 @@ namespace MonoMac.CoreGraphics {
 			
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextAddRect(IntPtr c, NSRect rect);
-		public void AddRect (RectangleF rect)
+		public void AddRect (NSRect rect)
 		{
-#if MAC64
-			CGContextAddRect (handle, new NSRect(rect));
-#else
 			CGContextAddRect (handle, rect);
-#endif
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextAddRects(IntPtr c, NSRect [] rects, IntPtr size_t_count) ;
-		public void AddRects (RectangleF [] rects)
+		public void AddRects (NSRect [] rects)
 		{
-#if MAC64
-			NSRect[] _rects = new NSRect[rects.Length];
-			for( int i=0; i<rects.Length; i++ )
-				_rects[i] = new NSRect(rects[i]);
-			CGContextAddRects (handle, _rects, new IntPtr(rects.Length));
-#else
 			CGContextAddRects (handle, rects, new IntPtr(rects.Length));
-#endif
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextAddLines(IntPtr c, NSPoint [] points, IntPtr size_t_count) ;
-		public void AddLines (PointF [] points)
+		public void AddLines (NSPoint [] points)
 		{
-#if MAC64
-			NSPoint[] _points = new NSPoint[points.Length];
-			for( int i=0; i<points.Length; i++ )
-				_points[i] = new NSPoint(points[i]);
-			CGContextAddLines (handle, _points, new IntPtr(points.Length));
-#else
 			CGContextAddLines (handle, points, new IntPtr(points.Length));
-#endif
 		}
 			
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextAddEllipseInRect(IntPtr context, NSRect rect);
-		public void AddEllipseInRect (RectangleF rect)
+		public void AddEllipseInRect (NSRect rect)
 		{
-#if MAC64
-			CGContextAddEllipseInRect (handle, new NSRect(rect));
-#else
 			CGContextAddEllipseInRect (handle, rect);
-#endif
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextAddArc(IntPtr c, CGFloat x, CGFloat y, CGFloat radius, CGFloat startAngle, CGFloat endAngle, int clockwise);
-		public void AddArc (float x, float y, float radius, float startAngle, float endAngle, bool clockwise)
+		public void AddArc (CGFloat x, CGFloat y, CGFloat radius, CGFloat startAngle, CGFloat endAngle, bool clockwise)
 		{
 			CGContextAddArc (handle, x, y, radius, startAngle, endAngle, clockwise ? 1 : 0);
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextAddArcToPoint(IntPtr c, CGFloat x1, CGFloat y1, CGFloat x2, CGFloat y2, CGFloat radius);
-		public void AddArcToPoint (float x1, float y1, float x2, float y2, float radius)
+		public void AddArcToPoint (CGFloat x1, CGFloat y1, CGFloat x2, CGFloat y2, CGFloat radius)
 		{
 			CGContextAddArcToPoint (handle, x1, y1, x2, y2, radius);
 		}
@@ -435,37 +413,23 @@ namespace MonoMac.CoreGraphics {
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static NSPoint CGContextGetPathCurrentPoint(IntPtr c);
-		public PointF GetPathCurrentPoint ()
+		public NSPoint GetPathCurrentPoint ()
 		{
-#if MAC64
-			NSPoint rc = CGContextGetPathCurrentPoint (handle);
-			return new PointF((float)rc.X, (float)rc.Y);
-#else
 			return CGContextGetPathCurrentPoint (handle);
-#endif
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static NSRect CGContextGetPathBoundingBox(IntPtr c);
-		public RectangleF GetPathBoundingBox ()
+		public NSRect GetPathBoundingBox ()
 		{
-#if MAC64
-			NSRect rc = CGContextGetPathBoundingBox (handle);
-			return new RectangleF((float)rc.Origin.X, (float)rc.Origin.Y, (float)rc.Width, (float)rc.Height);
-#else
 			return CGContextGetPathBoundingBox (handle);
-#endif
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static int CGContextPathContainsPoint(IntPtr context, NSPoint point, CGPathDrawingMode mode);
-		public bool PathContainsPoint (PointF point, CGPathDrawingMode mode)
+		public bool PathContainsPoint (NSPoint point, CGPathDrawingMode mode)
 		{
-#if MAC64
-			return CGContextPathContainsPoint (handle, new NSPoint(point), mode) != 0;
-#else
 			return CGContextPathContainsPoint (handle, point, mode) != 0;
-#endif
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
@@ -498,96 +462,58 @@ namespace MonoMac.CoreGraphics {
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextFillRect(IntPtr c, NSRect rect);
-		public void FillRect (RectangleF rect)
+		public void FillRect (NSRect rect)
 		{
-#if MAC64
-			CGContextFillRect (handle, new NSRect(rect));
-#else
 			CGContextFillRect (handle, rect);
-#endif
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextFillRects(IntPtr c, NSRect [] rects, IntPtr size_t_count);
-		public void ContextFillRects (RectangleF [] rects)
+		public void ContextFillRects (NSRect [] rects)
 		{
-#if MAC64
-			NSRect[] _rects = new NSRect[rects.Length];
-			for( int i=0; i<rects.Length; i++ )
-				_rects[i] = new NSRect(rects[i]);
-			CGContextFillRects (handle, _rects, new IntPtr(rects.Length));
-#else
 			CGContextFillRects (handle, rects, new IntPtr(rects.Length));
-#endif
 		}
 			
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextStrokeRect(IntPtr c, NSRect rect);
-		public void StrokeRect (RectangleF rect)
+		public void StrokeRect (NSRect rect)
 		{
-#if MAC64
-			CGContextStrokeRect (handle, new NSRect(rect));
-#else
 			CGContextStrokeRect (handle, rect);
-#endif
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextStrokeRectWithWidth(IntPtr c, NSRect rect, CGFloat width);
-		public void StrokeRectWithWidth (RectangleF rect, float width)
+		public void StrokeRectWithWidth (NSRect rect, CGFloat width)
 		{
-#if MAC64
-			CGContextStrokeRectWithWidth (handle, new NSRect(rect), width);
-#else
 			CGContextStrokeRectWithWidth (handle, rect, width);
-#endif
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextClearRect(IntPtr c, NSRect rect);
-		public void ClearRect (RectangleF rect)
+		public void ClearRect (NSRect rect)
 		{
-#if MAC64
-			CGContextClearRect (handle, new NSRect(rect));
-#else
 			CGContextClearRect (handle, rect);
-#endif
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextFillEllipseInRect(IntPtr context, NSRect rect);
-		public void FillEllipseInRect (RectangleF rect)
+		public void FillEllipseInRect (NSRect rect)
 		{
-#if MAC64
-			CGContextFillEllipseInRect (handle, new NSRect(rect));
-#else
 			CGContextFillEllipseInRect (handle, rect);
-#endif
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextStrokeEllipseInRect(IntPtr context, NSRect rect);
-		public void StrokeEllipseInRect (RectangleF rect)
+		public void StrokeEllipseInRect (NSRect rect)
 		{
-#if MAC64
-			CGContextStrokeEllipseInRect (handle, new NSRect(rect));
-#else
 			CGContextStrokeEllipseInRect (handle, rect);
-#endif
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextStrokeLineSegments(IntPtr c, NSPoint [] points, IntPtr size_t_count);
-		public void StrokeLineSegments (PointF [] points)
+		public void StrokeLineSegments (NSPoint [] points)
 		{
-#if MAC64
-			NSPoint[] _points = new NSPoint[points.Length];
-			for( int i=0; i<points.Length; i++ )
-				_points[i] = new NSPoint(points[i]);
-			CGContextStrokeLineSegments (handle, _points, new IntPtr(points.Length));
-#else
 			CGContextStrokeLineSegments (handle, points, new IntPtr(points.Length));
-#endif
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
@@ -606,50 +532,30 @@ namespace MonoMac.CoreGraphics {
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextClipToMask(IntPtr c, NSRect rect, IntPtr mask);
-		public void ClipToMask (RectangleF rect, CGImage mask)
+		public void ClipToMask (NSRect rect, CGImage mask)
 		{
-#if MAC64
-			CGContextClipToMask (handle, new NSRect(rect), mask.handle);
-#else
 			CGContextClipToMask (handle, rect, mask.handle);
-#endif
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static NSRect CGContextGetClipBoundingBox(IntPtr c);
-		public RectangleF GetClipBoundingBox ()
+		public NSRect GetClipBoundingBox ()
 		{
-#if MAC64
-			NSRect rc = CGContextGetClipBoundingBox (handle);
-			return new RectangleF((float)rc.Origin.X, (float)rc.Origin.Y, (float)rc.Width, (float)rc.Height);
-#else
 			return CGContextGetClipBoundingBox (handle);
-#endif
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextClipToRect(IntPtr c, NSRect rect);
-		public void ClipToRect (RectangleF rect)
+		public void ClipToRect (NSRect rect)
 		{
-#if MAC64
-			CGContextClipToRect (handle, new NSRect(rect));
-#else
 			CGContextClipToRect (handle, rect);
-#endif
 		}
 		       
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextClipToRects(IntPtr c, NSRect [] rects, IntPtr size_t_count);
-		public void ClipToRects (RectangleF [] rects)
+		public void ClipToRects (NSRect [] rects)
 		{
-#if MAC64
-			NSRect[] _rects = new NSRect[rects.Length];
-			for( int i=0; i<rects.Length; i++ )
-				_rects[i] = new NSRect(rects[i]);
-			CGContextClipToRects (handle, _rects, new IntPtr(rects.Length));
-#else
 			CGContextClipToRects (handle, rects, new IntPtr(rects.Length));
-#endif
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
@@ -694,149 +600,121 @@ namespace MonoMac.CoreGraphics {
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextSetFillColor(IntPtr context, CGFloat [] components);
-		public void SetFillColor (float [] components)
+		public void SetFillColor (CGFloat [] components)
 		{
 			if (components == null)
 				throw new ArgumentNullException ("components");
-#if MAC64
-			CGFloat[] _components = new CGFloat[components.Length];
-			Array.Copy(components, _components, components.Length);
-			CGContextSetFillColor (handle, _components);
-#else
 			CGContextSetFillColor (handle, components);
-#endif
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextSetStrokeColor(IntPtr context, CGFloat [] components);
-		public void SetStrokeColor (float [] components)
+		public void SetStrokeColor (CGFloat [] components)
 		{
 			if (components == null)
 				throw new ArgumentNullException ("components");
-#if MAC64
-			CGFloat[] _components = new CGFloat[components.Length];
-			Array.Copy(components, _components, components.Length);
-			CGContextSetStrokeColor (handle, _components);
-#else
 			CGContextSetStrokeColor (handle, components);
-#endif
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextSetFillPattern(IntPtr context, IntPtr pattern, CGFloat [] components);
-		public void SetFillPattern (CGPattern pattern, float [] components)
+		public void SetFillPattern (CGPattern pattern, CGFloat [] components)
 		{
 			if (components == null)
 				throw new ArgumentNullException ("components");
-#if MAC64
-			CGFloat[] _components = new CGFloat[components.Length];
-			Array.Copy(components, _components, components.Length);
-			CGContextSetFillPattern (handle, pattern.handle, _components);
-#else
 			CGContextSetFillPattern (handle, pattern.handle, components);
-#endif
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextSetStrokePattern(IntPtr context, IntPtr pattern, CGFloat [] components);
-		public void SetStrokePattern (CGPattern pattern, float [] components)
+		public void SetStrokePattern (CGPattern pattern, CGFloat [] components)
 		{
 			if (components == null)
 				throw new ArgumentNullException ("components");
-#if MAC64
-			CGFloat[] _components = new CGFloat[components.Length];
-			Array.Copy(components, _components, components.Length);
-			CGContextSetStrokePattern (handle, pattern.handle, _components);
-#else
 			CGContextSetStrokePattern (handle, pattern.handle, components);
-#endif
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextSetPatternPhase(IntPtr context, NSSize phase);
-		public void SetPatternPhase (SizeF phase)
+		public void SetPatternPhase (NSSize phase)
 		{
-#if MAC64
-			CGContextSetPatternPhase (handle, new NSSize(phase));
-#else
 			CGContextSetPatternPhase (handle, phase);
-#endif
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextSetGrayFillColor(IntPtr context, CGFloat gray, CGFloat alpha);
-		public void SetFillColor (float gray, float alpha)
+		public void SetFillColor (CGFloat gray, CGFloat alpha)
 		{
 			CGContextSetGrayFillColor (handle, gray, alpha);
 		}
 		
 		[Advice ("Use SetFillColor() instead.")]
-		public void SetGrayFillColor (float gray, float alpha)
+		public void SetGrayFillColor (CGFloat gray, CGFloat alpha)
 		{
 			CGContextSetGrayFillColor (handle, gray, alpha);
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextSetGrayStrokeColor(IntPtr context, CGFloat gray, CGFloat alpha);
-		public void SetStrokeColor (float gray, float alpha)
+		public void SetStrokeColor (CGFloat gray, CGFloat alpha)
 		{
 			CGContextSetGrayStrokeColor (handle, gray, alpha);
 		}
 		
 		[Advice ("Use SetStrokeColor() instead.")]
-		public void SetGrayStrokeColor (float gray, float alpha)
+		public void SetGrayStrokeColor (CGFloat gray, CGFloat alpha)
 		{
 			CGContextSetGrayStrokeColor (handle, gray, alpha);
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextSetRGBFillColor(IntPtr context, CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha);
-		public void SetFillColor (float red, float green, float blue, float alpha)
+		public void SetFillColor (CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha)
 		{
 			CGContextSetRGBFillColor (handle, red, green, blue, alpha);
 		}
 		
 		[Advice ("Use SetFillColor() instead.")]
-		public void SetRGBFillColor (float red, float green, float blue, float alpha)
+		public void SetRGBFillColor (CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha)
 		{
 			CGContextSetRGBFillColor (handle, red, green, blue, alpha);
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextSetRGBStrokeColor(IntPtr context, CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha);
-		public void SetStrokeColor (float red, float green, float blue, float alpha)
+		public void SetStrokeColor (CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha)
 		{
 			CGContextSetRGBStrokeColor (handle, red, green, blue, alpha);
 		}
 		
 		[Advice ("Use SetStrokeColor() instead.")]
-		public void SetRGBStrokeColor (float red, float green, float blue, float alpha)
+		public void SetRGBStrokeColor (CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha)
 		{
 			CGContextSetRGBStrokeColor (handle, red, green, blue, alpha);
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextSetCMYKFillColor(IntPtr context, CGFloat cyan, CGFloat magenta, CGFloat yellow, CGFloat black, CGFloat alpha);
-		public void SetFillColor (float cyan, float magenta, float yellow, float black, float alpha)
+		public void SetFillColor (CGFloat cyan, CGFloat magenta, CGFloat yellow, CGFloat black, CGFloat alpha)
 		{
 			CGContextSetCMYKFillColor (handle, cyan, magenta, yellow, black, alpha);
 		}
 		
 		[Advice ("Use SetFillColor() instead.")]
-		public void SetCMYKFillColor (float cyan, float magenta, float yellow, float black, float alpha)
+		public void SetCMYKFillColor (CGFloat cyan, CGFloat magenta, CGFloat yellow, CGFloat black, CGFloat alpha)
 		{
 			CGContextSetCMYKFillColor (handle, cyan, magenta, yellow, black, alpha);
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextSetCMYKStrokeColor(IntPtr context, CGFloat cyan, CGFloat magenta, CGFloat yellow, CGFloat black, CGFloat alpha);
-		public void SetStrokeColor (float cyan, float magenta, float yellow, float black, float alpha)
+		public void SetStrokeColor (CGFloat cyan, CGFloat magenta, CGFloat yellow, CGFloat black, CGFloat alpha)
 		{
 			CGContextSetCMYKStrokeColor (handle, cyan, magenta, yellow, black, alpha);
 		}
 		
 		[Advice ("Use SetStrokeColor() instead.")]
-		public void SetCMYKStrokeColor (float cyan, float magenta, float yellow, float black, float alpha)
+		public void SetCMYKStrokeColor (CGFloat cyan, CGFloat magenta, CGFloat yellow, CGFloat black, CGFloat alpha)
 		{
 			CGContextSetCMYKStrokeColor (handle, cyan, magenta, yellow, black, alpha);
 		}
@@ -850,24 +728,16 @@ namespace MonoMac.CoreGraphics {
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextDrawImage(IntPtr c, NSRect rect, IntPtr image);
-		public void DrawImage (RectangleF rect, CGImage image)
+		public void DrawImage (NSRect rect, CGImage image)
 		{
-#if MAC64
-			CGContextDrawImage (handle, new NSRect(rect), image.handle);
-#else
 			CGContextDrawImage (handle, rect, image.handle);
-#endif
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextDrawTiledImage(IntPtr c, NSRect rect, IntPtr image);
-		public void DrawTiledImage (RectangleF rect, CGImage image)
+		public void DrawTiledImage (NSRect rect, CGImage image)
 		{
-#if MAC64
-			CGContextDrawTiledImage (handle, new NSRect(rect), image.handle);
-#else
 			CGContextDrawTiledImage (handle, rect, image.handle);
-#endif
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
@@ -887,47 +757,31 @@ namespace MonoMac.CoreGraphics {
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextSetShadowWithColor(IntPtr context, NSSize offset, CGFloat blur, IntPtr color);
-		public void SetShadowWithColor (SizeF offset, float blur, CGColor color)
+		public void SetShadowWithColor (NSSize offset, CGFloat blur, CGColor color)
 		{
-#if MAC64
-			CGContextSetShadowWithColor (handle, new NSSize(offset), blur, color.handle);
-#else
 			CGContextSetShadowWithColor (handle, offset, blur, color.handle);
-#endif
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextSetShadow(IntPtr context, NSSize offset, CGFloat blur);
-		public void SetShadow (SizeF offset, float blur)
+		public void SetShadow (NSSize offset, CGFloat blur)
 		{
-#if MAC64
-			CGContextSetShadow (handle, new NSSize(offset), blur);
-#else
 			CGContextSetShadow (handle, offset, blur);
-#endif
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextDrawLinearGradient(IntPtr context, IntPtr gradient, NSPoint startPoint, NSPoint endPoint, CGGradientDrawingOptions options);
-		public void DrawLinearGradient (CGGradient gradient, PointF startPoint, PointF endPoint, CGGradientDrawingOptions options)
+		public void DrawLinearGradient (CGGradient gradient, NSPoint startPoint, NSPoint endPoint, CGGradientDrawingOptions options)
 		{
-#if MAC64
-			CGContextDrawLinearGradient (handle, gradient.handle, new NSPoint(startPoint), new NSPoint(endPoint), options);
-#else
 			CGContextDrawLinearGradient (handle, gradient.handle, startPoint, endPoint, options);
-#endif
 		}
 			
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextDrawRadialGradient (IntPtr context, IntPtr gradient, NSPoint startCenter, CGFloat startRadius,
 								NSPoint endCenter, CGFloat endRadius, CGGradientDrawingOptions options);
-		public void DrawRadialGradient (CGGradient gradient, PointF startCenter, float startRadius, PointF endCenter, float endRadius, CGGradientDrawingOptions options)
+		public void DrawRadialGradient (CGGradient gradient, NSPoint startCenter, CGFloat startRadius, NSPoint endCenter, CGFloat endRadius, CGGradientDrawingOptions options)
 		{
-#if MAC64
-			CGContextDrawRadialGradient (handle, gradient.handle, new NSPoint(startCenter), startRadius, new NSPoint(endCenter), endRadius, options);
-#else
 			CGContextDrawRadialGradient (handle, gradient.handle, startCenter, startRadius, endCenter, endRadius, options);
-#endif
 		}
 		
 #if !COREBUILD
@@ -941,7 +795,7 @@ namespace MonoMac.CoreGraphics {
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextSetCharacterSpacing(IntPtr context, CGFloat spacing);
-		public void SetCharacterSpacing (float spacing)
+		public void SetCharacterSpacing (CGFloat spacing)
 		{
 			CGContextSetCharacterSpacing (handle, spacing);
 		}
@@ -951,14 +805,9 @@ namespace MonoMac.CoreGraphics {
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static NSPoint CGContextGetTextPosition(IntPtr context);
 
-		public PointF TextPosition {
+		public NSPoint TextPosition {
 			get {
-#if MAC64
-				NSPoint rc = CGContextGetTextPosition (handle);
-				return new PointF((float)rc.X, (float)rc.Y);
-#else
 				return CGContextGetTextPosition (handle);
-#endif
 			}
 
 			set {
@@ -995,14 +844,14 @@ namespace MonoMac.CoreGraphics {
 			
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextSetFontSize(IntPtr c, CGFloat size);
-		public void SetFontSize (float size)
+		public void SetFontSize (CGFloat size)
 		{
 			CGContextSetFontSize (handle, size);
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextSelectFont(IntPtr c, string name, CGFloat size, CGTextEncoding textEncoding);
-		public void SelectFont (string name, float size, CGTextEncoding textEncoding)
+		public void SelectFont (string name, CGFloat size, CGTextEncoding textEncoding)
 		{
 			if (name == null)
 				throw new ArgumentNullException ("name");
@@ -1011,20 +860,13 @@ namespace MonoMac.CoreGraphics {
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextShowGlyphsAtPositions(IntPtr context, ushort [] glyphs, NSPoint [] positions, IntPtr size_t_count);
-		public void ShowGlyphsAtPositions (ushort [] glyphs, PointF [] positions, int size_t_count)
+		public void ShowGlyphsAtPositions (ushort [] glyphs, NSPoint [] positions, int size_t_count)
 		{
 			if (positions == null)
 				throw new ArgumentNullException ("positions");
 			if (glyphs == null)
 				throw new ArgumentNullException ("glyphs");
-#if MAC64
-			NSPoint[] _positions = new NSPoint[positions.Length];
-			for( int i=0; i<positions.Length; i++ )
-				_positions[i] = new NSPoint(positions[i]);
-			CGContextShowGlyphsAtPositions (handle, glyphs, _positions, new IntPtr(size_t_count));
-#else
 			CGContextShowGlyphsAtPositions (handle, glyphs, positions, new IntPtr(size_t_count));
-#endif
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
@@ -1065,14 +907,14 @@ namespace MonoMac.CoreGraphics {
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextShowTextAtPoint(IntPtr c, CGFloat x, CGFloat y, string str, IntPtr size_t_length);
-		public void ShowTextAtPoint (float x, float y, string str, int length)
+		public void ShowTextAtPoint (CGFloat x, CGFloat y, string str, int length)
 		{
 			if (str == null)
 				throw new ArgumentNullException ("str");
 			CGContextShowTextAtPoint (handle, x, y, str, new IntPtr(length));
 		}
 
-		public void ShowTextAtPoint (float x, float y, string str)
+		public void ShowTextAtPoint (CGFloat x, CGFloat y, string str)
 		{
 			if (str == null)
 				throw new ArgumentNullException ("str");
@@ -1081,14 +923,14 @@ namespace MonoMac.CoreGraphics {
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextShowTextAtPoint(IntPtr c, CGFloat x, CGFloat y, byte[] bytes, IntPtr size_t_length);
-		public void ShowTextAtPoint (float x, float y, byte[] bytes, int length)
+		public void ShowTextAtPoint (CGFloat x, CGFloat y, byte[] bytes, int length)
 		{
 			if (bytes == null)
 				throw new ArgumentNullException ("bytes");
 			CGContextShowTextAtPoint (handle, x, y, bytes, new IntPtr(length));
 		}
 		
-		public void ShowTextAtPoint (float x, float y, byte[] bytes)
+		public void ShowTextAtPoint (CGFloat x, CGFloat y, byte[] bytes)
 		{
 			if (bytes == null)
 				throw new ArgumentNullException ("bytes");
@@ -1115,7 +957,7 @@ namespace MonoMac.CoreGraphics {
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextShowGlyphsAtPoint(IntPtr context, CGFloat x, CGFloat y, ushort [] glyphs, IntPtr size_t_count);
-		public void ShowGlyphsAtPoint (float x, float y, ushort [] glyphs, int count)
+		public void ShowGlyphsAtPoint (CGFloat x, CGFloat y, ushort [] glyphs, int count)
 		{
 			if (glyphs == null)
 				throw new ArgumentNullException ("glyphs");
@@ -1124,7 +966,7 @@ namespace MonoMac.CoreGraphics {
 			CGContextShowGlyphsAtPoint (handle, x, y, glyphs, new IntPtr(count));
 		}
 
-		public void ShowGlyphsAtPoint (float x, float y, ushort [] glyphs)
+		public void ShowGlyphsAtPoint (CGFloat x, CGFloat y, ushort [] glyphs)
 		{
 			if (glyphs == null)
 				throw new ArgumentNullException ("glyphs");
@@ -1134,7 +976,7 @@ namespace MonoMac.CoreGraphics {
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextShowGlyphsWithAdvances(IntPtr c, ushort [] glyphs, NSSize [] advances, IntPtr size_t_count);
-		public void ShowGlyphsWithAdvances (ushort [] glyphs, SizeF [] advances, int count)
+		public void ShowGlyphsWithAdvances (ushort [] glyphs, NSSize [] advances, int count)
 		{
 			if (glyphs == null)
 				throw new ArgumentNullException ("glyphs");
@@ -1142,14 +984,7 @@ namespace MonoMac.CoreGraphics {
 				throw new ArgumentNullException ("advances");
 			if (count > glyphs.Length || count > advances.Length)
 				throw new ArgumentException ("count");
-#if MAC64
-			NSSize[] _advances = new NSSize[advances.Length];
-			for( int i=0; i<advances.Length; i++ )
-				_advances[i] = new NSSize(advances[i]);
-			CGContextShowGlyphsWithAdvances (handle, glyphs, _advances, new IntPtr(count));
-#else
 			CGContextShowGlyphsWithAdvances (handle, glyphs, advances, new IntPtr(count));
-#endif
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
@@ -1163,16 +998,11 @@ namespace MonoMac.CoreGraphics {
 		unsafe extern static void CGContextBeginPage(IntPtr c, ref NSRect mediaBox);
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		unsafe extern static void CGContextBeginPage(IntPtr c, IntPtr zero);
-		public void BeginPage (RectangleF? rect)
+		public void BeginPage (NSRect? rect)
 		{
 			if (rect.HasValue){
-				RectangleF v = rect.Value;
-#if MAC64
-				NSRect _v = new NSRect(v);
-				CGContextBeginPage (handle, ref _v);
-#else
+				NSRect v = rect.Value;
 				CGContextBeginPage (handle, ref v);
-#endif
 			} else {
 				CGContextBeginPage (handle, IntPtr.Zero);
 			}
@@ -1240,101 +1070,63 @@ namespace MonoMac.CoreGraphics {
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static NSPoint CGContextConvertPointToDeviceSpace(IntPtr context, NSPoint point);
-		public PointF PointToDeviceSpace (PointF point)
+		public NSPoint PointToDeviceSpace (NSPoint point)
 		{
-#if MAC64
-			NSPoint rc = CGContextConvertPointToDeviceSpace (handle, new NSPoint(point));
-			return new PointF((float)rc.X, (float)rc.Y);
-#else
 			return CGContextConvertPointToDeviceSpace (handle, point);
-#endif
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static NSPoint CGContextConvertPointToUserSpace(IntPtr context, NSPoint point);
-		public PointF ConvertPointToUserSpace (PointF point)
+		public NSPoint ConvertPointToUserSpace (NSPoint point)
 		{
-#if MAC64
-			NSPoint rc = CGContextConvertPointToUserSpace (handle, new NSPoint(point));
-			return new PointF((float)rc.X, (float)rc.Y);
-#else
 			return CGContextConvertPointToUserSpace (handle, point);
-#endif
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static NSSize CGContextConvertSizeToDeviceSpace(IntPtr context, NSSize size);
-		public SizeF ConvertSizeToDeviceSpace (SizeF size)
+		public NSSize ConvertSizeToDeviceSpace (NSSize size)
 		{
-#if MAC64
-			NSSize rc = CGContextConvertSizeToDeviceSpace (handle, new NSSize(size));
-			return new SizeF((float)rc.Width, (float)rc.Height);
-#else
 			return CGContextConvertSizeToDeviceSpace (handle, size);
-#endif
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static NSSize CGContextConvertSizeToUserSpace(IntPtr context, NSSize size);
-		public SizeF ConvertSizeToUserSpace (SizeF size)
+		public NSSize ConvertSizeToUserSpace (NSSize size)
 		{
-#if MAC64
-			NSSize rc = CGContextConvertSizeToUserSpace (handle, new NSSize(size));
-			return new SizeF((float)rc.Width, (float)rc.Height);
-#else
 			return CGContextConvertSizeToUserSpace (handle, size);
-#endif
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static NSRect CGContextConvertRectToDeviceSpace(IntPtr context, NSRect rect);
-		public RectangleF ConvertRectToDeviceSpace (RectangleF rect)
+		public NSRect ConvertRectToDeviceSpace (NSRect rect)
 		{
-#if MAC64
-			NSRect rc = CGContextConvertRectToDeviceSpace (handle, new NSRect(rect));
-			return new RectangleF((float)rc.Origin.X, (float)rc.Origin.Y, (float)rc.Width, (float)rc.Height);
-#else
 			return CGContextConvertRectToDeviceSpace (handle, rect);
-#endif
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static NSRect CGContextConvertRectToUserSpace(IntPtr context, NSRect rect);
-		public RectangleF ConvertRectToUserSpace (RectangleF rect)
+		public NSRect ConvertRectToUserSpace (NSRect rect)
 		{
-#if MAC64
-			NSRect rc = CGContextConvertRectToUserSpace (handle, new NSRect(rect));
-			return new RectangleF((float)rc.Origin.X, (float)rc.Origin.Y, (float)rc.Width, (float)rc.Height);
-#else
 			return CGContextConvertRectToUserSpace (handle, rect);
-#endif
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextDrawLayerInRect (IntPtr context, NSRect rect, IntPtr layer);
-		public void DrawLayer (CGLayer layer, RectangleF rect)
+		public void DrawLayer (CGLayer layer, NSRect rect)
 		{
 			if (layer == null)
 				throw new ArgumentNullException ("layer");
-#if MAC64
-			CGContextDrawLayerInRect (handle, new NSRect(rect), layer.Handle);
-#else
 			CGContextDrawLayerInRect (handle, rect, layer.Handle);
-#endif
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextDrawLayerAtPoint (IntPtr context, NSPoint rect, IntPtr layer);
 
-		public void DrawLayer (CGLayer layer, PointF point)
+		public void DrawLayer (CGLayer layer, NSPoint point)
 		{
 			if (layer == null)
 				throw new ArgumentNullException ("layer");
-#if MAC64
-			CGContextDrawLayerAtPoint (handle, new NSPoint(point), layer.Handle);
-#else
 			CGContextDrawLayerAtPoint (handle, point, layer.Handle);
-#endif
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
@@ -1403,22 +1195,14 @@ namespace MonoMac.CoreGraphics {
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static IntPtr CGContextBeginTransparencyLayerWithRect (IntPtr context, NSRect rect, IntPtr dictionary);
-		public void BeginTransparencyLayer (RectangleF rectangle, NSDictionary auxiliaryInfo = null)
+		public void BeginTransparencyLayer (NSRect rectangle, NSDictionary auxiliaryInfo = null)
 		{
-#if MAC64
-			CGContextBeginTransparencyLayerWithRect (handle, new NSRect(rectangle), auxiliaryInfo == null ? IntPtr.Zero : auxiliaryInfo.Handle);
-#else
 			CGContextBeginTransparencyLayerWithRect (handle, rectangle, auxiliaryInfo == null ? IntPtr.Zero : auxiliaryInfo.Handle);
-#endif
 		}
 
-		public void BeginTransparencyLayer (RectangleF rectangle)
+		public void BeginTransparencyLayer (NSRect rectangle)
 		{
-#if MAC64
-			CGContextBeginTransparencyLayerWithRect (handle, new NSRect(rectangle), IntPtr.Zero);
-#else
 			CGContextBeginTransparencyLayerWithRect (handle, rectangle, IntPtr.Zero);
-#endif
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
