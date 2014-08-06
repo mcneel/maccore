@@ -39,6 +39,31 @@ namespace MonoMac.Foundation {
 			Y = point.Y;
 		}
 
+		public override int GetHashCode()
+		{
+			return X.GetHashCode() ^ Y.GetHashCode();
+		}
+
+		public static bool operator ==(NSPoint left, NSPoint right)
+		{
+			return left.X == right.X && left.Y == right.Y;
+		}
+
+		public static bool operator !=(NSPoint left, NSPoint right)
+		{
+			return left.X != right.X || left.Y != right.Y;
+		}
+		
+		public static NSPoint operator +(NSPoint pt, NSSize sz)
+		{
+			return new NSPoint(pt.X + sz.Width, pt.Y + sz.Height);
+		}
+
+		public static NSPoint operator -(NSPoint pt, NSSize sz)
+		{
+			return new NSPoint(pt.X - sz.Width, pt.Y - sz.Height);
+		}
+
 		public NSPoint(int x, int y)
 		{
 #if MAC64

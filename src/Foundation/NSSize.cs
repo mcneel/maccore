@@ -27,6 +27,13 @@ using System.Runtime.InteropServices;
 // For now, only support MAC64 for NSSize in order to make sure
 // we didn't mess up the 32 bit build
 #if MAC64
+
+#if MAC64
+using CGFloat = System.Double;
+#else
+using CGFloat = System.Single;
+#endif
+
 namespace MonoMac.Foundation {
 	[StructLayout(LayoutKind.Sequential)]
 	public struct NSSize {
@@ -38,10 +45,44 @@ namespace MonoMac.Foundation {
 			Width = size.Width;
 			Height = size.Height;
 		}
+		
+		public NSSize(CGFloat width, CGFloat height)
+		{
+			Width = width;
+			Height = height;
+		}
+
+#if MAC64
 		public NSSize(float width, float height)
 		{
 			Width = width;
 			Height = height;
+		}
+#endif
+		
+		public override int GetHashCode()
+		{
+			return Width.GetHashCode() ^ Height.GetHashCode();
+		}
+
+		public static bool operator ==(NSSize left, NSSize right)
+		{
+			return left.Width == right.Width && left.Height == right.Height;
+		}
+
+		public static bool operator !=(NSSize left, NSSize right)
+		{
+			return left.Width != right.Width || left.Height != right.Height;
+		}
+
+		public static NSSize operator +(NSSize size1, NSSize size2)
+		{
+			return new NSSize(size1.Width + size2.Width, size1.Height + size2.Height);
+		}
+
+		public static NSSize operator -(NSSize size1, NSSize size2)
+		{
+			return new NSSize(size1.Width - size2.Width, size1.Height - size2.Height);
 		}
 
 #if MAC64

@@ -74,6 +74,31 @@ namespace MonoMac.Foundation {
 				return Origin;
 			}
 		}
+		
+		public double Left { get { return X; } }
+		public double Top { get { return Y; } }
+		public double Right { get { return X + Width; } }
+		public double Bottom { get { return Y + Height; } }
+		
+		public override bool Equals(object obj)
+		{
+			return obj is NSRect && this == (NSRect)obj;
+		}
+
+		public override int GetHashCode()
+		{
+			return Origin.GetHashCode() ^ Size.GetHashCode();
+		}
+		
+		public static bool operator ==(NSRect left, NSRect right)
+		{
+			return left.Origin == right.Origin && left.Size == right.Size;
+		}
+
+		public static bool operator !=(NSRect left, NSRect right)
+		{
+			return left.Origin != right.Origin || left.Size != right.Size;
+		}
 
 #if MAC64
 		public double X { get { return Origin.X; } set { Origin.X=value; } }
