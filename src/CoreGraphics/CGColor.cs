@@ -86,7 +86,7 @@ namespace MonoMac.CoreGraphics {
 		[DllImport(Constants.CoreGraphicsLibrary)]
 		extern static IntPtr CGColorCreate(IntPtr space, CGFloat [] components);
 
-		public CGColor (CGColorSpace colorspace, float [] components)
+		public CGColor (CGColorSpace colorspace, CGFloat [] components)
 		{
 			if (components == null)
 				throw new ArgumentNullException ("components");
@@ -94,26 +94,24 @@ namespace MonoMac.CoreGraphics {
 				throw new ArgumentNullException ("colorspace");
 			if (colorspace.handle == IntPtr.Zero)
 				throw new ObjectDisposedException ("colorspace");
-			CGFloat[] _components = new CGFloat[components.Length];
-			Array.Copy (components, _components, components.Length);
-			handle = CGColorCreate (colorspace.handle, _components);
+			handle = CGColorCreate (colorspace.handle, components);
 		}
 
 		[DllImport(Constants.CoreGraphicsLibrary)]
 		extern static IntPtr CGColorCreateGenericGray(CGFloat gray, CGFloat alpha);
-		public CGColor (float gray, float alpha)
+		public CGColor (CGFloat gray, CGFloat alpha)
 		{
 			handle = CGColorCreateGenericGray (gray, alpha);
 		}
 
 		[DllImport(Constants.CoreGraphicsLibrary)]
 		extern static IntPtr CGColorCreateGenericRGB (CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha);
-		public CGColor (float red, float green, float blue, float alpha)
+		public CGColor (CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha)
 		{
 			handle = CGColorCreateGenericRGB (red, green, blue, alpha);
 		}
 
-		public CGColor (float red, float green, float blue)
+		public CGColor (CGFloat red, CGFloat green, CGFloat blue)
 		{
 			handle = CGColorCreateGenericRGB (red, green, blue, 1.0f);
 		}
@@ -134,7 +132,7 @@ namespace MonoMac.CoreGraphics {
 
 		[DllImport(Constants.CoreGraphicsLibrary)]
 		extern static IntPtr CGColorCreateWithPattern(IntPtr space, IntPtr pattern, CGFloat [] components);
-		public CGColor (CGColorSpace colorspace, CGPattern pattern, float [] components)
+		public CGColor (CGColorSpace colorspace, CGPattern pattern, CGFloat [] components)
 		{
 			if (colorspace == null)
 				throw new ArgumentNullException ("colorspace");
@@ -145,16 +143,14 @@ namespace MonoMac.CoreGraphics {
 			if (components == null)
 				throw new ArgumentNullException ("components");
 
-			CGFloat[] _components = new CGFloat[components.Length];
-			Array.Copy (components, _components, components.Length);
-			handle = CGColorCreateWithPattern (colorspace.handle, pattern.handle, _components);
+			handle = CGColorCreateWithPattern (colorspace.handle, pattern.handle, components);
 			if (handle == IntPtr.Zero)
 				throw new ArgumentException ();
 		}
 
 		[DllImport(Constants.CoreGraphicsLibrary)]
 		extern static IntPtr CGColorCreateCopyWithAlpha(IntPtr color, CGFloat alpha);
-		public CGColor (CGColor source, float alpha)
+		public CGColor (CGColor source, CGFloat alpha)
 		{
 			if (source == null)
 				throw new ArgumentNullException ("source");
@@ -201,15 +197,15 @@ namespace MonoMac.CoreGraphics {
 
 		[DllImport(Constants.CoreGraphicsLibrary)]
 		extern static unsafe CGFloat *CGColorGetComponents(IntPtr color);
-		public float [] Components {
+		public CGFloat [] Components {
 			get {
 				int n = NumberOfComponents;
-				float [] result = new float[n];
+				CGFloat [] result = new CGFloat[n];
 				unsafe {
 					CGFloat *cptr = CGColorGetComponents (handle);
 
 					for (int i = 0; i < n; i++){
-						result [i] = (float)cptr [i];
+						result [i] = cptr [i];
 					}
 				}
 				return result;
@@ -218,9 +214,9 @@ namespace MonoMac.CoreGraphics {
 
 		[DllImport(Constants.CoreGraphicsLibrary)]
 		extern static CGFloat CGColorGetAlpha(IntPtr color);
-		public float Alpha {
+		public CGFloat Alpha {
 			get {
-				return (float)CGColorGetAlpha (handle);
+				return CGColorGetAlpha (handle);
 			}
 		}
 		

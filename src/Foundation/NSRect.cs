@@ -27,6 +27,13 @@ using System.Runtime.InteropServices;
 // For now, only support MAC64 for NSRect in order to make sure
 // we didn't mess up the 32 bit build
 #if MAC64
+
+#if MAC64
+using nfloat = System.Double;
+#else
+using nfloat = System.Single;
+#endif
+
 namespace MonoMac.Foundation {
 	[StructLayout(LayoutKind.Sequential)]
 	public struct NSRect {
@@ -57,7 +64,7 @@ namespace MonoMac.Foundation {
 			Size.Height = size.Height;
 		}
 
-		public NSRect(double x, double y, double width, double height)
+		public NSRect(nfloat x, nfloat y, nfloat width, nfloat height)
 		{
 			Origin.X = x;
 			Origin.Y = y;
@@ -75,10 +82,10 @@ namespace MonoMac.Foundation {
 			}
 		}
 		
-		public double Left { get { return X; } }
-		public double Top { get { return Y; } }
-		public double Right { get { return X + Width; } }
-		public double Bottom { get { return Y + Height; } }
+		public nfloat Left { get { return X; } }
+		public nfloat Top { get { return Y; } }
+		public nfloat Right { get { return X + Width; } }
+		public nfloat Bottom { get { return Y + Height; } }
 		
 		public override bool Equals(object obj)
 		{
@@ -110,17 +117,10 @@ namespace MonoMac.Foundation {
 			return new System.Drawing.RectangleF ((float)rect.X, (float)rect.Y, (float)rect.Width, (float)rect.Height);
 		}
 
-#if MAC64
-		public double X { get { return Origin.X; } set { Origin.X=value; } }
-		public double Y { get { return Origin.Y; } set { Origin.Y=value; } }
-		public double Width { get { return Size.Width; } set { Size.Width = value; } }
-		public double Height { get { return Size.Height; } set { Size.Height = value; } }
-#else
-		public float X { get { return Origin.X; } set { Origin.X=value; } }
-		public float Y { get { return Origin.Y; } set { Origin.Y=value; } }
-		public float Width { get { return Size.Width; } set { Size.Width = value; } }
-		public float Height { get { return Size.Height; } set { Size.Height = value; } }
-#endif
+		public nfloat X { get { return Origin.X; } set { Origin.X=value; } }
+		public nfloat Y { get { return Origin.Y; } set { Origin.Y=value; } }
+		public nfloat Width { get { return Size.Width; } set { Size.Width = value; } }
+		public nfloat Height { get { return Size.Height; } set { Size.Height = value; } }
 	}
 }
 #endif

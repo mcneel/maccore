@@ -197,38 +197,25 @@ namespace MonoMac.CoreGraphics {
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static NSRect CGFontGetFontBBox(IntPtr font);
-		public RectangleF FontBBox {
+		public NSRect FontBBox {
 			get {
-#if MAC64
-				NSRect rc = CGFontGetFontBBox (handle);
-				return new RectangleF((float)rc.Origin.X, (float)rc.Origin.Y, (float)rc.Width, (float)rc.Height);
-#else
 				return CGFontGetFontBBox (handle);
-#endif
 			}
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static CGFloat CGFontGetItalicAngle(IntPtr font);
-		public float ItalicAngle {
+		public CGFloat ItalicAngle {
 			get {
-#if MAC64
-				return (float)CGFontGetItalicAngle (handle);
-#else
 				return CGFontGetItalicAngle (handle);
-#endif
 			}
 		}
 			
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static CGFloat CGFontGetStemV(IntPtr font);
-		public float StemV {
+		public CGFloat StemV {
 			get {
-#if MAC64
-				return (float)CGFontGetStemV (handle);
-#else
 				return CGFontGetStemV (handle);
-#endif
 			}
 		}
 		

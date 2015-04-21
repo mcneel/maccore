@@ -204,21 +204,21 @@ namespace MonoMac.CoreGraphics {
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextScaleCTM (IntPtr ctx, CGFloat sx, CGFloat sy);
-		public void ScaleCTM (float sx, float sy)
+		public void ScaleCTM (CGFloat sx, CGFloat sy)
 		{
 			CGContextScaleCTM (handle, sx, sy);
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextTranslateCTM (IntPtr ctx, CGFloat tx, CGFloat ty);
-		public void TranslateCTM (float tx, float ty)
+		public void TranslateCTM (CGFloat tx, CGFloat ty)
 		{
 			CGContextTranslateCTM (handle, tx, ty);
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static void CGContextRotateCTM (IntPtr ctx, CGFloat angle);
-		public void RotateCTM (float angle)
+		public void RotateCTM (CGFloat angle)
 		{
 			CGContextRotateCTM (handle, angle);
 		}
@@ -233,7 +233,7 @@ namespace MonoMac.CoreGraphics {
 		// Settings
 		[DllImport (Constants.CoreGraphicsLibrary)]		
 		extern static void CGContextSetLineWidth(IntPtr c, CGFloat width);
-		public void SetLineWidth (float w)
+		public void SetLineWidth (CGFloat w)
 		{
 			CGContextSetLineWidth (handle, w);
 		}
@@ -254,39 +254,37 @@ namespace MonoMac.CoreGraphics {
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static	void CGContextSetMiterLimit(IntPtr c, CGFloat limit);
-		public void SetMiterLimit (float limit)
+		public void SetMiterLimit (CGFloat limit)
 		{
 			CGContextSetMiterLimit (handle, limit);
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static	void CGContextSetLineDash(IntPtr c, CGFloat phase, CGFloat [] lengths, NSInteger count);
-		public void SetLineDash (float phase, float [] lengths)
+		public void SetLineDash (CGFloat phase, CGFloat [] lengths)
 		{
 			SetLineDash (phase, lengths, lengths.Length);
 		}
 
-		public void SetLineDash (float phase, float [] lengths, int n)
+		public void SetLineDash (CGFloat phase, CGFloat [] lengths, int n)
 		{
 			if (lengths == null)
 				n = 0;
 			else if (n < 0 || n > lengths.Length)
 				throw new ArgumentException ("n");
-			CGFloat[] _lengths = new CGFloat[lengths.Length];
-			Array.Copy (lengths, _lengths, lengths.Length);
-			CGContextSetLineDash (handle, phase, _lengths, n);
+			CGContextSetLineDash (handle, phase, lengths, n);
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static	void CGContextSetFlatness(IntPtr c, CGFloat flatness);
-		public void SetFlatness (float flatness)
+		public void SetFlatness (CGFloat flatness)
 		{
 			CGContextSetFlatness (handle, flatness);
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static	void CGContextSetAlpha(IntPtr c, CGFloat alpha);
-		public void SetAlpha (float alpha)
+		public void SetAlpha (CGFloat alpha)
 		{
 			CGContextSetAlpha (handle, alpha);
 		}

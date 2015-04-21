@@ -25,7 +25,7 @@ using System;
 #if MAC64
 using NSUInteger = System.UInt64;
 #else
-using NSUInteger = System.Int32;
+using NSUInteger = System.UInt32;
 #endif
 
 namespace MonoMac.Foundation {
@@ -35,13 +35,11 @@ namespace MonoMac.Foundation {
 
 		public const NSUInteger NotFound = NSUInteger.MaxValue;
 		
-		#if MAC64
 		public NSRange (NSUInteger start, NSUInteger len)
 		{
 			Location = start;
 			Length = len;
 		}
-		#endif
 		
 		public NSRange (int start, int len)
 		{

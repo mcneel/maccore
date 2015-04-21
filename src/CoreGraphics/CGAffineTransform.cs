@@ -49,44 +49,24 @@ namespace MonoMac.CoreGraphics {
 
 	[StructLayout(LayoutKind.Sequential)]
 	public struct CGAffineTransform {
-		CGFloat a,b,c,d,tx,ty;
-
-		public CGFloat xx {
-			get { return a; }
-			set { a = value; }
-		}
-		public CGFloat yx {
-			get { return b; }
-			set { b = value; }
-		}
-		public CGFloat xy {
-			get { return c; }
-			set { c = value; }
-		}
-		public CGFloat yy {
-			get { return d; }
-			set { d = value; }
-		}
-		public CGFloat x0 {
-			get { return tx; }
-			set { tx = value; }
-		}
-		public CGFloat y0 {
-			get { return ty; }
-			set { ty = value; }
-		}
+		public CGFloat xx;   // a
+		public CGFloat yx;   // b 
+		public CGFloat xy;   // c
+		public CGFloat yy;   // d
+		public CGFloat x0;   // tx
+		public CGFloat y0;   // ty
 
 		//
 		// Constructors
 		//
 		public CGAffineTransform (CGFloat xx, CGFloat yx, CGFloat xy, CGFloat yy, CGFloat x0, CGFloat y0)
 		{
-			this.a = xx;
-			this.b = yx;
-			this.c = xy;
-			this.d = yy;
-			this.tx = x0;
-			this.ty = y0;
+			this.xx = xx;
+			this.yx = yx;
+			this.xy = xy;
+			this.yy = yy;
+			this.x0 = x0;
+			this.y0 = y0;
 		}
 		
 		// Identity
@@ -98,8 +78,8 @@ namespace MonoMac.CoreGraphics {
 		public static CGAffineTransform MakeRotation (CGFloat angle)
 		{
 			return new CGAffineTransform (
-				Math.Cos (angle), Math.Sin (angle),
-				-Math.Sin (angle), Math.Cos (angle),
+				(CGFloat)Math.Cos (angle), (CGFloat)Math.Sin (angle),
+				(CGFloat)(-Math.Sin (angle)), (CGFloat)Math.Cos (angle),
 				0, 0);
 		}
 
@@ -118,12 +98,12 @@ namespace MonoMac.CoreGraphics {
 		//
 		public static CGAffineTransform Multiply (CGAffineTransform a, CGAffineTransform b)
 		{
-			return new CGAffineTransform ((a.xx * b.xx + a.yx * b.xy),
-						      (a.xx * b.yx + a.yx * b.yy),
-						      (a.xy * b.xx + a.yy * b.xy),
-						      (a.xy * b.yx + a.yy * b.yy),
-						      (a.x0 * b.xx + a.y0 * b.xy + b.x0),
-						      (a.x0 * b.yx + a.y0 * b.yy + b.y0));
+			return new CGAffineTransform (a.xx * b.xx + a.yx * b.xy,
+						      a.xx * b.yx + a.yx * b.yy,
+						      a.xy * b.xx + a.yy * b.xy,
+						      a.xy * b.yx + a.yy * b.yy,
+						      a.x0 * b.xx + a.y0 * b.xy + b.x0,
+						      a.x0 * b.yx + a.y0 * b.yy + b.y0);
 		}
 
 		public void Multiply (CGAffineTransform b)
@@ -178,12 +158,12 @@ namespace MonoMac.CoreGraphics {
 
 		public static CGAffineTransform operator * (CGAffineTransform a, CGAffineTransform b)
 		{
-			return new CGAffineTransform ((a.xx * b.xx + a.yx * b.xy),
-						      (a.xx * b.yx + a.yx * b.yy),
-						      (a.xy * b.xx + a.yy * b.xy),
-						      (a.xy * b.yx + a.yy * b.yy),
-						      (a.x0 * b.xx + a.y0 * b.xy + b.x0),
-						      (a.x0 * b.yx + a.y0 * b.yy + b.y0));
+			return new CGAffineTransform (a.xx * b.xx + a.yx * b.xy,
+						      a.xx * b.yx + a.yx * b.yy,
+						      a.xy * b.xx + a.yy * b.xy,
+						      a.xy * b.yx + a.yy * b.yy,
+						      a.x0 * b.xx + a.y0 * b.xy + b.x0,
+						      a.x0 * b.yx + a.y0 * b.yy + b.y0);
 		}
                 
                 public override bool Equals(object o)
@@ -203,8 +183,8 @@ namespace MonoMac.CoreGraphics {
                 
 		public NSPoint TransformPoint (PointF point)
 		{
-			return new NSPoint ((xx * point.X + xy * point.Y + x0),
-					   (yx * point.X + yy * point.Y + y0));
+			return new PointF (xx * point.X + xy * point.Y + x0,
+					    yx * point.X + yy * point.Y + y0);
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]

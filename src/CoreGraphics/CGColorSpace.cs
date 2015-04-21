@@ -144,23 +144,19 @@ namespace MonoMac.CoreGraphics {
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static IntPtr CGColorSpaceCreateCalibratedGray (CGFloat [] whitepoint, CGFloat [] blackpoint, CGFloat gamma);
 
-		public static CGColorSpace CreateCalibratedGray (float [] whitepoint, float [] blackpoint, float gamma)
+		public static CGColorSpace CreateCalibratedGray (CGFloat [] whitepoint, CGFloat [] blackpoint, CGFloat gamma)
 		{
 			if (whitepoint.Length != 3)
 				throw new ArgumentException ("Must have 3 values", "whitepoint");
 			if (blackpoint.Length != 3)
 				throw new ArgumentException ("Must have 3 values", "blackpoint");
-			CGFloat[] _whitepoint = new CGFloat[3];
-			Array.Copy (whitepoint, _whitepoint, 3);
-			CGFloat[] _blackpoint = new CGFloat[3];
-			Array.Copy (blackpoint, _blackpoint, 3);
-			return new CGColorSpace (CGColorSpaceCreateCalibratedGray (_whitepoint, _blackpoint, gamma), true);
+			return new CGColorSpace (CGColorSpaceCreateCalibratedGray (whitepoint, blackpoint, gamma), true);
 		}
 		
 		// 3, 3, 3, 9
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static IntPtr CGColorSpaceCreateCalibratedRGB (CGFloat [] whitePoint, CGFloat [] blackPoint, CGFloat [] gamma, CGFloat [] matrix);
-		public static CGColorSpace CreateCalibratedRGB (float [] whitepoint, float [] blackpoint, float [] gamma, float [] matrix)
+		public static CGColorSpace CreateCalibratedRGB (CGFloat [] whitepoint, CGFloat [] blackpoint, CGFloat [] gamma, CGFloat [] matrix)
 		{
 			if (whitepoint.Length != 3)
 				throw new ArgumentException ("Must have 3 values", "whitepoint");
@@ -170,16 +166,7 @@ namespace MonoMac.CoreGraphics {
 				throw new ArgumentException ("Must have 3 values", "gamma");
 			if (matrix.Length != 9)
 				throw new ArgumentException ("Must have 9 values", "matrix");
-			CGFloat[] _whitepoint = new CGFloat[3];
-			Array.Copy (whitepoint, _whitepoint, 3);
-			CGFloat[] _blackpoint = new CGFloat[3];
-			Array.Copy (blackpoint, _blackpoint, 3);
-			CGFloat[] _gamma = new CGFloat[3];
-			Array.Copy (gamma, _gamma, 3);
-			CGFloat[] _matrix = new CGFloat[9];
-			Array.Copy (matrix, _matrix, 9);
-
-			return new CGColorSpace (CGColorSpaceCreateCalibratedRGB (_whitepoint, _blackpoint, _gamma, _matrix), true);
+			return new CGColorSpace (CGColorSpaceCreateCalibratedRGB (whitepoint, blackpoint, gamma, matrix), true);
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]

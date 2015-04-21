@@ -21,9 +21,17 @@
 // Copyright 2011, 2012 Xamarin Inc
 using System;
 
+#if MAC64
+using nint = System.Int64;
+using nuint = System.UInt64;
+#else
+using nint = System.Int32;
+using nuint = System.UInt32;
+#endif
+
 namespace MonoMac.CoreData {
 
-        public enum NSEntityMappingType : uint {
+        public enum NSEntityMappingType : nuint {
                 Undefined = 0x00,
                 Custom = 0x01,
                 Add = 0x02,
@@ -32,8 +40,7 @@ namespace MonoMac.CoreData {
 		Transform = 0x06
         }
 
-	//TODO: figure out size for 64 bit
-	public enum NSAttributeType : uint {
+	public enum NSAttributeType : nuint {
 		Undefined = 0,
 		Integer16 = 100,
 		Integer32 = 200,
@@ -49,44 +56,49 @@ namespace MonoMac.CoreData {
 	}
 
 	[Flags]
-	public enum NSFetchRequestResultType : uint {
+	public enum NSFetchRequestResultType : nuint {
 		ManagedObject = 0x00,
 		ManagedObjectID = 0x01,
 		DictionaryResultType = 0x02,
 		NSCountResultType = 0x04
 	}
 
-	public enum NSKeyValueSetMutationKind : uint {
+	public enum NSKeyValueSetMutationKind : nuint {
 		Union = 1,
 		Minus = 2,
 		Intersect = 3,
 		NSKeyValueSet = 4
 	}
 
-	public enum NSDeleteRule : uint {
+	public enum NSDeleteRule : nuint {
 		NoAction,
 		Nullify,
 		Cascade,
 		Deny
 	}
 
-	public enum NSPersistentStoreRequestType {
+	public enum NSPersistentStoreRequestType : nuint {
 		Fetch = 1,
-		Save
+		Save,
+#if MONOMAC
+		BatchUpdate = 6
+#endif
 	}
 
-	public enum NSManagedObjectContextConcurrencyType {
+	public enum NSManagedObjectContextConcurrencyType : nuint {
 		Confinement, PrivateQueue, MainQueue
 	}
 
-	public enum NSMergePolicyType {
+	public enum NSMergePolicyType : nuint {
 		Error, PropertyStoreTrump, PropertyObjectTrump, Overwrite, RollbackMerge
 	}
 
+#if !MONOMAC
 	public enum NSFetchedResultsChangeType {
 		Insert = 1,
 		Delete = 2,
 		Move = 3,
 		Update = 4
 	}
+#endif
 }

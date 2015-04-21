@@ -30,6 +30,12 @@ using System;
 
 using MonoMac.ObjCRuntime;
 
+#if MAC64
+using nuint = System.UInt64;
+#else
+using nuint = System.UInt32;
+#endif
+
 namespace MonoMac.Foundation {
 	public sealed class NSUrlProtocolClient : NSObject
 	{
@@ -59,7 +65,7 @@ namespace MonoMac.Foundation {
 
 		public void ReceivedResponse (NSUrlProtocol protocol, NSUrlResponse response, NSUrlCacheStoragePolicy policy)
 		{
-			Messaging.void_objc_msgSend_IntPtr_IntPtr_int (this.Handle, Selector.GetHandle (selUrlProtocolDidReceiveResponseCacheStoragePolicy_), protocol.Handle, response.Handle, (int)policy);
+			Messaging.void_objc_msgSend_intptr_intptr_nuint (this.Handle, Selector.GetHandle (selUrlProtocolDidReceiveResponseCacheStoragePolicy_), protocol.Handle, response.Handle, (nuint)policy);
 		}
 
 		public void DataLoaded (NSUrlProtocol protocol, NSData data)

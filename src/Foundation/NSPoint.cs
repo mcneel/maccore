@@ -27,6 +27,13 @@ using System.Runtime.InteropServices;
 // For now, only support MAC64 for NSPoint in order to make sure
 // we didn't mess up the 32 bit build
 #if MAC64
+
+#if MAC64
+using nfloat = System.Double;
+#else
+using nfloat = System.Single;
+#endif
+
 namespace MonoMac.Foundation {
 	[StructLayout(LayoutKind.Sequential)]
 	public struct NSPoint {
@@ -76,33 +83,18 @@ namespace MonoMac.Foundation {
 
 		public NSPoint(int x, int y)
 		{
-#if MAC64
-			X = (double)x;
-			Y = (double)y;
-#else
-			X = (float)x;
-			Y = (float)y;
-#endif
+			X = (nfloat)x;
+			Y = (nfloat)y;
 		}
-#if MAC64
-		public NSPoint(double x, double y)
+
+		public NSPoint(nfloat x, nfloat y)
 		{
 			X = x;
 			Y = y;
 		}
 
-		public double X;
-		public double Y;
-#else
-		public NSPoint(float x, float y)
-		{
-			X = x;
-			Y = y;
-		}
-
-		public float X;
-		public float Y;
-#endif
+		public nfloat X;
+		public nfloat Y;
 	}
 }
 #endif

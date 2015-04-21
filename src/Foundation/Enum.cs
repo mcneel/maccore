@@ -26,8 +26,16 @@
 using System;
 using MonoMac.ObjCRuntime;
 
+#if MAC64
+using nint = System.Int64;
+using nuint = System.UInt64;
+#else
+using nint = System.Int32;
+using nuint = System.UInt32;
+#endif
+
 namespace MonoMac.Foundation  {
-	public enum NSUrlCredentialPersistence {
+	public enum NSUrlCredentialPersistence : nuint {
 		None,
 		ForSession,
 		Permanent
@@ -40,21 +48,13 @@ namespace MonoMac.Foundation  {
 		PPC64  = 0x01000012
 	}
 
-#if MAC64
-	public enum NSComparisonResult : long {
-#else
-	public enum NSComparisonResult {
-#endif
+	public enum NSComparisonResult : nint {
 		Ascending = -1,
 		Same,
 		Descending
 	}
 
-#if MAC64
-	public enum NSUrlRequestCachePolicy : ulong {
-#else
-	public enum NSUrlRequestCachePolicy {
-#endif
+	public enum NSUrlRequestCachePolicy : nuint {
 		UseProtocolCachePolicy = 0,
 		ReloadIgnoringLocalCacheData = 1,
 		ReloadIgnoringLocalAndRemoteCacheData = 4, // Unimplemented
@@ -66,11 +66,11 @@ namespace MonoMac.Foundation  {
 		ReloadRevalidatingCacheData = 5, // Unimplemented
 	}
 
-	public enum NSUrlCacheStoragePolicy {
+	public enum NSUrlCacheStoragePolicy : nuint {
 		Allowed, AllowedInMemoryOnly, NotAllowed
 	}
 	
-	public enum NSStreamStatus {
+	public enum NSStreamStatus : nuint {
 		NotOpen = 0,
 		Opening = 1,
 		Open = 2,
@@ -81,24 +81,20 @@ namespace MonoMac.Foundation  {
 		Error = 7
 	}
 
-#if MAC64
-	public enum NSPropertyListFormat : ulong {
-#else
-	public enum NSPropertyListFormat {
-#endif
+	public enum NSPropertyListFormat : nuint {
 		OpenStep = 1,
 		Xml = 100,
 		Binary = 200
 	}
 
-	public enum NSPropertyListMutabilityOptions {
+	public enum NSPropertyListMutabilityOptions : nuint {
 		Immutable = 0,
 		MutableContainers = 1,
 		MutableContainersAndLeaves = 2
 	}
 
 	// Should mirror NSPropertyListMutabilityOptions
-	public enum NSPropertyListWriteOptions {
+	public enum NSPropertyListWriteOptions : nuint {
 		Immutable = 0,
 		MutableContainers = 1,
 		MutableContainersAndLeaves = 2
@@ -106,20 +102,20 @@ namespace MonoMac.Foundation  {
 
 	// Should mirror NSPropertyListMutabilityOptions, but currently
 	// not implemented (always use Immutable/0)
-	public enum NSPropertyListReadOptions {
+	public enum NSPropertyListReadOptions : nuint {
 		Immutable = 0,
 		MutableContainers = 1,
 		MutableContainersAndLeaves = 2
 	}
 
 	[Flags]
-	public enum NSMachPortRights {
+	public enum NSMachPortRights : nuint {
 		None = 0,
 		SendRight = (1 << 0),
 		ReceiveRight = (1 << 1)
 	}
 
-	public enum NSNetServicesStatus {
+	public enum NSNetServicesStatus : nint {
 		UnknownError = -72000,
 		CollisionError = -72001,
 		NotFoundError	= -72002,
@@ -130,11 +126,11 @@ namespace MonoMac.Foundation  {
 		TimeoutError = -72007
 	}
 	
-	public enum NSNetServiceOptions {
+	public enum NSNetServiceOptions : nuint {
 		NoAutoRename = 1 << 0
 	}
 
-	public enum NSDateFormatterStyle {
+	public enum NSDateFormatterStyle : nuint {
 		None,
 		Short,
 		Medium,
@@ -142,20 +138,16 @@ namespace MonoMac.Foundation  {
 		Full
 	}
 
-	public enum NSDateFormatterBehavior {
+	public enum NSDateFormatterBehavior : nuint {
 		Default = 0, Mode_10_4 = 1040
 	}
 
-	public enum NSHttpCookieAcceptPolicy {
+	public enum NSHttpCookieAcceptPolicy : nuint {
 		Always, Never, OnlyFromMainDocumentDomain
 	}
 
 	[Flags]
-#if MAC64
-	public enum NSCalendarUnit : ulong {
-#else
-	public enum NSCalendarUnit {
-#endif
+	public enum NSCalendarUnit : nuint {
 		Era = 2, 
 		Year = 4,
 		Month = 8,
@@ -182,11 +174,7 @@ namespace MonoMac.Foundation  {
 	}
 
 	[Flags]
-#if MAC64
-	public enum NSDataReadingOptions: ulong {
-#else
-	public enum NSDataReadingOptions: uint {
-#endif
+	public enum NSDataReadingOptions: nuint {
 		   Mapped =   1 << 0,
 		   Uncached = 1 << 1,
 
@@ -197,7 +185,7 @@ namespace MonoMac.Foundation  {
 	}
 
 	[Flags]
-	public enum NSDataWritingOptions : uint {
+	public enum NSDataWritingOptions : nuint {
 		Atomic = 1,
 
 		WithoutOverwriting  = 2,
@@ -220,32 +208,28 @@ namespace MonoMac.Foundation  {
 	public delegate void NSSetEnumerator (NSObject obj, ref bool stop);
 
 	[Since (4,0)]
-	public enum NSOperationQueuePriority {
+	public enum NSOperationQueuePriority : nint {
 		VeryLow = -8, Low = -4, Normal = 0, High = 4, VeryHigh = 8
 	}
 
 	[Flags]
-	public enum NSNotificationCoalescing {
+	public enum NSNotificationCoalescing : nuint {
 		NoCoalescing = 0,
 		CoalescingOnName = 1,
 		CoalescingOnSender = 2
 	}
 
-	public enum NSPostingStyle {
+	public enum NSPostingStyle : nuint {
 		PostWhenIdle = 1, PostASAP = 2, Now = 3
 	}
 
 	[Flags]
-#if MAC64
-	public enum NSDataSearchOptions : ulong {
-#else
-	public enum NSDataSearchOptions {
-#endif
+	public enum NSDataSearchOptions : nuint {
 		SearchBackwards = 1,
 		SearchAnchored = 2
 	}
 
-	public enum NSExpressionType {
+	public enum NSExpressionType : nuint {
 		ConstantValue = 0, 
 		EvaluatedObject, 
 		Variable, 
@@ -306,26 +290,26 @@ namespace MonoMac.Foundation  {
 	}
 
 	[Flags]
-	public enum NSKeyValueObservingOptions {
+	public enum NSKeyValueObservingOptions : nuint {
 		New = 1, Old = 2, OldNew = 3, Initial = 4, Prior = 8, 
 	}
 
-	public enum NSKeyValueChange {
+	public enum NSKeyValueChange : nuint {
 		Setting = 1, Insertion, Removal, Replacement
 	}
 
-	public enum NSKeyValueSetMutationKind {
+	public enum NSKeyValueSetMutationKind : nuint {
 		UnionSet = 1, MinusSet, IntersectSet, SetSet
 	}
 
 	[Flags]
-	public enum NSEnumerationOptions {
+	public enum NSEnumerationOptions : nuint {
 		SortConcurrent = 1,
 		Reverse = 2
 	}
 	
 #if MONOMAC
-	public enum NSNotificationSuspensionBehavior {
+	public enum NSNotificationSuspensionBehavior : nuint {
 		Drop = 1,
 		Coalesce = 2,
 		Hold = 3,
@@ -333,17 +317,13 @@ namespace MonoMac.Foundation  {
 	}
     
 	[Flags]
-#if MAC64
-	public enum NSNotificationFlags : ulong {
-#else
-	public enum NSNotificationFlags {
-#endif
+	public enum NSNotificationFlags : nuint {
 		DeliverImmediately = (1 << 0),
 		PostToAllSessions = (1 << 1),
 	}
 #endif
 
-	public enum NSStreamEvent : uint {
+	public enum NSStreamEvent : nuint {
 		None = 0,
 		OpenCompleted = 1 << 0,
 		HasBytesAvailable = 1 << 1,
@@ -352,21 +332,13 @@ namespace MonoMac.Foundation  {
 		EndEncountered = 1 << 4
 	}
 
-#if MAC64
-	public enum NSComparisonPredicateModifier : ulong {
-#else
-	public enum NSComparisonPredicateModifier {
-#endif
+	public enum NSComparisonPredicateModifier : nuint {
 		Direct,
 		All,
 		Any
 	}
 
-#if MAC64
-	public enum NSPredicateOperatorType : ulong {
-#else
-	public enum NSPredicateOperatorType {
-#endif
+	public enum NSPredicateOperatorType : nuint {
 		LessThan,
 		LessThanOrEqualTo,
 		GreaterThan,
@@ -384,18 +356,14 @@ namespace MonoMac.Foundation  {
 	}
 
 	[Flags]
-#if MAC64
-	public enum NSComparisonPredicateOptions : ulong {
-#else
-	public enum NSComparisonPredicateOptions {
-#endif
+	public enum NSComparisonPredicateOptions : nuint {
 		None                 = 0x00,
 		CaseInsensitive      = 1<<0,
 		DiacriticInsensitive = 1<<1,
 		Normalized           = 1<<2
 	}	
 	
-	public enum NSCompoundPredicateType {
+	public enum NSCompoundPredicateType : nuint {
 		Not,
 		And,
 		Or
@@ -403,7 +371,7 @@ namespace MonoMac.Foundation  {
 
 	[Since (4,0)]
 	[Flags]
-	public enum NSVolumeEnumerationOptions {
+	public enum NSVolumeEnumerationOptions : nuint {
 		None                     = 0,
 		// skip                  = 1 << 0,
 		SkipHiddenVolumes        = 1 << 1,
@@ -412,7 +380,7 @@ namespace MonoMac.Foundation  {
 
 	[Since (4,0)]
 	[Flags]
-	public enum NSDirectoryEnumerationOptions {
+	public enum NSDirectoryEnumerationOptions : nuint {
 		SkipsNone                    = 0,
 		SkipsSubdirectoryDescendants = 1 << 0,
 		SkipsPackageDescendants      = 1 << 1,
@@ -421,13 +389,13 @@ namespace MonoMac.Foundation  {
 
 	[Since (4,0)]
 	[Flags]
-	public enum NSFileManagerItemReplacementOptions {
+	public enum NSFileManagerItemReplacementOptions : nuint {
 		None                      = 0,
 		UsingNewMetadataOnly      = 1 << 0,
 		WithoutDeletingBackupItem = 1 << 1,
 	}
 
-	public enum NSSearchPathDirectory {
+	public enum NSSearchPathDirectory : nuint {
 		ApplicationDirectory = 1,
 		DemoApplicationDirectory,
 		DeveloperApplicationDirectory,
@@ -458,7 +426,7 @@ namespace MonoMac.Foundation  {
 	}
 
 	[Flags]
-	public enum NSSearchPathDomain {
+	public enum NSSearchPathDomain : nuint {
 		None    = 0,
 		User    = 1 << 0,
 		Local   = 1 << 1,
@@ -467,19 +435,15 @@ namespace MonoMac.Foundation  {
 		All     = 0x0ffff,
 	}
 
-	public enum NSRoundingMode {
+	public enum NSRoundingMode : nuint {
 		Plain, Down, Up, Bankers
 	}
 
-	public enum NSCalculationError {
+	public enum NSCalculationError : nuint {
 		None, PrecisionLoss, Underflow, Overflow, DivideByZero
 	}
 	
-#if MAC64
-	public enum NSStringDrawingOptions : long {
-#else
-	public enum NSStringDrawingOptions : uint {
-#endif
+	public enum NSStringDrawingOptions : nuint {
 		UsesLineFragmentOrigin = (1 << 0),
 		UsesFontLeading = (1 << 1),
 		DisableScreenFontSubstitution = (1 << 2),
@@ -488,11 +452,7 @@ namespace MonoMac.Foundation  {
 		TruncatesLastVisibleLine = (1 << 5)
 	}		
 
-#if MAC64
-	public enum NSNumberFormatterStyle : ulong {
-#else
-	public enum NSNumberFormatterStyle {
-#endif	
+	public enum NSNumberFormatterStyle : nuint {
 		None = 0,
 		Decimal = 1,
 		Currency = 2,
@@ -501,56 +461,36 @@ namespace MonoMac.Foundation  {
 		SpellOut = 5
 	}
 
-#if MAC64
-	public enum NSNumberFormatterBehavior : ulong {
-#else
-	public enum NSNumberFormatterBehavior {
-#endif
+	public enum NSNumberFormatterBehavior : nuint {
 		Default = 0,
 		Version_10_0 = 1000,
 		Version_10_4 = 1040
 	}
 
-#if MAC64
-	public enum NSNumberFormatterPadPosition : ulong {
-#else
-	public enum NSNumberFormatterPadPosition {
-#endif
+	public enum NSNumberFormatterPadPosition : nuint {
 		BeforePrefix, AfterPrefix, BeforeSuffix, AfterSuffix
 	}
 
-#if MAC64
-	public enum NSNumberFormatterRoundingMode : ulong {
-#else
-	public enum NSNumberFormatterRoundingMode {
-#endif
+	public enum NSNumberFormatterRoundingMode : nuint {
 		Ceiling, Floor, Down, Up, HalfEven, HalfDown, HalfUp
 	}
 
 	[Flags]
-	public enum NSFileVersionReplacingOptions {
+	public enum NSFileVersionReplacingOptions : nuint {
 		ByMoving = 1 << 0
 	}
 
-	public enum NSFileVersionAddingOptions {
+	public enum NSFileVersionAddingOptions : nuint {
 		ByMoving = 1 << 0
 	}
 
 	[Flags]
-#if MAC64
-	public enum NSFileCoordinatorReadingOptions : ulong {
-#else
-	public enum NSFileCoordinatorReadingOptions {
-#endif
+	public enum NSFileCoordinatorReadingOptions : nuint {
 		WithoutChanges = 1
 	}
 
 	[Flags]
-#if MAC64
-	public enum NSFileCoordinatorWritingOptions : ulong {
-#else
-	public enum NSFileCoordinatorWritingOptions {
-#endif
+	public enum NSFileCoordinatorWritingOptions : nuint {
 		ForDeleting = 1,
 		ForMoving = 2,
 		ForMerging = 4,
@@ -558,11 +498,7 @@ namespace MonoMac.Foundation  {
 	}
 
 	[Flags]
-#if MAC64
-	public enum NSLinguisticTaggerOptions : ulong {
-#else
-	public enum NSLinguisticTaggerOptions {
-#endif
+	public enum NSLinguisticTaggerOptions : nuint {
 		OmitWords = 1,
 		OmitPunctuation = 2,
 		OmitWhitespace = 4,
@@ -575,35 +511,23 @@ namespace MonoMac.Foundation  {
 	}
 
 	[Flags]
-#if MAC64
-	public enum NSJsonReadingOptions : ulong {
-#else
-	public enum NSJsonReadingOptions {
-#endif	
+	public enum NSJsonReadingOptions : nuint {
 		MutableContainers = 1,
 		MutableLeaves = 2,
 		AllowFragments = 4
 	}
 
 	[Flags]
-#if MAC64
-	public enum NSJsonWritingOptions : ulong {
-#else
-	public enum NSJsonWritingOptions {
-#endif
+	public enum NSJsonWritingOptions : nuint {
 		PrettyPrinted = 1
 	}
 
-#if MAC64
-	public enum NSLocaleLanguageDirection : ulong {
-#else
-	public enum NSLocaleLanguageDirection {
-#endif
+	public enum NSLocaleLanguageDirection : nuint {
 		Unknown, LeftToRight, RightToLeft, TopToBottom, BottomToTop,
 	}
 
 	[Flags]
-	public enum NSAlignmentOptions : long {
+	public enum NSAlignmentOptions : ulong {
 		MinXInward   = 1 << 0,
 		MinYInward   = 1 << 1,
 		MaxXInward   = 1 << 2,
@@ -625,7 +549,7 @@ namespace MonoMac.Foundation  {
 		WidthNearest  = 1 << 20,
 		HeightNearest = 1 << 21,
 
-		RectFlipped   = 1 << 63,
+		RectFlipped   = unchecked((ulong)(1 << 63)),
 
 		AllEdgesInward = MinXInward|MaxXInward|MinYInward|MaxYInward,
 		AllEdgesOutward = MinXOutward|MaxXOutward|MinYOutward|MaxYOutward,
@@ -633,19 +557,19 @@ namespace MonoMac.Foundation  {
 	}
 
 	[Flags]
-	public enum NSFileWrapperReadingOptions {
+	public enum NSFileWrapperReadingOptions : nuint {
 		Immediate = 1 << 0,
 		WithoutMapping = 1 << 1
 	}
 
 	[Flags]
-	public enum NSFileWrapperWritingOptions {
+	public enum NSFileWrapperWritingOptions : nuint {
 		Atomic = 1 << 0,
 		WithNameUpdating = 1 << 1
 	}
 
 	[Flags]
-	public enum NSAttributedStringEnumeration {
+	public enum NSAttributedStringEnumeration : nuint {
 		None = 0,
 		Reverse = 1 << 1,
 		LongestEffectiveRangeNotRequired = 1 << 20
@@ -658,16 +582,12 @@ namespace MonoMac.Foundation  {
 	}
 #endif
 
-	public enum NSWritingDirection {
+	public enum NSWritingDirection : nint {
 		Natural = -1, LeftToRight = 0, RightToLeft = -1
 	}
 
 	[Flags]
-#if MAC64
-	public enum NSByteCountFormatterUnits : ulong {
-#else
-	public enum NSByteCountFormatterUnits {
-#endif
+	public enum NSByteCountFormatterUnits : nuint {
 		UseDefault      = 0,
 		UseBytes        = 1 << 0,
 		UseKB           = 1 << 1,
@@ -681,16 +601,12 @@ namespace MonoMac.Foundation  {
 		UseAll          = 0x0FFFF
 	}
 
-#if MAC64
-	public enum NSByteCountFormatterCountStyle : long {
-#else
-	public enum NSByteCountFormatterCountStyle {
-#endif
+	public enum NSByteCountFormatterCountStyle : nint {
 		File, Memory, Decimal, Binary
 	}
 
 	[Flags]
-	public enum NSUrlBookmarkCreationOptions {
+	public enum NSUrlBookmarkCreationOptions : nuint {
 		PreferFileIDResolution = 1 << 8,
 		MinimalBookmark = 1 << 9,
 		SuitableForBookmarkFile = 1 << 10,
@@ -699,30 +615,24 @@ namespace MonoMac.Foundation  {
 	}
 
 	[Flags]
-	public enum NSUrlBookmarkResolutionOptions {
+	public enum NSUrlBookmarkResolutionOptions : nuint {
 		WithoutUI = 1 << 8,
 		WithoutMounting = 1 << 9,
 		WithSecurityScope = 1 << 10,
 	}
 
+#if !MONOMAC
 	public enum NSLigatureType {
 		None, Default, All 
 	}
-	
-#if MAC64
-	public enum NSDateComponentsWrappingBehavior : ulong {
-#else
-	public enum NSDateComponentsWrappingBehavior {
 #endif
+	
+	public enum NSDateComponentsWrappingBehavior : nuint {
 		None = 0,
 		WrapCalendarComponents = 1 << 0,
 	}
 
-#if MAC64
-	public enum NSUrlRequestNetworkServiceType : ulong {
-#else
-	public enum NSUrlRequestNetworkServiceType {
-#endif
+	public enum NSUrlRequestNetworkServiceType : nuint {
 		Default,
 		VoIP,
 		Video,
@@ -731,7 +641,7 @@ namespace MonoMac.Foundation  {
 	}
 
 	[Flags]
-	public enum NSSortOptions {
+	public enum NSSortOptions : nuint {
 		Concurrent = 1 << 0,
 		Stable = 1 << 4
 	}

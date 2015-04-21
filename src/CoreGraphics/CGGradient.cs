@@ -96,57 +96,36 @@ namespace MonoMac.CoreGraphics {
 
 		[DllImport(Constants.CoreGraphicsLibrary)]
 		extern static IntPtr CGGradientCreateWithColorComponents (IntPtr colorspace, CGFloat [] components, CGFloat [] locations, IntPtr size_t_count);
-		public CGGradient (CGColorSpace colorspace, float [] components, float [] locations)
+		public CGGradient (CGColorSpace colorspace, CGFloat [] components, CGFloat [] locations)
 		{
 			if (colorspace == null)
 				throw new ArgumentNullException ("colorspace");
 			if (components == null)
 				throw new ArgumentNullException ("components");
 
-#if MAC64
-			CGFloat[] _components = new CGFloat[components.Length];
-			Array.Copy(components, _components, components.Length);
-			CGFloat[] _locations = new CGFloat[locations.Length];
-			Array.Copy(locations, _locations, locations.Length);
-			handle = CGGradientCreateWithColorComponents (colorspace.handle, _components, _locations, new IntPtr(components.Length / (colorspace.Components+1)));
-#else
 			handle = CGGradientCreateWithColorComponents (colorspace.handle, components, locations, new IntPtr(components.Length / (colorspace.Components+1)));
-#endif
 		}
 
-		public CGGradient (CGColorSpace colorspace, float [] components)
+		public CGGradient (CGColorSpace colorspace, CGFloat [] components)
 		{
 			if (colorspace == null)
 				throw new ArgumentNullException ("colorspace");
 			if (components == null)
 				throw new ArgumentNullException ("components");
-#if MAC64
-			CGFloat[] _components = new CGFloat[components.Length];
-			Array.Copy(components, _components, components.Length);
-			handle = CGGradientCreateWithColorComponents (colorspace.handle, _components, null, new IntPtr(components.Length / (colorspace.Components+1)));
-#else
 			handle = CGGradientCreateWithColorComponents (colorspace.handle, components, null, new IntPtr(components.Length / (colorspace.Components+1)));
-#endif
 		}
 #if !COREBUILD
 		[DllImport(Constants.CoreGraphicsLibrary)]
 		extern static IntPtr CGGradientCreateWithColors (/* CGColorSpaceRef */ IntPtr colorspace, /* CFArrayRef */ IntPtr colors, CGFloat [] locations);
 
-		public CGGradient (CGColorSpace colorspace, CGColor [] colors, float [] locations)
+		public CGGradient (CGColorSpace colorspace, CGColor [] colors, CGFloat [] locations)
 		{
 			if (colors == null)
 				throw new ArgumentNullException ("colors");
 			
 			IntPtr csh = colorspace == null ? IntPtr.Zero : colorspace.handle;
-#if MAC64
-			CGFloat[] _locations = new CGFloat[locations.Length];
-			Array.Copy(locations, _locations, locations.Length);
-			using (var array = CFArray.FromNativeObjects (colors))
-				handle = CGGradientCreateWithColors (csh, array.Handle, _locations);
-#else
 			using (var array = CFArray.FromNativeObjects (colors))
 				handle = CGGradientCreateWithColors (csh, array.Handle, locations);
-#endif
 		}
 
 		public CGGradient (CGColorSpace colorspace, CGColor [] colors)

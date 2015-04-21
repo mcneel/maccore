@@ -97,13 +97,10 @@ namespace MonoMac.Foundation {
 			return FromNSObjects (nsoa);
 		}
 
-#if MAC64
 		public static NSArray FromObjects (IntPtr array, int count)
 		{
-			NSUInteger ucount = (NSUInteger)count;
-			return FromObjects (array, ucount);
+			return FromObjects (array, (NSUInteger)count);
 		}
-#endif
 
 		internal static NSArray FromNSObjects (IList<NSObject> items)
 		{

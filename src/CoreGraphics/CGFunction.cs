@@ -110,7 +110,7 @@ namespace MonoMac.CoreGraphics {
 		
 		unsafe public delegate void CGFunctionEvaluate (CGFloat *data, CGFloat *outData);
 
-		public unsafe CGFunction (float [] domain, float [] range, CGFunctionEvaluate callback)
+		public unsafe CGFunction (CGFloat [] domain, CGFloat [] range, CGFunctionEvaluate callback)
 		{
 			if (domain != null){
 				if ((domain.Length % 2) != 0)
@@ -131,17 +131,8 @@ namespace MonoMac.CoreGraphics {
 			cbacks.release = IntPtr.Zero;
 
 			gch = GCHandle.Alloc (this);
-#if MAC64
-			CGFloat[] _domain = new CGFloat[domain.Length];
-			Array.Copy(domain, _domain, domain.Length);
-			CGFloat[] _range = new CGFloat[range.Length];
-			Array.Copy(range, _range, range.Length);
-			handle = CGFunctionCreate (GCHandle.ToIntPtr (gch), domain != null ? new IntPtr(domain.Length/2) : IntPtr.Zero,
-			                           _domain, range != null ? new IntPtr(range.Length/2) : IntPtr.Zero, _range, ref cbacks);
-#else
 			handle = CGFunctionCreate (GCHandle.ToIntPtr (gch), domain != null ? new IntPtr(domain.Length/2) : IntPtr.Zero,
 			                           domain, range != null ? new IntPtr(range.Length/2) : IntPtr.Zero, range, ref cbacks);
-#endif	
 		}
 
 #if !MONOMAC

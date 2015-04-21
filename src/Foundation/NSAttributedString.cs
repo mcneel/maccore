@@ -30,6 +30,13 @@ using MonoMac.CoreText;
 #if !MONOMAC
 using MonoMac.UIKit;
 #endif
+
+#if MAC64
+using nuint = System.UInt64;
+#else
+using nuint = System.UInt32;
+#endif
+
 namespace MonoMac.Foundation {
 	public partial class NSAttributedString {
 
@@ -38,23 +45,15 @@ namespace MonoMac.Foundation {
 		{
 		}
 
-		public CTStringAttributes GetCoreTextAttributes (int location, out NSRange effectiveRange)
+		public CTStringAttributes GetCoreTextAttributes (nuint location, out NSRange effectiveRange)
 		{
-#if MAC64
-			var attr = GetAttributes ((ulong)location, out effectiveRange);
-#else
 			var attr = GetAttributes (location, out effectiveRange);
-#endif
 			return attr == null ? null : new CTStringAttributes (attr);
 		}
 
-		public CTStringAttributes GetCoreTextAttributes (int location, out NSRange longestEffectiveRange, NSRange rangeLimit)
+		public CTStringAttributes GetCoreTextAttributes (nuint location, out NSRange longestEffectiveRange, NSRange rangeLimit)
 		{
-#if MAC64
-			var attr = GetAttributes ((ulong)location, out longestEffectiveRange, rangeLimit);
-#else
 			var attr = GetAttributes (location, out longestEffectiveRange, rangeLimit);
-#endif
 			return attr == null ? null : new CTStringAttributes (attr);			
 		}
 

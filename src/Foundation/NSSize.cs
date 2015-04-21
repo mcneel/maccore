@@ -29,9 +29,9 @@ using System.Runtime.InteropServices;
 #if MAC64
 
 #if MAC64
-using CGFloat = System.Double;
+using nfloat = System.Double;
 #else
-using CGFloat = System.Single;
+using nfloat = System.Single;
 #endif
 
 namespace MonoMac.Foundation {
@@ -46,19 +46,11 @@ namespace MonoMac.Foundation {
 			Height = size.Height;
 		}
 		
-		public NSSize(CGFloat width, CGFloat height)
+		public NSSize(nfloat width, nfloat height)
 		{
 			Width = width;
 			Height = height;
 		}
-
-#if MAC64
-		public NSSize(float width, float height)
-		{
-			Width = width;
-			Height = height;
-		}
-#endif
 		
 		public override int GetHashCode()
 		{
@@ -95,13 +87,8 @@ namespace MonoMac.Foundation {
 			return new System.Drawing.SizeF ((float)size.Width, (float)size.Height);
 		}
 
-#if MAC64
-		public double Width;
-		public double Height;
-#else
-		public float Width;
-		public float Height;
-#endif
+		public nfloat Width;
+		public nfloat Height;
 	}
 }
 #endif
