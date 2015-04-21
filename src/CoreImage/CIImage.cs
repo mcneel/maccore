@@ -33,16 +33,18 @@ using MonoMac.CoreGraphics;
 #endif
 
 #if MAC64
-using PointF = MonoMac.Foundation.NSPoint;
-using SizeF = MonoMac.Foundation.NSSize;
-using RectangleF = MonoMac.Foundation.NSRect;
-using NSInteger = System.Int64;
-using NSUInteger = System.UInt64;
-using CGFloat = System.Double;
+using nint = System.Int64;
+using nuint = System.UInt64;
+using nfloat = System.Double;
 #else
-using NSInteger = System.Int32;
-using NSUInteger = System.UInt32;
-using CGFloat = System.Single;
+using nint = System.Int32;
+using nuint = System.UInt32;
+using nfloat = System.Single;
+#if SDCOMPAT
+using CGPoint = System.Drawing.PointF;
+using CGSize = System.Drawing.SizeF;
+using CGRect = System.Drawing.RectangleF;
+#endif
 #endif
 
 
@@ -103,11 +105,11 @@ namespace MonoMac.CoreImage {
 			if (filters == null)
 				return new CIFilter [0];
 
-			NSUInteger count = filters.Count;
+			nuint count = filters.Count;
 			if (count == 0)
 				return new CIFilter [0];
 			var ret = new CIFilter [count];
-			for (NSUInteger i = 0; i < count; i++){
+			for (nuint i = 0; i < count; i++){
 				IntPtr filterHandle = filters.ValueAt (i);
 				string filterName = CIFilter.GetFilterName (filterHandle);
 									 
@@ -150,7 +152,7 @@ namespace MonoMac.CoreImage {
 			return FromCGImage (image);
 		}
 		
-		internal static NSInteger CIFormatToInt (CIFormat format)
+		internal static nint CIFormatToInt (CIFormat format)
 		{
 			switch (format) {
 #if MONOMAC

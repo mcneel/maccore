@@ -33,6 +33,21 @@ using MonoMac.ObjCRuntime;
 using MonoMac.Foundation;
 using MonoMac.CoreGraphics;
 
+#if MAC64
+using nint = System.Int64;
+using nuint = System.UInt64;
+using nfloat = System.Double;
+#else
+using nint = System.Int32;
+using nuint = System.UInt32;
+using nfloat = System.Single;
+#if SDCOMPAT
+using CGPoint = System.Drawing.PointF;
+using CGSize = System.Drawing.SizeF;
+using CGRect = System.Drawing.RectangleF;
+#endif
+#endif
+
 namespace MonoMac.CoreVideo {
 
 	[Since (4,0)]
@@ -150,24 +165,24 @@ namespace MonoMac.CoreVideo {
 		}
 		
 		[DllImport (Constants.CoreVideoLibrary)]
-		extern static RectangleF CVImageBufferGetCleanRect (IntPtr imageBuffer);
-		public RectangleF CleanRect {
+		extern static CGRect CVImageBufferGetCleanRect (IntPtr imageBuffer);
+		public CGRect CleanRect {
 			get {
 				return CVImageBufferGetCleanRect (handle);
 			}
 		}
 
 		[DllImport (Constants.CoreVideoLibrary)]
-		extern static SizeF CVImageBufferGetDisplaySize (IntPtr imageBuffer);
-		public SizeF DisplaySize {
+		extern static CGSize CVImageBufferGetDisplaySize (IntPtr imageBuffer);
+		public CGSize DisplaySize {
 			get {
 				return CVImageBufferGetDisplaySize (handle);
 			}
 		}
 
 		[DllImport (Constants.CoreVideoLibrary)]
-		extern static SizeF CVImageBufferGetEncodedSize (IntPtr imageBuffer);
-		public SizeF EncodedSize {
+		extern static CGSize CVImageBufferGetEncodedSize (IntPtr imageBuffer);
+		public CGSize EncodedSize {
 			get {
 				return CVImageBufferGetDisplaySize (handle);
 			}

@@ -33,33 +33,35 @@ using MonoMac.ObjCRuntime;
 using MonoMac.Foundation;
 
 #if MAC64
-using NSInteger = System.Int64;
-using NSUInteger = System.UInt64;
-using CGFloat = System.Double;
+using nint = System.Int64;
+using nuint = System.UInt64;
+using nfloat = System.Double;
 #else
-using NSInteger = System.Int32;
-using NSUInteger = System.UInt32;
-using NSPoint = System.Drawing.PointF;
-using NSSize = System.Drawing.SizeF;
-using NSRect = System.Drawing.RectangleF;
-using CGFloat = System.Single;
+using nint = System.Int32;
+using nuint = System.UInt32;
+using nfloat = System.Single;
+#if SDCOMPAT
+using CGPoint = System.Drawing.PointF;
+using CGSize = System.Drawing.SizeF;
+using CGRect = System.Drawing.RectangleF;
+#endif
 #endif
 
 namespace MonoMac.CoreGraphics {
 
 	[StructLayout(LayoutKind.Sequential)]
 	public struct CGAffineTransform {
-		public CGFloat xx;   // a
-		public CGFloat yx;   // b 
-		public CGFloat xy;   // c
-		public CGFloat yy;   // d
-		public CGFloat x0;   // tx
-		public CGFloat y0;   // ty
+		public nfloat xx;   // a
+		public nfloat yx;   // b 
+		public nfloat xy;   // c
+		public nfloat yy;   // d
+		public nfloat x0;   // tx
+		public nfloat y0;   // ty
 
 		//
 		// Constructors
 		//
-		public CGAffineTransform (CGFloat xx, CGFloat yx, CGFloat xy, CGFloat yy, CGFloat x0, CGFloat y0)
+		public CGAffineTransform (nfloat xx, nfloat yx, nfloat xy, nfloat yy, nfloat x0, nfloat y0)
 		{
 			this.xx = xx;
 			this.yx = yx;
@@ -75,20 +77,20 @@ namespace MonoMac.CoreGraphics {
 			return new CGAffineTransform (1, 0, 0, 1, 0, 0);
 		}
 		
-		public static CGAffineTransform MakeRotation (CGFloat angle)
+		public static CGAffineTransform MakeRotation (nfloat angle)
 		{
 			return new CGAffineTransform (
-				(CGFloat)Math.Cos (angle), (CGFloat)Math.Sin (angle),
-				(CGFloat)(-Math.Sin (angle)), (CGFloat)Math.Cos (angle),
+				(nfloat)Math.Cos (angle), (nfloat)Math.Sin (angle),
+				(nfloat)(-Math.Sin (angle)), (nfloat)Math.Cos (angle),
 				0, 0);
 		}
 
-		public static CGAffineTransform MakeScale (CGFloat sx, CGFloat sy)
+		public static CGAffineTransform MakeScale (nfloat sx, nfloat sy)
 		{
 			return new CGAffineTransform (sx, 0, 0, sy, 0, 0);
 		}
 
-		public static CGAffineTransform MakeTranslation (CGFloat tx, CGFloat ty)
+		public static CGAffineTransform MakeTranslation (nfloat tx, nfloat ty)
 		{
 			return new CGAffineTransform (1, 0, 0, 1, tx, ty);
 		}
@@ -117,17 +119,17 @@ namespace MonoMac.CoreGraphics {
 			y0 = a.x0 * b.yx + a.y0 * b.yy + b.y0;
 		}
 		
-		public void Scale (CGFloat sx, CGFloat sy)
+		public void Scale (nfloat sx, nfloat sy)
 		{
 			Multiply (MakeScale (sx, sy));
 		}
 
-		public void Translate (CGFloat tx, CGFloat ty)
+		public void Translate (nfloat tx, nfloat ty)
 		{
 			Multiply (MakeTranslation (tx, ty));
 		}
 
-		public void Rotate (CGFloat angle)
+		public void Rotate (nfloat angle)
 		{
 			Multiply (MakeRotation (angle));
 		}
@@ -181,16 +183,16 @@ namespace MonoMac.CoreGraphics {
                                 (int)this.x0 ^ (int)this.y0;
                 }
                 
-		public NSPoint TransformPoint (PointF point)
+		public CGPoint TransformPoint (CGPoint point)
 		{
-			return new PointF (xx * point.X + xy * point.Y + x0,
+			return new CGPoint (xx * point.X + xy * point.Y + x0,
 					    yx * point.X + yy * point.Y + y0);
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		public extern static NSRect CGRectApplyAffineTransform (NSRect rect, CGAffineTransform t);
+		public extern static CGRect CGRectApplyAffineTransform (CGRect rect, CGAffineTransform t);
 
-		public NSRect TransformRect (NSRect rect)
+		public CGRect TransformRect (CGRect rect)
 		{
 			return CGRectApplyAffineTransform (rect, this);
 		}

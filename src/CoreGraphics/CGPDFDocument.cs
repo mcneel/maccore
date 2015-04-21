@@ -32,6 +32,21 @@ using MonoMac.ObjCRuntime;
 using System.Drawing;
 using MonoMac.CoreFoundation;
 
+#if MAC64
+using nint = System.Int64;
+using nuint = System.UInt64;
+using nfloat = System.Double;
+#else
+using nint = System.Int32;
+using nuint = System.UInt32;
+using nfloat = System.Single;
+#if SDCOMPAT
+using CGPoint = System.Drawing.PointF;
+using CGSize = System.Drawing.SizeF;
+using CGRect = System.Drawing.RectangleF;
+#endif
+#endif
+
 namespace MonoMac.CoreGraphics {
 
 	public class CGPDFDocument : INativeObject, IDisposable {
@@ -186,36 +201,36 @@ namespace MonoMac.CoreGraphics {
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		extern static RectangleF CGPDFDocumentGetMediaBox (IntPtr handle, int page);
-		public RectangleF GetMediaBox (int page)
+		extern static CGRect CGPDFDocumentGetMediaBox (IntPtr handle, int page);
+		public CGRect GetMediaBox (int page)
 		{
 			return CGPDFDocumentGetMediaBox (handle, page);
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		extern static RectangleF CGPDFDocumentGetCropBox (IntPtr handle, int page);
-		public RectangleF GetCropBox (int page)
+		extern static CGRect CGPDFDocumentGetCropBox (IntPtr handle, int page);
+		public CGRect GetCropBox (int page)
 		{
 			return CGPDFDocumentGetCropBox (handle, page);
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		extern static RectangleF CGPDFDocumentGetBleedBox (IntPtr handle, int page);
-		public RectangleF GetBleedBox (int page)
+		extern static CGRect CGPDFDocumentGetBleedBox (IntPtr handle, int page);
+		public CGRect GetBleedBox (int page)
 		{
 			return CGPDFDocumentGetBleedBox (handle, page);
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		extern static RectangleF CGPDFDocumentGetTrimBox (IntPtr handle, int page);
-		public RectangleF GetTrimBox (int page)
+		extern static CGRect CGPDFDocumentGetTrimBox (IntPtr handle, int page);
+		public CGRect GetTrimBox (int page)
 		{
 			return CGPDFDocumentGetTrimBox (handle, page);
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		extern static RectangleF CGPDFDocumentGetArtBox (IntPtr handle, int page);
-		public RectangleF GetArtBox (int page)
+		extern static CGRect CGPDFDocumentGetArtBox (IntPtr handle, int page);
+		public CGRect GetArtBox (int page)
 		{
 			return CGPDFDocumentGetArtBox (handle, page);
 		}

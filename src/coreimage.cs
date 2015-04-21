@@ -50,16 +50,18 @@ using MonoMac.AppKit;
 #endif
 
 #if MAC64
-using PointF = MonoMac.Foundation.NSPoint;
-using SizeF = MonoMac.Foundation.NSSize;
-using RectangleF = MonoMac.Foundation.NSRect;
-using NSInteger = System.Int64;
-using NSUInteger = System.UInt64;
-using CGFloat = System.Double;
+using nint = System.Int64;
+using nuint = System.UInt64;
+using nfloat = System.Double;
 #else
-using NSInteger = System.Int32;
-using NSUInteger = System.UInt32;
-using CGFloat = System.Single;
+using nint = System.Int32;
+using nuint = System.UInt32;
+using nfloat = System.Single;
+#if SDCOMPAT
+using CGPoint = System.Drawing.PointF;
+using CGSize = System.Drawing.SizeF;
+using CGRect = System.Drawing.RectangleF;
+#endif
 #endif
 
 namespace MonoMac.CoreImage {
@@ -74,11 +76,11 @@ namespace MonoMac.CoreImage {
 
 		[Static]
 		[Export ("colorWithRed:green:blue:alpha:")]
-		CIColor FromRgba (CGFloat red, CGFloat green, CGFloat blue, CGFloat alpha);
+		CIColor FromRgba (nfloat red, nfloat green, nfloat blue, nfloat alpha);
 
 		[Static]
 		[Export ("colorWithRed:green:blue:")]
-		CIColor FromRgb (CGFloat red, CGFloat green, CGFloat blue);
+		CIColor FromRgb (nfloat red, nfloat green, nfloat blue);
 
 		[Static]
 		[Export ("colorWithString:")]
@@ -92,22 +94,22 @@ namespace MonoMac.CoreImage {
 
 		// FIXME: bdining
 		//[Export ("components")]
-		//const CGFloat Components ();
+		//const nfloat Components ();
 
 		[Export ("alpha")]
-		CGFloat Alpha { get; }
+		nfloat Alpha { get; }
 
 		[Export ("colorSpace")]
 		CGColorSpace ColorSpace { get; }
 
 		[Export ("red")]
-		CGFloat Red { get; }
+		nfloat Red { get; }
 
 		[Export ("green")]
-		CGFloat Green { get; }
+		nfloat Green { get; }
 
 		[Export ("blue")]
-		CGFloat Blue { get; }
+		nfloat Blue { get; }
 
 		[Export ("stringRepresentation")]
 		string StringRepresentation ();
@@ -147,38 +149,38 @@ namespace MonoMac.CoreImage {
 		void Render (CIImage image, CVPixelBuffer buffer);
 
 		[Export ("render:toCVPixelBuffer:bounds:colorSpace:")]
-		void Render (CIImage image, CVPixelBuffer buffer, RectangleF rectangle, CGColorSpace cs);
+		void Render (CIImage image, CVPixelBuffer buffer, CGRect rectangle, CGColorSpace cs);
 
 		[Export ("inputImageMaximumSize")]
-		SizeF InputImageMaximumSize { get; }
+		CGSize InputImageMaximumSize { get; }
 
 		[Export ("outputImageMaximumSize")]
-		SizeF OutputImageMaximumSize { get; }
+		CGSize OutputImageMaximumSize { get; }
 #endif
 
 		[Obsolete ("Deprecated in iOS 6.0. Use DrawImage (CIImage, RectangleF, RectangleF) instead")]
 		[Export ("drawImage:atPoint:fromRect:")]
-		void DrawImage (CIImage image, PointF atPoint, RectangleF fromRect);
+		void DrawImage (CIImage image, CGPoint atPoint, CGRect fromRect);
 
 		[Export ("drawImage:inRect:fromRect:")]
-		void DrawImage (CIImage image, RectangleF inRectangle, RectangleF fromRectangle);
+		void DrawImage (CIImage image, CGRect inRectangle, CGRect fromRectangle);
 
 		[Export ("createCGImage:fromRect:")]
 		[return: Release ()]
-		CGImage CreateCGImage (CIImage image, RectangleF fromRectangle);
+		CGImage CreateCGImage (CIImage image, CGRect fromRectangle);
 
 		[Export ("createCGImage:fromRect:format:colorSpace:")]
 		[return: Release ()]
-		CGImage CreateCGImage (CIImage image, RectangleF fromRect, NSInteger ciImageFormat, [NullAllowed] CGColorSpace colorSpace);
+		CGImage CreateCGImage (CIImage image, CGRect fromRect, nint ciImageFormat, [NullAllowed] CGColorSpace colorSpace);
 #if MONOMAC
 		[Internal, Export ("createCGLayerWithSize:info:")]
-		CGLayer CreateCGLayer (SizeF size, [NullAllowed] NSDictionary info);
+		CGLayer CreateCGLayer (CGSize size, [NullAllowed] NSDictionary info);
 #endif
 		[Export ("render:toBitmap:rowBytes:bounds:format:colorSpace:")]
-		void RenderToBitmap (CIImage image, IntPtr bitmapPtr, NSInteger bytesPerRow, RectangleF bounds, NSInteger bitmapFormat, CGColorSpace colorSpace);
+		void RenderToBitmap (CIImage image, IntPtr bitmapPtr, nint bytesPerRow, CGRect bounds, nint bitmapFormat, CGColorSpace colorSpace);
 
 		//[Export ("render:toIOSurface:bounds:colorSpace:")]
-		//void RendertoIOSurfaceboundscolorSpace (CIImage im, IOSurfaceRef surface, RectangleF r, CGColorSpaceRef cs, );
+		//void RendertoIOSurfaceboundscolorSpace (CIImage im, IOSurfaceRef surface, CGRect r, CGColorSpaceRef cs, );
 
 #if MONOMAC
 		[Export ("reclaimResources")]
@@ -258,11 +260,11 @@ namespace MonoMac.CoreImage {
 
 		[Since (6,0)]
 		[Export ("serializedXMPFromFilters:inputImageExtent:"), Static]
-		NSData SerializedXMP (CIFilter[] filters, RectangleF extent); 
+		NSData SerializedXMP (CIFilter[] filters, CGRect extent); 
 
 		[Since (6,0)]
 		[Export ("filterArrayFromSerializedXMP:inputImageExtent:error:"), Static]
-		CIFilter[] FromSerializedXMP (NSData xmpData, RectangleF extent, out NSError error);
+		CIFilter[] FromSerializedXMP (NSData xmpData, CGRect extent, out NSError error);
 #endif
 
 		[Export ("setValue:forKey:"), Internal]
@@ -617,28 +619,28 @@ namespace MonoMac.CoreImage {
 	public interface CIFilterShape {
 		[Static]
 		[Export ("shapeWithRect:")]
-		CIFilterShape FromRect (RectangleF rect);
+		CIFilterShape FromRect (CGRect rect);
 
 		[Export ("initWithRect:")]
-		IntPtr Constructor (RectangleF rect);
+		IntPtr Constructor (CGRect rect);
 
 		[Export ("transformBy:interior:")]
 		CIFilterShape Transform (CGAffineTransform transformation, bool interiorFlag);
 
 		[Export ("insetByX:Y:")]
-		CIFilterShape Inset (NSInteger dx, NSInteger dy);
+		CIFilterShape Inset (nint dx, nint dy);
 
 		[Export ("unionWith:")]
 		CIFilterShape Union (CIFilterShape other);
 
 		[Export ("unionWithRect:")]
-		CIFilterShape Union (RectangleF rectangle);
+		CIFilterShape Union (CGRect rectangle);
 
 		[Export ("intersectWith:")]
 		CIFilterShape Intersect (CIFilterShape other);
 
 		[Export ("intersectWithRect:")]
-		CIFilterShape IntersectWithRect (RectangleF rectangle);
+		CIFilterShape IntersectWithRect (CGRect rectangle);
 	}
 #endif
 	
@@ -671,13 +673,13 @@ namespace MonoMac.CoreImage {
 		[Static]
 		[Export ("imageWithBitmapData:bytesPerRow:size:format:colorSpace:")]
 		// TODO: pixelFormat should be enum of kCIFormatARGB8, kCIFormatRGBA16, kCIFormatRGBAf, kCIFormatRGBAh
-		CIImage FromData (NSData bitmapData, NSInteger bytesPerRow, SizeF size, NSInteger pixelFormat, [NullAllowed] CGColorSpace colorSpace);
+		CIImage FromData (NSData bitmapData, nint bytesPerRow, CGSize size, nint pixelFormat, [NullAllowed] CGColorSpace colorSpace);
 
 #if MONOMAC
 		[Since (6,0)]
 		[Static]
 		[Export ("imageWithTexture:size:flipped:colorSpace:")]
-		CIImage ImageWithTexture (NSUInteger glTextureName, SizeF size, bool flipped, CGColorSpace colorspace);
+		CIImage ImageWithTexture (nuint glTextureName, CGSize size, bool flipped, CGColorSpace colorspace);
 #endif
 
 		[Static]
@@ -768,11 +770,11 @@ namespace MonoMac.CoreImage {
 		IntPtr Constructor (NSData data, [NullAllowed] CIImageInitializationOptionsWithMetadata options);
 
 		[Export ("initWithBitmapData:bytesPerRow:size:format:colorSpace:")]
-		IntPtr Constructor (NSData d, NSInteger bytesPerRow, SizeF size, NSInteger pixelFormat, CGColorSpace colorSpace);
+		IntPtr Constructor (NSData d, nint bytesPerRow, CGSize size, nint pixelFormat, CGColorSpace colorSpace);
 
 		[Since (6,0)]
 		[Export ("initWithTexture:size:flipped:colorSpace:")]
-		IntPtr Constructor (NSInteger glTextureName, SizeF size, bool flipped, CGColorSpace colorSpace);
+		IntPtr Constructor (nint glTextureName, CGSize size, bool flipped, CGColorSpace colorSpace);
 
 		[Export ("initWithContentsOfURL:")]
 		IntPtr Constructor (NSUrl url);
@@ -807,20 +809,20 @@ namespace MonoMac.CoreImage {
 		IntPtr Constructor (NSImageRep imageRep);
 		
 		[Export ("drawAtPoint:fromRect:operation:fraction:")]
-		void Draw (PointF point, RectangleF srcRect, NSCompositingOperation op, CGFloat delta); 
+		void Draw (CGPoint point, CGRect srcRect, NSCompositingOperation op, nfloat delta); 
 
 		[Export ("drawInRect:fromRect:operation:fraction:")]
-		void Draw (RectangleF dstRect, RectangleF srcRect, NSCompositingOperation op, CGFloat delta); 
+		void Draw (CGRect dstRect, CGRect srcRect, NSCompositingOperation op, nfloat delta); 
 #endif
 
 		[Export ("imageByApplyingTransform:")]
 		CIImage ImageByApplyingTransform (CGAffineTransform matrix);
 
 		[Export ("imageByCroppingToRect:")]
-		CIImage ImageByCroppingToRect (RectangleF r);
+		CIImage ImageByCroppingToRect (CGRect r);
 
 		[Export ("extent")]
-		RectangleF Extent { get; }
+		CGRect Extent { get; }
 
 		[Since (5,0)]
 		[Export ("properties"), Internal]
@@ -835,33 +837,33 @@ namespace MonoMac.CoreImage {
 		//CIFilterShape Definition ();
 
 		[Field ("kCIFormatARGB8")]
-		NSInteger FormatARGB8 { get; }
+		nint FormatARGB8 { get; }
 
 		[Field ("kCIFormatRGBA16")]
-		NSInteger FormatRGBA16 { get; }
+		nint FormatRGBA16 { get; }
 
 		[Field ("kCIFormatRGBAf")]
-		NSInteger FormatRGBAf { get; }
+		nint FormatRGBAf { get; }
 
 		[Field ("kCIFormatRGBAh")]
-		NSInteger FormatRGBAh { get; }
+		nint FormatRGBAh { get; }
 #else
 
 		[Field ("kCIFormatARGB8")]
 		[Since (6,0)]
-		NSInteger FormatARGB8 { get; }
+		nint FormatARGB8 { get; }
 		
 		[Field ("kCIFormatRGBAh")]
 		[Since (6,0)]
-		NSInteger FormatRGBAh { get; }
+		nint FormatRGBAh { get; }
 
 		[Field ("kCIFormatBGRA8")]
 		[Since (5,0)]
-		NSInteger FormatBGRA8 { get; }
+		nint FormatBGRA8 { get; }
 
 		[Field ("kCIFormatRGBA8")]
 		[Since (5,0)]
-		NSInteger FormatRGBA8 { get; }
+		nint FormatRGBA8 { get; }
 
 		// UIKit extensions
 		[Since (5,0)]
@@ -910,19 +912,19 @@ namespace MonoMac.CoreImage {
 	public interface CIImageAccumulator {
 		[Static]
 		[Export ("imageAccumulatorWithExtent:format:")]
-		CIImageAccumulator FromRectangle (RectangleF rect, NSInteger ciImageFormat);
+		CIImageAccumulator FromRectangle (CGRect rect, nint ciImageFormat);
 
 		[Export ("initWithExtent:format:")]
-		IntPtr Constructor (RectangleF rectangle, NSInteger ciImageFormat);
+		IntPtr Constructor (CGRect rectangle, nint ciImageFormat);
 
 		[Export ("extent")]
-		RectangleF Extent { get; }
+		CGRect Extent { get; }
 
 		[Export ("format")]
-		NSInteger CIImageFormat { get; }
+		nint CIImageFormat { get; }
 
 		[Export ("setImage:dirtyRect:")]
-		void SetImageDirty (CIImage image, RectangleF dirtyRect);
+		void SetImageDirty (CIImage image, CGRect dirtyRect);
 
 		[Export ("clear")]
 		void Clear ();
@@ -979,7 +981,7 @@ namespace MonoMac.CoreImage {
 		CIFilterShape Definition { get; }
 
 		[Export ("extent")]
-		RectangleF Extent { get; }
+		CGRect Extent { get; }
 
 		[Field ("kCISamplerAffineMatrix", "+CoreImage"), Internal]
 		NSString AffineMatrix { get; }
@@ -1006,32 +1008,32 @@ namespace MonoMac.CoreImage {
 	[DisableDefaultCtor]
 	interface CIVector {
 		[Static, Internal, Export ("vectorWithValues:count:")]
-		CIVector _FromValues (IntPtr values, NSInteger count);
+		CIVector _FromValues (IntPtr values, nint count);
 
 		[Static]
 		[Export ("vectorWithX:")]
-		CIVector Create (CGFloat x);
+		CIVector Create (nfloat x);
 
 		[Static]
 		[Export ("vectorWithX:Y:")]
-		CIVector Create (CGFloat x, CGFloat y);
+		CIVector Create (nfloat x, nfloat y);
 
 		[Static]
 		[Export ("vectorWithX:Y:Z:")]
-		CIVector Create (CGFloat x, CGFloat y, CGFloat z);
+		CIVector Create (nfloat x, nfloat y, nfloat z);
 
 		[Static]
 		[Export ("vectorWithX:Y:Z:W:")]
-		CIVector Create (CGFloat x, CGFloat y, CGFloat z, CGFloat w);
+		CIVector Create (nfloat x, nfloat y, nfloat z, nfloat w);
 
 #if !MONOMAC
 		[Static]
 		[Export ("vectorWithCGPoint:")]
-		CIVector Create (PointF point);
+		CIVector Create (CGPoint point);
 
 		[Static]
 		[Export ("vectorWithCGRect:")]
-		CIVector Create (RectangleF point);
+		CIVector Create (CGRect point);
 
 		[Static]
 		[Export ("vectorWithCGAffineTransform:")]
@@ -1043,47 +1045,47 @@ namespace MonoMac.CoreImage {
 		CIVector FromString (string representation);
 
 		[Internal, Export ("initWithValues:count:")]
-		IntPtr Constructor (IntPtr values, NSInteger count);
+		IntPtr Constructor (IntPtr values, nint count);
 
 		[Export ("initWithX:")]
-		IntPtr Constructor(CGFloat x);
+		IntPtr Constructor(nfloat x);
 
 		[Export ("initWithX:Y:")]
-		IntPtr Constructor (CGFloat x, CGFloat y);
+		IntPtr Constructor (nfloat x, nfloat y);
 
 		[Export ("initWithX:Y:Z:")]
-		IntPtr Constructor (CGFloat x, CGFloat y, CGFloat z);
+		IntPtr Constructor (nfloat x, nfloat y, nfloat z);
 
 		[Export ("initWithX:Y:Z:W:")]
-		IntPtr Constructor (CGFloat x, CGFloat y, CGFloat z, CGFloat w);
+		IntPtr Constructor (nfloat x, nfloat y, nfloat z, nfloat w);
 
 		[Export ("initWithString:")]
 		IntPtr Constructor (string representation);
 
 		[Export ("valueAtIndex:"), Internal]
-		CGFloat ValueAtIndex (NSInteger index);
+		nfloat ValueAtIndex (nint index);
 
 		[Export ("count")]
 		int Count { get; }
 
 		[Export ("X")]
-		CGFloat X { get; }
+		nfloat X { get; }
 
 		[Export ("Y")]
-		CGFloat Y { get; }
+		nfloat Y { get; }
 
 		[Export ("Z")]
-		CGFloat Z { get; }
+		nfloat Z { get; }
 
 		[Export ("W")]
-		CGFloat W { get; }
+		nfloat W { get; }
 
 #if !MONOMAC
 		[Export ("CGPointValue")]
-		PointF Point { get; }
+		CGPoint Point { get; }
 
 		[Export ("CGRectValue")]
-		RectangleF Rectangle { get; }
+		CGRect Rectangle { get; }
 
 		[Export ("CGAffineTransformValue")]
 		CGAffineTransform AffineTransform { get; }
@@ -1140,7 +1142,7 @@ namespace MonoMac.CoreImage {
 		NSString Type { get; }
 
 		[Export ("bounds")]
-		RectangleF Bounds { get; }
+		CGRect Bounds { get; }
 
 		[Field ("CIFeatureTypeFace")]
 		NSString TypeFace { get; }
@@ -1154,19 +1156,19 @@ namespace MonoMac.CoreImage {
 		bool HasLeftEyePosition { get; }
 		
 		[Export ("leftEyePosition")]
-		PointF LeftEyePosition { get; }
+		CGPoint LeftEyePosition { get; }
 		
 		[Export ("hasRightEyePosition")]
 		bool HasRightEyePosition { get; }
 		
 		[Export ("rightEyePosition")]
-		PointF RightEyePosition { get; }
+		CGPoint RightEyePosition { get; }
 		
 		[Export ("hasMouthPosition")]
 		bool HasMouthPosition { get; }
 		
 		[Export ("mouthPosition")]
-		PointF MouthPosition { get; }
+		CGPoint MouthPosition { get; }
 
 		[Since (6,0)]
 		[Export ("hasTrackingID")]

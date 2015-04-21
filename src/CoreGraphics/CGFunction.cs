@@ -32,16 +32,18 @@ using MonoMac.ObjCRuntime;
 using MonoMac.Foundation;
 
 #if MAC64
-using NSInteger = System.Int64;
-using NSUInteger = System.UInt64;
-using CGFloat = System.Double;
+using nint = System.Int64;
+using nuint = System.UInt64;
+using nfloat = System.Double;
 #else
-using NSInteger = System.Int32;
-using NSUInteger = System.UInt32;
-using NSPoint = System.Drawing.PointF;
-using NSSize = System.Drawing.SizeF;
-using NSRect = System.Drawing.RectangleF;
-using CGFloat = System.Single;
+using nint = System.Int32;
+using nuint = System.UInt32;
+using nfloat = System.Single;
+#if SDCOMPAT
+using CGPoint = System.Drawing.PointF;
+using CGSize = System.Drawing.SizeF;
+using CGRect = System.Drawing.RectangleF;
+#endif
 #endif
 
 namespace MonoMac.CoreGraphics {
@@ -96,7 +98,7 @@ namespace MonoMac.CoreGraphics {
 			}
 		}
 
-		unsafe delegate void CGFunctionEvaluateCallback (IntPtr info, CGFloat *data, CGFloat *outData);
+		unsafe delegate void CGFunctionEvaluateCallback (IntPtr info, nfloat *data, nfloat *outData);
 			
 		[StructLayout (LayoutKind.Sequential)]
 		struct CGFunctionCallbacks {
@@ -106,11 +108,11 @@ namespace MonoMac.CoreGraphics {
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		extern static IntPtr CGFunctionCreate (IntPtr data, IntPtr domainCount, CGFloat [] domain, IntPtr rangeDomain, CGFloat [] range, ref CGFunctionCallbacks callbacks);
+		extern static IntPtr CGFunctionCreate (IntPtr data, IntPtr domainCount, nfloat [] domain, IntPtr rangeDomain, nfloat [] range, ref CGFunctionCallbacks callbacks);
 		
-		unsafe public delegate void CGFunctionEvaluate (CGFloat *data, CGFloat *outData);
+		unsafe public delegate void CGFunctionEvaluate (nfloat *data, nfloat *outData);
 
-		public unsafe CGFunction (CGFloat [] domain, CGFloat [] range, CGFunctionEvaluate callback)
+		public unsafe CGFunction (nfloat [] domain, nfloat [] range, CGFunctionEvaluate callback)
 		{
 			if (domain != null){
 				if ((domain.Length % 2) != 0)
@@ -138,7 +140,7 @@ namespace MonoMac.CoreGraphics {
 #if !MONOMAC
 		[MonoPInvokeCallback (typeof (CGFunctionEvaluateCallback))]
 #endif
-		unsafe static void EvaluateCallback (IntPtr info, CGFloat *input, CGFloat *output)
+		unsafe static void EvaluateCallback (IntPtr info, nfloat *input, nfloat *output)
 		{
 			GCHandle lgc = GCHandle.FromIntPtr (info);
 			CGFunction container = (CGFunction) lgc.Target;

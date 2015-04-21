@@ -26,16 +26,18 @@ using MonoMac.Foundation;
 using MonoMac.ObjCRuntime;
 
 #if MAC64
-using NSInteger = System.Int64;
-using NSUInteger = System.UInt64;
-using CGFloat = System.Double;
+using nint = System.Int64;
+using nuint = System.UInt64;
+using nfloat = System.Double;
 #else
-using NSInteger = System.Int32;
-using NSUInteger = System.UInt32;
-using NSPoint = System.Drawing.PointF;
-using NSSize = System.Drawing.SizeF;
-using NSRect = System.Drawing.RectangleF;
-using CGFloat = System.Single;
+using nint = System.Int32;
+using nuint = System.UInt32;
+using nfloat = System.Single;
+#if SDCOMPAT
+using CGPoint = System.Drawing.PointF;
+using CGSize = System.Drawing.SizeF;
+using CGRect = System.Drawing.RectangleF;
+#endif
 #endif
 
 
@@ -47,23 +49,23 @@ namespace MonoMac.Foundation {
 		IntPtr callback;
 		CFStreamClientContext context;
 
-		public NSInteger Read (byte [] buffer, NSUInteger len) {
+		public nint Read (byte [] buffer, nuint len) {
 			return objc_msgSend (Handle, Selector.GetHandle (selReadMaxLength), buffer, len);
 		}
 
 		[DllImport ("/usr/lib/libobjc.dylib")]
-		static extern NSInteger objc_msgSend (IntPtr handle, IntPtr sel, [In, Out] byte [] buffer, NSUInteger len);
+		static extern nint objc_msgSend (IntPtr handle, IntPtr sel, [In, Out] byte [] buffer, nuint len);
 
 		[DllImport ("/usr/lib/libobjc.dylib")]
-		static extern NSInteger objc_msgSend (IntPtr handle, IntPtr sel, IntPtr buffer, NSUInteger len);
+		static extern nint objc_msgSend (IntPtr handle, IntPtr sel, IntPtr buffer, nuint len);
 
 		[Export ("read:maxLength:")]
-		public virtual NSInteger Read (IntPtr buffer, NSUInteger len)
+		public virtual nint Read (IntPtr buffer, nuint len)
 		{
 			if (buffer == IntPtr.Zero)
 				throw new ArgumentNullException ("buffer");
 			
-			NSInteger ret;
+			nint ret;
 			if (IsDirectBinding) {
 				ret = objc_msgSend (this.Handle, Selector.GetHandle (selReadMaxLength), buffer, len);
 			} else {

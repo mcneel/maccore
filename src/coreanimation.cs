@@ -43,6 +43,21 @@ using MonoMac.Foundation;
 using MonoMac.CoreGraphics;
 using MonoMac.ObjCRuntime;
 
+#if MAC64
+using nint = System.Int64;
+using nuint = System.UInt64;
+using nfloat = System.Double;
+#else
+using nint = System.Int32;
+using nuint = System.UInt32;
+using nfloat = System.Single;
+#if SDCOMPAT
+using CGPoint = System.Drawing.PointF;
+using CGSize = System.Drawing.SizeF;
+using CGRect = System.Drawing.RectangleF;
+#endif
+#endif
+
 namespace MonoMac.CoreAnimation {
 
 #if false
@@ -160,19 +175,19 @@ namespace MonoMac.CoreAnimation {
 		bool NeedsDisplayForKey (string key);
 
 		[Export ("bounds")]
-		RectangleF Bounds  { get; set; }
+		CGRect Bounds  { get; set; }
 
 		[Export ("zPosition")]
-		float ZPosition { get; set; }
+		nfloat ZPosition { get; set; }
 		
 		[Export ("anchorPoint")]
-		PointF AnchorPoint { get; set; }
+		CGPoint AnchorPoint { get; set; }
 
 		[Export ("anchorPointZ")]
-		float AnchorPointZ { get; set; }
+		nfloat AnchorPointZ { get; set; }
 		
 		[Export ("position")]
-		PointF Position { get; set; }
+		CGPoint Position { get; set; }
 
 		[Export ("transform")]
 		CATransform3D Transform { get; set; }
@@ -181,7 +196,7 @@ namespace MonoMac.CoreAnimation {
 		CGAffineTransform AffineTransform { get; set; }
 
 		[Export ("frame")]
-		RectangleF Frame { get; set; }
+		CGRect Frame { get; set; }
 
 		[Export ("hidden")] // Setter needs setHidden instead
 		bool Hidden { [Bind ("isHidden")] get; set; }  
@@ -229,16 +244,16 @@ namespace MonoMac.CoreAnimation {
 		bool MasksToBounds { get; set; }
 
 		[Export ("convertPoint:fromLayer:")]
-		PointF ConvertPointFromLayer (PointF point, [NullAllowed] CALayer layer);
+		CGPoint ConvertPointFromLayer (CGPoint point, [NullAllowed] CALayer layer);
 		
 		[Export ("convertPoint:toLayer:")]
-		PointF ConvertPointToLayer (PointF point, [NullAllowed] CALayer layer);
+		CGPoint ConvertPointToLayer (CGPoint point, [NullAllowed] CALayer layer);
 		
 		[Export ("convertRect:fromLayer:")]
-		RectangleF ConvertRectFromLayer (RectangleF rect, [NullAllowed] CALayer layer);
+		CGRect ConvertRectFromLayer (CGRect rect, [NullAllowed] CALayer layer);
 		
 		[Export ("convertRect:toLayer:")]
-		RectangleF ConvertRectToLayer (RectangleF rect, [NullAllowed] CALayer layer);
+		CGRect ConvertRectToLayer (CGRect rect, [NullAllowed] CALayer layer);
 
 		[Export ("convertTime:fromLayer:")]
 		double ConvertTimeFromLayer (double timeInterval, [NullAllowed] CALayer layer);
@@ -247,10 +262,10 @@ namespace MonoMac.CoreAnimation {
 		double ConvertTimeToLayer (double timeInterval, [NullAllowed] CALayer layer);
 
 		[Export ("hitTest:")]
-		CALayer HitTest (PointF p);
+		CALayer HitTest (CGPoint p);
 
 		[Export ("containsPoint:")]
-		bool Contains (PointF p);
+		bool Contains (CGPoint p);
 
 		[Export ("contents", ArgumentSemantic.Retain), NullAllowed]
 		CGImage Contents { get; set; }
@@ -261,16 +276,16 @@ namespace MonoMac.CoreAnimation {
 #endif
 
 		[Export ("contentsScale")]
-		float ContentsScale { get; set; }
+		nfloat ContentsScale { get; set; }
 
 		[Export ("contentsRect")]
-		RectangleF ContentsRect { get; set; }
+		CGRect ContentsRect { get; set; }
 
 		[Export ("contentsGravity", ArgumentSemantic.Copy)]
 		string ContentsGravity { get; set; }
 
 		[Export ("contentsCenter")]
-		RectangleF ContentsCenter { get; set; }
+		CGRect ContentsCenter { get; set; }
 
 		[Export ("minificationFilter", ArgumentSemantic.Copy)]
 		string MinificationFilter { get; set; }
@@ -291,7 +306,7 @@ namespace MonoMac.CoreAnimation {
 		void SetNeedsDisplay ();
 
 		[Export ("setNeedsDisplayInRect:")]
-		void SetNeedsDisplayInRect (RectangleF r);
+		void SetNeedsDisplayInRect (CGRect r);
 
 		[Export ("displayIfNeeded")]
 		void DisplayIfNeeded ();
@@ -309,16 +324,16 @@ namespace MonoMac.CoreAnimation {
 		CGColor BackgroundColor { get; set; }
 
 		[Export ("cornerRadius")]
-		float CornerRadius { get; set; }
+		nfloat CornerRadius { get; set; }
 
 		[Export ("borderWidth")]
-		float BorderWidth { get; set; }
+		nfloat BorderWidth { get; set; }
 
 		[Export ("borderColor")]
 		CGColor BorderColor { get; set; }
 
 		[Export ("opacity")]
-		float Opacity { get; set; }
+		float Opacity { get; set; } // 32-bit
 
 		[Export ("edgeAntialiasingMask")]
 		CAEdgeAntialiasingMask EdgeAntialiasingMask { get; set; }
@@ -326,7 +341,7 @@ namespace MonoMac.CoreAnimation {
 		// Layout methods
 
 		[Export ("preferredFrameSize")]
-		SizeF PreferredFrameSize ();
+		CGSize PreferredFrameSize ();
 
 		[Export ("setNeedsLayout")]
 		void SetNeedsLayout ();
@@ -384,13 +399,13 @@ namespace MonoMac.CoreAnimation {
 		double Duration { get; set; }
 	
 		[Export ("speed")]
-		float Speed { get; set; }
+		float Speed { get; set; } // 32-bit
 	
 		[Export ("timeOffset")]
 		double TimeOffset { get; set; }
 	
 		[Export ("repeatCount")]
-		float RepeatCount { get; set; }
+		float RepeatCount { get; set; } // 32-bit
 	
 		[Export ("repeatDuration")]
 		double RepeatDuration { get; set; }
@@ -407,15 +422,15 @@ namespace MonoMac.CoreAnimation {
 
 		[Since (3,2)]
 		[Export ("shadowOffset")]
-		SizeF ShadowOffset { get; set; }
+		CGSize ShadowOffset { get; set; }
 
 		[Since (3,2)]
 		[Export ("shadowOpacity")]
-		float ShadowOpacity { get; set; }
+		float ShadowOpacity { get; set; } // 32-bit
 
 		[Since (3,2)]
 		[Export ("shadowRadius")]
-		float ShadowRadius { get; set; }
+		nfloat ShadowRadius { get; set; }
 
 		[Field ("kCATransition")]
 		NSString Transition { get; } 
@@ -472,23 +487,23 @@ namespace MonoMac.CoreAnimation {
 		NSString OnOrderOut { get; }
 
 		[Export ("visibleRect")]
-		RectangleF VisibleRect { get;  }
+		CGRect VisibleRect { get;  }
 
 		[Export ("scrollPoint:")]
-		void ScrollPoint (PointF p);
+		void ScrollPoint (CGPoint p);
 
 		[Export ("scrollRectToVisible:")]
-		void ScrollRectToVisible (RectangleF r);
+		void ScrollRectToVisible (CGRect r);
 
 #if MONOMAC
 		[Export ("autoresizingMask")]
 		CAAutoresizingMask AutoresizinMask { get; set; }
 
 		[Export ("resizeSublayersWithOldSize:")]
-		void ResizeSublayers (SizeF oldSize);
+		void ResizeSublayers (CGSize oldSize);
 
 		[Export ("resizeWithOldSuperlayerSize:")]
-		void Resize (SizeF oldSuperlayerSize);
+		void Resize (CGSize oldSuperlayerSize);
 		
 		[Export ("constraints")]
 		CAConstraint[] Constraints { get; set;  }
@@ -532,7 +547,7 @@ namespace MonoMac.CoreAnimation {
 		int LevelsOfDetailBias { get; set; }
 
 		[Export ("tileSize")]
-		SizeF TileSize { get; set; }
+		CGSize TileSize { get; set; }
 	}
 
 	[BaseType (typeof (CALayer))]
@@ -578,10 +593,10 @@ namespace MonoMac.CoreAnimation {
 		NSString ScrollMode { get; set;  }
 
 		[Export ("scrollToPoint:")]
-		void ScrollToPoint (PointF p);
+		void ScrollToPoint (CGPoint p);
 
 		[Export ("scrollToRect:")]
-		void ScrollToRect (RectangleF r);
+		void ScrollToRect (CGRect r);
 
 		[Field ("kCAScrollNone")]
 		NSString ScrollNone { get; }
@@ -670,7 +685,7 @@ namespace MonoMac.CoreAnimation {
 		CALayer Create ();
 
 		[Export ("hitTest:")]
-		CALayer HitTest (PointF thePoint);
+		CALayer HitTest (CGPoint thePoint);
 	}
 
 	[Since (3,2)]
@@ -1053,10 +1068,10 @@ namespace MonoMac.CoreAnimation {
 		NSNumber [] Locations { get; set;  }
 	
 		[Export ("startPoint")]
-		PointF StartPoint { get; set;  }
+		CGPoint StartPoint { get; set;  }
 
 		[Export ("endPoint")]
-		PointF EndPoint { get; set;  }
+		CGPoint EndPoint { get; set;  }
 	
 		[Export ("type", ArgumentSemantic.Copy)]
 		string Type { get; set;  }
@@ -1249,7 +1264,7 @@ namespace MonoMac.CoreAnimation {
 		IntPtr _Contents { get; set; }
 
 		[Export ("contentsRect")]
-		RectangleF ContentsRect { get; set;  }
+		CGRect ContentsRect { get; set;  }
 
 		[Export ("minificationFilter")]
 		string MinificationFilter { get; set;  }
@@ -1300,22 +1315,22 @@ namespace MonoMac.CoreAnimation {
 		CAEmitterCell[] Cells { get; set;  }
 
 		[Export ("birthRate")]
-		float BirthRate { get; set;  }
+		float BirthRate { get; set;  } // 32-bit
 
 		[Export ("lifetime")]
-		float LifeTime { get; set;  }
+		float LifeTime { get; set;  } // 32-bit
 
 		[Export ("emitterPosition")]
-		PointF Position { get; set;  }
+		CGPoint Position { get; set;  }
 
 		[Export ("emitterZPosition")]
-		float ZPosition { get; set;  }
+		nfloat ZPosition { get; set;  }
 
 		[Export ("emitterSize")]
-		SizeF Size { get; set;  }
+		CGSize Size { get; set;  }
 
 		[Export ("emitterDepth")]
-		float Depth { get; set;  }
+		nfloat Depth { get; set;  }
 
 		[Export ("emitterShape")]
 		string Shape { get; set;  }
@@ -1330,16 +1345,16 @@ namespace MonoMac.CoreAnimation {
 		bool PreservesDepth { get; set;  }
 
 		[Export ("velocity")]
-		float Velocity { get; set;  }
+		float Velocity { get; set;  } // 32-bit
 
 		[Export ("scale")]
-		float Scale { get; set;  }
+		float Scale { get; set;  } // 32-bit
 
 		[Export ("spin")]
-		float Spin { get; set;  }
+		float Spin { get; set;  } // 32-bit
 
 		[Export ("seed")]
-		int Seed { get; set;  }
+		int Seed { get; set;  } // 32-bit
 		
 		/** `emitterShape' values. **/
 		[Field ("kCAEmitterLayerPoint")]

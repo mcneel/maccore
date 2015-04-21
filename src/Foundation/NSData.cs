@@ -34,16 +34,18 @@ using System.Collections;
 using System.Collections.Generic;
 
 #if MAC64
-using NSInteger = System.Int64;
-using NSUInteger = System.UInt64;
-using CGFloat = System.Double;
+using nint = System.Int64;
+using nuint = System.UInt64;
+using nfloat = System.Double;
 #else
-using NSInteger = System.Int32;
-using NSUInteger = System.UInt32;
-using NSPoint = System.Drawing.PointF;
-using NSSize = System.Drawing.SizeF;
-using NSRect = System.Drawing.RectangleF;
-using CGFloat = System.Single;
+using nint = System.Int32;
+using nuint = System.UInt32;
+using nfloat = System.Single;
+#if SDCOMPAT
+using CGPoint = System.Drawing.PointF;
+using CGSize = System.Drawing.SizeF;
+using CGRect = System.Drawing.RectangleF;
+#endif
 #endif
 
 
@@ -114,7 +116,7 @@ namespace MonoMac.Foundation {
 			} catch {
 				len = 8192;
 			}
-			ret = NSMutableData.FromCapacity ((NSUInteger)len);
+			ret = NSMutableData.FromCapacity ((nuint)len);
 			byte [] buffer = new byte [32*1024];
 			int n;
 			try {
@@ -240,7 +242,7 @@ namespace MonoMac.Foundation {
 				IntPtr val;
 				IntPtr val_addr = (IntPtr) ((IntPtr *) &val);
 
-				bool ret = _Save (file, (NSUInteger)(auxiliaryFile ? 1 : 0), val_addr);
+				bool ret = _Save (file, (nuint)(auxiliaryFile ? 1 : 0), val_addr);
 				error = (NSError) Runtime.GetNSObject (val);
 				
 				return ret;
@@ -253,7 +255,7 @@ namespace MonoMac.Foundation {
 				IntPtr val;
 				IntPtr val_addr = (IntPtr) ((IntPtr *) &val);
 
-				bool ret = _Save (file, (NSUInteger) options, val_addr);
+				bool ret = _Save (file, (nuint) options, val_addr);
 				error = (NSError) Runtime.GetNSObject (val);
 				
 				return ret;
@@ -266,7 +268,7 @@ namespace MonoMac.Foundation {
 				IntPtr val;
 				IntPtr val_addr = (IntPtr) ((IntPtr *) &val);
 
-				bool ret = _Save (url, (NSUInteger)(auxiliaryFile ? 1 : 0), val_addr);
+				bool ret = _Save (url, (nuint)(auxiliaryFile ? 1 : 0), val_addr);
 				error = (NSError) Runtime.GetNSObject (val);
 				
 				return ret;

@@ -24,29 +24,33 @@
 using System;
 using System.Runtime.InteropServices;
 
-// For now, only support MAC64 for NSSize in order to make sure
+// For now, only support MAC64 for CGSize in order to make sure
 // we didn't mess up the 32 bit build
-#if MAC64
+#if !SDCOMPAT
 
 #if MAC64
+using nint = System.Int64;
+using nuint = System.UInt64;
 using nfloat = System.Double;
 #else
+using nint = System.Int32;
+using nuint = System.UInt32;
 using nfloat = System.Single;
 #endif
 
-namespace MonoMac.Foundation {
+namespace MonoMac.CoreGraphics {
 	[StructLayout(LayoutKind.Sequential)]
-	public struct NSSize {
+	public struct CGSize {
 	
-		public static readonly NSSize Empty;
+		public static readonly CGSize Empty;
 		
-		public NSSize(System.Drawing.SizeF size)
+		public CGSize(System.Drawing.SizeF size)
 		{
 			Width = size.Width;
 			Height = size.Height;
 		}
 		
-		public NSSize(nfloat width, nfloat height)
+		public CGSize(nfloat width, nfloat height)
 		{
 			Width = width;
 			Height = height;
@@ -57,32 +61,32 @@ namespace MonoMac.Foundation {
 			return Width.GetHashCode() ^ Height.GetHashCode();
 		}
 
-		public static bool operator ==(NSSize left, NSSize right)
+		public static bool operator ==(CGSize left, CGSize right)
 		{
 			return left.Width == right.Width && left.Height == right.Height;
 		}
 
-		public static bool operator !=(NSSize left, NSSize right)
+		public static bool operator !=(CGSize left, CGSize right)
 		{
 			return left.Width != right.Width || left.Height != right.Height;
 		}
 
-		public static NSSize operator +(NSSize size1, NSSize size2)
+		public static CGSize operator +(CGSize size1, CGSize size2)
 		{
-			return new NSSize (size1.Width + size2.Width, size1.Height + size2.Height);
+			return new CGSize (size1.Width + size2.Width, size1.Height + size2.Height);
 		}
 
-		public static NSSize operator -(NSSize size1, NSSize size2)
+		public static CGSize operator -(CGSize size1, CGSize size2)
 		{
-			return new NSSize (size1.Width - size2.Width, size1.Height - size2.Height);
+			return new CGSize (size1.Width - size2.Width, size1.Height - size2.Height);
 		}
 		
-		public static implicit operator NSSize (System.Drawing.SizeF size)
+		public static implicit operator CGSize (System.Drawing.SizeF size)
 		{
-			return new NSSize (size.Width, size.Height);
+			return new CGSize (size.Width, size.Height);
 		}
 		
-		public static explicit operator System.Drawing.SizeF (NSSize size)
+		public static explicit operator System.Drawing.SizeF (CGSize size)
 		{
 			return new System.Drawing.SizeF ((float)size.Width, (float)size.Height);
 		}

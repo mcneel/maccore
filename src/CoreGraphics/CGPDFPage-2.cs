@@ -31,6 +31,21 @@ using System.Drawing;
 using MonoMac.ObjCRuntime;
 using MonoMac.Foundation;
 
+#if MAC64
+using nint = System.Int64;
+using nuint = System.UInt64;
+using nfloat = System.Double;
+#else
+using nint = System.Int32;
+using nuint = System.UInt32;
+using nfloat = System.Single;
+#if SDCOMPAT
+using CGPoint = System.Drawing.PointF;
+using CGSize = System.Drawing.SizeF;
+using CGRect = System.Drawing.RectangleF;
+#endif
+#endif
+
 namespace MonoMac.CoreGraphics {
 
 	public enum CGPDFBox {
@@ -75,8 +90,8 @@ namespace MonoMac.CoreGraphics {
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		extern static RectangleF CGPDFPageGetBoxRect (IntPtr handle, CGPDFBox box);
-		public RectangleF GetBoxRect (CGPDFBox box)
+		extern static CGRect CGPDFPageGetBoxRect (IntPtr handle, CGPDFBox box);
+		public CGRect GetBoxRect (CGPDFBox box)
 		{
 			return CGPDFPageGetBoxRect (handle, box);
 		}
@@ -90,9 +105,9 @@ namespace MonoMac.CoreGraphics {
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		extern static CGAffineTransform CGPDFPageGetDrawingTransform (IntPtr handle, CGPDFBox box, RectangleF rect, int rotate, int preserveAspectRatio);
+		extern static CGAffineTransform CGPDFPageGetDrawingTransform (IntPtr handle, CGPDFBox box, CGRect rect, int rotate, int preserveAspectRatio);
 
-		public CGAffineTransform GetDrawingTransform (CGPDFBox box, RectangleF rect, int rotate, bool preserveAspectRatio)
+		public CGAffineTransform GetDrawingTransform (CGPDFBox box, CGRect rect, int rotate, bool preserveAspectRatio)
 		{
 			return CGPDFPageGetDrawingTransform (handle, box, rect, rotate, preserveAspectRatio ? 1 : 0);
 		}

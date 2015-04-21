@@ -34,16 +34,18 @@ using MonoMac.CoreFoundation;
 using MonoMac.CoreGraphics;
 
 #if MAC64
-using NSInteger = System.Int64;
-using NSUInteger = System.UInt64;
-using CGFloat = System.Double;
+using nint = System.Int64;
+using nuint = System.UInt64;
+using nfloat = System.Double;
 #else
-using NSInteger = System.Int32;
-using NSUInteger = System.UInt32;
-using NSPoint = System.Drawing.PointF;
-using NSSize = System.Drawing.SizeF;
-using NSRect = System.Drawing.RectangleF;
-using CGFloat = System.Single;
+using nint = System.Int32;
+using nuint = System.UInt32;
+using nfloat = System.Single;
+#if SDCOMPAT
+using CGPoint = System.Drawing.PointF;
+using CGSize = System.Drawing.SizeF;
+using CGRect = System.Drawing.RectangleF;
+#endif
 #endif
 
 namespace MonoMac.CoreText {
@@ -105,8 +107,8 @@ namespace MonoMac.CoreText {
 		}
 
 		[DllImport (Constants.CoreTextLibrary)]
-		extern static void CTRunGetAdvances (IntPtr h, NSRange range, [In, Out] SizeF [] buffer);
-		public SizeF[] GetAdvances (NSRange range, SizeF[] buffer)
+		extern static void CTRunGetAdvances (IntPtr h, NSRange range, [In, Out] CGSize [] buffer);
+		public CGSize[] GetAdvances (NSRange range, CGSize[] buffer)
 		{
 			buffer = GetBuffer (range, buffer);
 
@@ -119,7 +121,7 @@ namespace MonoMac.CoreText {
 		{
 			var glyphCount = GlyphCount;
 
-			if (buffer != null && range.Length != 0 && (NSUInteger)buffer.Length < range.Length)
+			if (buffer != null && range.Length != 0 && (nuint)buffer.Length < range.Length)
 				throw new ArgumentException ("buffer.Length must be >= range.Length.", "buffer");
 			if (buffer != null && range.Length == 0 && buffer.Length < glyphCount)
 				throw new ArgumentException ("buffer.Length must be >= GlyphCount.", "buffer");
@@ -127,11 +129,11 @@ namespace MonoMac.CoreText {
 			return buffer ?? new T [range.Length == 0 ? glyphCount : (int)range.Length];
 		}
 
-		public SizeF [] GetAdvances (NSRange range) {
+		public CGSize [] GetAdvances (NSRange range) {
 			return GetAdvances (range, null);
 		}
 
-		public SizeF [] GetAdvances ()
+		public CGSize [] GetAdvances ()
 		{
 			return GetAdvances (new NSRange (0, 0), null);
 		}
@@ -175,14 +177,14 @@ namespace MonoMac.CoreText {
 		}
 
 		[DllImport (Constants.CoreTextLibrary)]
-		extern static RectangleF CTRunGetImageBounds (IntPtr h, IntPtr context, NSRange range);
-		public RectangleF GetImageBounds (CGContext context, NSRange range) {
+		extern static CGRect CTRunGetImageBounds (IntPtr h, IntPtr context, NSRange range);
+		public CGRect GetImageBounds (CGContext context, NSRange range) {
 			return CTRunGetImageBounds (handle, context.Handle, range);
 		}
 
 		[DllImport (Constants.CoreTextLibrary)]
-		extern static void CTRunGetPositions (IntPtr h, NSRange range, [In, Out] PointF [] buffer);
-		public PointF [] GetPositions (NSRange range, PointF[] buffer)
+		extern static void CTRunGetPositions (IntPtr h, NSRange range, [In, Out] CGPoint [] buffer);
+		public CGPoint [] GetPositions (NSRange range, CGPoint[] buffer)
 		{
 			buffer = GetBuffer (range, buffer);
 
@@ -191,11 +193,11 @@ namespace MonoMac.CoreText {
 			return buffer;
 		}
 
-		public PointF [] GetPositions (NSRange range) {
+		public CGPoint [] GetPositions (NSRange range) {
 			return GetPositions (range, null);
 		}
 
-		public PointF [] GetPositions ()
+		public CGPoint [] GetPositions ()
 		{
 			return GetPositions (new NSRange (0, 0), null);
 		}
@@ -245,10 +247,10 @@ namespace MonoMac.CoreText {
 		}
 		
 		[DllImport (Constants.CoreTextLibrary)]
-		extern static double CTRunGetTypographicBounds (IntPtr h, NSRange range, out float ascent, out float descent, out float leading);
+		extern static double CTRunGetTypographicBounds (IntPtr h, NSRange range, out nfloat ascent, out nfloat descent, out nfloat leading);
 		[DllImport (Constants.CoreTextLibrary)]
 		extern static double CTRunGetTypographicBounds (IntPtr h, NSRange range, IntPtr ascent, IntPtr descent, IntPtr leading);
-		public double GetTypographicBounds (NSRange range, out float ascent, out float descent, out float leading) {
+		public double GetTypographicBounds (NSRange range, out nfloat ascent, out nfloat descent, out nfloat leading) {
 			return CTRunGetTypographicBounds (handle, range, out ascent, out descent, out leading);
 		}
 

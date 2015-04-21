@@ -14,16 +14,18 @@ using System.Runtime.InteropServices;
 using MonoMac.ObjCRuntime;
 
 #if MAC64
-using NSInteger = System.Int64;
-using NSUInteger = System.UInt64;
-using CGFloat = System.Double;
+using nint = System.Int64;
+using nuint = System.UInt64;
+using nfloat = System.Double;
 #else
-using NSInteger = System.Int32;
-using NSUInteger = System.UInt32;
-using NSPoint = System.Drawing.PointF;
-using NSSize = System.Drawing.SizeF;
-using NSRect = System.Drawing.RectangleF;
-using CGFloat = System.Single;
+using nint = System.Int32;
+using nuint = System.UInt32;
+using nfloat = System.Single;
+#if SDCOMPAT
+using CGPoint = System.Drawing.PointF;
+using CGSize = System.Drawing.SizeF;
+using CGRect = System.Drawing.RectangleF;
+#endif
 #endif
 
 namespace MonoMac.Foundation {
@@ -38,7 +40,7 @@ namespace MonoMac.Foundation {
 			IntPtr buf = Marshal.AllocHGlobal (4 * indexes.Length);
 			for (int i = 0; i < indexes.Length; i++)
 				Marshal.WriteInt32 (buf, i * 4, (int) indexes [i]);
-			NSIndexPath ret = _FromIndex (buf, (NSUInteger)indexes.Length);
+			NSIndexPath ret = _FromIndex (buf, (nuint)indexes.Length);
 			Marshal.FreeHGlobal (buf);
 			return ret;
 		}
@@ -52,7 +54,7 @@ namespace MonoMac.Foundation {
 			for (int i = 0; i < indexes.Length; i++)
 				Marshal.WriteInt32 (buf, i * 4, indexes [i]);
 
-			NSIndexPath ret = _FromIndex (buf, (NSUInteger)indexes.Length);
+			NSIndexPath ret = _FromIndex (buf, (nuint)indexes.Length);
 			Marshal.FreeHGlobal (buf);
 			return ret;
 		}
@@ -66,7 +68,7 @@ namespace MonoMac.Foundation {
 			for (int i = 0; i < indexes.Length; i++)
 				Marshal.WriteInt32 (buf, i * 4, (int) indexes [i]);
 
-			NSIndexPath ret = _FromIndex (buf, (NSUInteger)indexes.Length);
+			NSIndexPath ret = _FromIndex (buf, (nuint)indexes.Length);
 			Marshal.FreeHGlobal (buf);
 			return ret;
 		}

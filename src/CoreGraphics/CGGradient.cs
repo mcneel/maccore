@@ -33,16 +33,18 @@ using MonoMac.CoreFoundation;
 using MonoMac.Foundation;
 
 #if MAC64
-using NSInteger = System.Int64;
-using NSUInteger = System.UInt64;
-using CGFloat = System.Double;
+using nint = System.Int64;
+using nuint = System.UInt64;
+using nfloat = System.Double;
 #else
-using NSInteger = System.Int32;
-using NSUInteger = System.UInt32;
-using NSPoint = System.Drawing.PointF;
-using NSSize = System.Drawing.SizeF;
-using NSRect = System.Drawing.RectangleF;
-using CGFloat = System.Single;
+using nint = System.Int32;
+using nuint = System.UInt32;
+using nfloat = System.Single;
+#if SDCOMPAT
+using CGPoint = System.Drawing.PointF;
+using CGSize = System.Drawing.SizeF;
+using CGRect = System.Drawing.RectangleF;
+#endif
 #endif
 
 namespace MonoMac.CoreGraphics {
@@ -95,8 +97,8 @@ namespace MonoMac.CoreGraphics {
 
 
 		[DllImport(Constants.CoreGraphicsLibrary)]
-		extern static IntPtr CGGradientCreateWithColorComponents (IntPtr colorspace, CGFloat [] components, CGFloat [] locations, IntPtr size_t_count);
-		public CGGradient (CGColorSpace colorspace, CGFloat [] components, CGFloat [] locations)
+		extern static IntPtr CGGradientCreateWithColorComponents (IntPtr colorspace, nfloat [] components, nfloat [] locations, IntPtr size_t_count);
+		public CGGradient (CGColorSpace colorspace, nfloat [] components, nfloat [] locations)
 		{
 			if (colorspace == null)
 				throw new ArgumentNullException ("colorspace");
@@ -106,7 +108,7 @@ namespace MonoMac.CoreGraphics {
 			handle = CGGradientCreateWithColorComponents (colorspace.handle, components, locations, new IntPtr(components.Length / (colorspace.Components+1)));
 		}
 
-		public CGGradient (CGColorSpace colorspace, CGFloat [] components)
+		public CGGradient (CGColorSpace colorspace, nfloat [] components)
 		{
 			if (colorspace == null)
 				throw new ArgumentNullException ("colorspace");
@@ -116,9 +118,9 @@ namespace MonoMac.CoreGraphics {
 		}
 #if !COREBUILD
 		[DllImport(Constants.CoreGraphicsLibrary)]
-		extern static IntPtr CGGradientCreateWithColors (/* CGColorSpaceRef */ IntPtr colorspace, /* CFArrayRef */ IntPtr colors, CGFloat [] locations);
+		extern static IntPtr CGGradientCreateWithColors (/* CGColorSpaceRef */ IntPtr colorspace, /* CFArrayRef */ IntPtr colors, nfloat [] locations);
 
-		public CGGradient (CGColorSpace colorspace, CGColor [] colors, CGFloat [] locations)
+		public CGGradient (CGColorSpace colorspace, CGColor [] colors, nfloat [] locations)
 		{
 			if (colors == null)
 				throw new ArgumentNullException ("colors");

@@ -33,16 +33,18 @@ using MonoTouch.CoreAnimation;
 using MonoMac.CoreGraphics;
 
 #if MAC64
-using NSInteger = System.Int64;
-using NSUInteger = System.UInt64;
-using CGFloat = System.Double;
+using nint = System.Int64;
+using nuint = System.UInt64;
+using nfloat = System.Double;
 #else
-using NSInteger = System.Int32;
-using NSUInteger = System.UInt32;
-using NSPoint = System.Drawing.PointF;
-using NSSize = System.Drawing.SizeF;
-using NSRect = System.Drawing.RectangleF;
-using CGFloat = System.Single;
+using nint = System.Int32;
+using nuint = System.UInt32;
+using nfloat = System.Single;
+#if SDCOMPAT
+using CGPoint = System.Drawing.PointF;
+using CGSize = System.Drawing.SizeF;
+using CGRect = System.Drawing.RectangleF;
+#endif
 #endif
 
 
@@ -437,12 +439,12 @@ namespace MonoMac.Foundation {
 				if (t == typeof (IntPtr))
 					return NSValue.ValueFromPointer ((IntPtr) obj);
 #if MAC64
-				if (t == typeof (NSSize))
-					return NSValue.FromSize ((NSSize) obj);
-				else if (t == typeof (NSRect))
-					return NSValue.FromRectangle ((NSRect) obj);
-				else if (t == typeof (NSPoint))
-					return NSValue.FromPoint ((NSPoint) obj);
+				if (t == typeof (CGSize))
+					return NSValue.FromSize ((CGSize) obj);
+				else if (t == typeof (CGRect))
+					return NSValue.FromRectangle ((CGRect) obj);
+				else if (t == typeof (CGPoint))
+					return NSValue.FromPoint ((CGPoint) obj);
 #else
 				if (t == typeof (SizeF))
 					return NSValue.FromSizeF ((SizeF) obj);

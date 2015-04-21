@@ -33,16 +33,18 @@ using MonoMac.ObjCRuntime;
 using MonoMac.Foundation;
 
 #if MAC64
-using NSInteger = System.Int64;
-using NSUInteger = System.UInt64;
-using CGFloat = System.Double;
+using nint = System.Int64;
+using nuint = System.UInt64;
+using nfloat = System.Double;
 #else
-using NSInteger = System.Int32;
-using NSUInteger = System.UInt32;
-using NSPoint = System.Drawing.PointF;
-using NSSize = System.Drawing.SizeF;
-using NSRect = System.Drawing.RectangleF;
-using CGFloat = System.Single;
+using nint = System.Int32;
+using nuint = System.UInt32;
+using nfloat = System.Single;
+#if SDCOMPAT
+using CGPoint = System.Drawing.PointF;
+using CGSize = System.Drawing.SizeF;
+using CGRect = System.Drawing.RectangleF;
+#endif
 #endif
 
 
@@ -68,9 +70,9 @@ namespace MonoMac.CoreGraphics {
 		
 
 		[DllImport(Constants.CoreGraphicsLibrary)]
-		extern static IntPtr CGShadingCreateAxial(IntPtr space, NSPoint start, NSPoint end, IntPtr functionHandle, bool extendStart, bool extendEnd);
+		extern static IntPtr CGShadingCreateAxial(IntPtr space, CGPoint start, CGPoint end, IntPtr functionHandle, bool extendStart, bool extendEnd);
 
-		public static CGShading CreateAxial (CGColorSpace colorspace, NSPoint start, NSPoint end, CGFunction function, bool extendStart, bool extendEnd)
+		public static CGShading CreateAxial (CGColorSpace colorspace, CGPoint start, CGPoint end, CGFunction function, bool extendStart, bool extendEnd)
 		{
 			if (colorspace == null)
 				throw new ArgumentNullException ("colorspace");
@@ -85,10 +87,10 @@ namespace MonoMac.CoreGraphics {
 		}
 		
 		[DllImport(Constants.CoreGraphicsLibrary)]
-		extern static IntPtr CGShadingCreateRadial(IntPtr space, NSPoint start, CGFloat startRadius, NSPoint end, CGFloat endRadius,
+		extern static IntPtr CGShadingCreateRadial(IntPtr space, CGPoint start, nfloat startRadius, CGPoint end, nfloat endRadius,
 							   IntPtr function, bool extendStart, bool extendEnd);
 
-		public static CGShading CreateRadial (CGColorSpace colorspace, NSPoint start, CGFloat startRadius, NSPoint end, CGFloat endRadius,
+		public static CGShading CreateRadial (CGColorSpace colorspace, CGPoint start, nfloat startRadius, CGPoint end, nfloat endRadius,
 						      CGFunction function, bool extendStart, bool extendEnd)
 		{
 			if (colorspace == null)

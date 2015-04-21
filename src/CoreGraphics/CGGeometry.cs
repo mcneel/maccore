@@ -34,22 +34,24 @@ using MonoMac.ObjCRuntime;
 using MonoMac.Foundation;
 
 #if MAC64
-using NSInteger = System.Int64;
-using NSUInteger = System.UInt64;
-using CGFloat = System.Double;
+using nint = System.Int64;
+using nuint = System.UInt64;
+using nfloat = System.Double;
 #else
-using NSInteger = System.Int32;
-using NSUInteger = System.UInt32;
-using NSPoint = System.Drawing.PointF;
-using NSSize = System.Drawing.SizeF;
-using NSRect = System.Drawing.RectangleF;
-using CGFloat = System.Single;
+using nint = System.Int32;
+using nuint = System.UInt32;
+using nfloat = System.Single;
+#if SDCOMPAT
+using CGPoint = System.Drawing.PointF;
+using CGSize = System.Drawing.SizeF;
+using CGRect = System.Drawing.RectangleF;
+#endif
 #endif
 
 namespace MonoMac.CoreGraphics {
 
 	[Since (3,2)]
-	public enum CGRectEdge {
+	public enum NSRectEdge {
 		MinXEdge,
 		MinYEdge,
 		MaxXEdge,
@@ -60,92 +62,92 @@ namespace MonoMac.CoreGraphics {
 	public static class RectangleFExtensions {
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		static extern CGFloat CGRectGetMinX (NSRect rect);
-		public static CGFloat GetMinX (this NSRect self)
+		static extern nfloat CGRectGetMinX (CGRect rect);
+		public static nfloat GetMinX (this CGRect self)
 		{
 			return CGRectGetMinX (self);
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		static extern CGFloat CGRectGetMidX (NSRect rect);
-		public static CGFloat GetMidX (this NSRect self)
+		static extern nfloat CGRectGetMidX (CGRect rect);
+		public static nfloat GetMidX (this CGRect self)
 		{
 			return CGRectGetMidX (self);
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		static extern CGFloat CGRectGetMaxX (NSRect rect);
-		public static CGFloat GetMaxX (this NSRect self)
+		static extern nfloat CGRectGetMaxX (CGRect rect);
+		public static nfloat GetMaxX (this CGRect self)
 		{
 			return CGRectGetMaxX (self);
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		static extern CGFloat CGRectGetMinY (NSRect rect);
-		public static CGFloat GetMinY (this NSRect self)
+		static extern nfloat CGRectGetMinY (CGRect rect);
+		public static nfloat GetMinY (this CGRect self)
 		{
 			return CGRectGetMinY (self);
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		static extern CGFloat CGRectGetMidY (NSRect rect);
-		public static CGFloat GetMidY (this NSRect self)
+		static extern nfloat CGRectGetMidY (CGRect rect);
+		public static nfloat GetMidY (this CGRect self)
 		{
 			return CGRectGetMidY (self);
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		static extern CGFloat CGRectGetMaxY (NSRect rect);
-		public static CGFloat GetMaxY (this NSRect self)
+		static extern nfloat CGRectGetMaxY (CGRect rect);
+		public static nfloat GetMaxY (this CGRect self)
 		{
 			return CGRectGetMaxY (self);
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		static extern NSRect CGRectStandardize (NSRect rect);
-		public static NSRect Standardize (this NSRect self)
+		static extern CGRect CGRectStandardize (CGRect rect);
+		public static CGRect Standardize (this CGRect self)
 		{
 			return CGRectStandardize (self);
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		static extern bool CGRectIsNull (NSRect rect);
-		public static bool IsNull (this NSRect self)
+		static extern bool CGRectIsNull (CGRect rect);
+		public static bool IsNull (this CGRect self)
 		{
 			return CGRectIsNull (self);
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		static extern bool CGRectIsInfinite (NSRect rect);
-		public static bool IsInfinite (this NSRect self)
+		static extern bool CGRectIsInfinite (CGRect rect);
+		public static bool IsInfinite (this CGRect self)
 		{
 			return CGRectIsNull (self);
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		static extern NSRect CGRectInset (NSRect rect, CGFloat dx, CGFloat dy);
-		public static NSRect Inset (this NSRect self, float dx, float dy)
+		static extern CGRect CGRectInset (CGRect rect, nfloat dx, nfloat dy);
+		public static CGRect Inset (this CGRect self, nfloat dx, nfloat dy)
 		{
 			return CGRectInset (self, dx, dy);
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		static extern NSRect CGRectIntegral (NSRect rect);
-		public static NSRect Integral (this NSRect self)
+		static extern CGRect CGRectIntegral (CGRect rect);
+		public static CGRect Integral (this CGRect self)
 		{
 			return CGRectIntegral (self);
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		static extern NSRect CGRectUnion (NSRect r1, NSRect r2);
-		public static NSRect UnionWith (this NSRect self, NSRect other)
+		static extern CGRect CGRectUnion (CGRect r1, CGRect r2);
+		public static CGRect UnionWith (this CGRect self, CGRect other)
 		{
 			return CGRectUnion (self, other);
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		static extern void CGRectDivide (NSRect rect, out NSRect slice, out NSRect remainder, CGFloat amount, CGRectEdge edge);
-		public static void Divide (this NSRect self, CGFloat amount, CGRectEdge edge, out NSRect slice, out NSRect remainder)
+		static extern void CGRectDivide (CGRect rect, out CGRect slice, out CGRect remainder, nfloat amount, NSRectEdge edge);
+		public static void Divide (this CGRect self, nfloat amount, NSRectEdge edge, out CGRect slice, out CGRect remainder)
 		{
 			CGRectDivide (self, out slice, out remainder, amount, edge);
 		}

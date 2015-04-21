@@ -33,16 +33,18 @@ using MonoMac.ObjCRuntime;
 using MonoMac.Foundation;
 
 #if MAC64
-using NSInteger = System.Int64;
-using NSUInteger = System.UInt64;
-using CGFloat = System.Double;
+using nint = System.Int64;
+using nuint = System.UInt64;
+using nfloat = System.Double;
 #else
-using NSInteger = System.Int32;
-using NSUInteger = System.UInt32;
-using NSPoint = System.Drawing.PointF;
-using NSSize = System.Drawing.SizeF;
-using NSRect = System.Drawing.RectangleF;
-using CGFloat = System.Single;
+using nint = System.Int32;
+using nuint = System.UInt32;
+using nfloat = System.Single;
+#if SDCOMPAT
+using CGPoint = System.Drawing.PointF;
+using CGSize = System.Drawing.SizeF;
+using CGRect = System.Drawing.RectangleF;
+#endif
 #endif
 
 
@@ -142,9 +144,9 @@ namespace MonoMac.CoreGraphics {
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		extern static IntPtr CGColorSpaceCreateCalibratedGray (CGFloat [] whitepoint, CGFloat [] blackpoint, CGFloat gamma);
+		extern static IntPtr CGColorSpaceCreateCalibratedGray (nfloat [] whitepoint, nfloat [] blackpoint, nfloat gamma);
 
-		public static CGColorSpace CreateCalibratedGray (CGFloat [] whitepoint, CGFloat [] blackpoint, CGFloat gamma)
+		public static CGColorSpace CreateCalibratedGray (nfloat [] whitepoint, nfloat [] blackpoint, nfloat gamma)
 		{
 			if (whitepoint.Length != 3)
 				throw new ArgumentException ("Must have 3 values", "whitepoint");
@@ -155,8 +157,8 @@ namespace MonoMac.CoreGraphics {
 		
 		// 3, 3, 3, 9
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		extern static IntPtr CGColorSpaceCreateCalibratedRGB (CGFloat [] whitePoint, CGFloat [] blackPoint, CGFloat [] gamma, CGFloat [] matrix);
-		public static CGColorSpace CreateCalibratedRGB (CGFloat [] whitepoint, CGFloat [] blackpoint, CGFloat [] gamma, CGFloat [] matrix)
+		extern static IntPtr CGColorSpaceCreateCalibratedRGB (nfloat [] whitePoint, nfloat [] blackPoint, nfloat [] gamma, nfloat [] matrix);
+		public static CGColorSpace CreateCalibratedRGB (nfloat [] whitepoint, nfloat [] blackpoint, nfloat [] gamma, nfloat [] matrix)
 		{
 			if (whitepoint.Length != 3)
 				throw new ArgumentException ("Must have 3 values", "whitepoint");

@@ -35,16 +35,18 @@ using MonoMac.Foundation;
 using MonoMac.CoreFoundation;
 
 #if MAC64
-using NSInteger = System.Int64;
-using NSUInteger = System.UInt64;
-using CGFloat = System.Double;
+using nint = System.Int64;
+using nuint = System.UInt64;
+using nfloat = System.Double;
 #else
-using NSInteger = System.Int32;
-using NSUInteger = System.UInt32;
-using NSPoint = System.Drawing.PointF;
-using NSSize = System.Drawing.SizeF;
-using NSRect = System.Drawing.RectangleF;
-using CGFloat = System.Single;
+using nint = System.Int32;
+using nuint = System.UInt32;
+using nfloat = System.Single;
+#if SDCOMPAT
+using CGPoint = System.Drawing.PointF;
+using CGSize = System.Drawing.SizeF;
+using CGRect = System.Drawing.RectangleF;
+#endif
 #endif
 
 namespace MonoMac.CoreGraphics {
@@ -69,20 +71,20 @@ namespace MonoMac.CoreGraphics {
 			}
 		}
 		
-		public RectangleF? MediaBox { get; set; }
-		public RectangleF? CropBox { get; set; }
-		public RectangleF? BleedBox { get; set; }
-		public RectangleF? TrimBox { get; set; }
-		public RectangleF? ArtBox { get; set; }
+		public CGRect? MediaBox { get; set; }
+		public CGRect? CropBox { get; set; }
+		public CGRect? BleedBox { get; set; }
+		public CGRect? TrimBox { get; set; }
+		public CGRect? ArtBox { get; set; }
 
-		static void Add (NSMutableDictionary dict, IntPtr key, RectangleF? val)
+		static void Add (NSMutableDictionary dict, IntPtr key, CGRect? val)
 		{
 			if (!val.HasValue)
 				return;
 			NSData data;
 			unsafe {
-				RectangleF f = val.Value;
-				RectangleF *pf = &f;
+				CGRect f = val.Value;
+				CGRect *pf = &f;
 				data = NSData.FromBytes ((IntPtr) pf, 16);
 			}
 			dict.LowlevelSetObject (data, key);
@@ -200,16 +202,16 @@ namespace MonoMac.CoreGraphics {
 		bool closed;
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		extern static IntPtr CGPDFContextCreateWithURL (IntPtr url, ref NSRect rect, IntPtr dictionary);
+		extern static IntPtr CGPDFContextCreateWithURL (IntPtr url, ref CGRect rect, IntPtr dictionary);
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static IntPtr CGPDFContextCreateWithURL (IntPtr url, IntPtr rect, IntPtr dictionary);
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		extern static IntPtr CGPDFContextCreate (IntPtr dataConsumer, ref RectangleF rect, IntPtr dictionary);
+		extern static IntPtr CGPDFContextCreate (IntPtr dataConsumer, ref CGRect rect, IntPtr dictionary);
 		
 		
-		public CGContextPDF (CGDataConsumer dataConsumer, RectangleF mediaBox, CGPDFInfo info)
+		public CGContextPDF (CGDataConsumer dataConsumer, CGRect mediaBox, CGPDFInfo info)
 		{
 			if (dataConsumer == null)
 				throw new ArgumentNullException ("dataConsumer");
@@ -217,14 +219,14 @@ namespace MonoMac.CoreGraphics {
 			handle = CGPDFContextCreate (dataConsumer.Handle, ref mediaBox, info == null ? IntPtr.Zero : info.ToDictionary ().Handle);
 		}
 
-		public CGContextPDF (NSUrl url, NSRect mediaBox, CGPDFInfo info)
+		public CGContextPDF (NSUrl url, CGRect mediaBox, CGPDFInfo info)
 		{
 			if (url == null)
 				throw new ArgumentNullException ("url");
 			handle = CGPDFContextCreateWithURL (url.Handle, ref mediaBox, info == null ? IntPtr.Zero : info.ToDictionary ().Handle);
 		}
 
-		public CGContextPDF (NSUrl url, NSRect mediaBox)
+		public CGContextPDF (NSUrl url, CGRect mediaBox)
 		{
 			if (url == null)
 				throw new ArgumentNullException ("url");
@@ -280,8 +282,8 @@ namespace MonoMac.CoreGraphics {
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		extern static void CGPDFContextSetURLForRect (IntPtr handle, IntPtr urlh, NSRect rect);
-		public void SetUrl (NSUrl url, NSRect region)
+		extern static void CGPDFContextSetURLForRect (IntPtr handle, IntPtr urlh, CGRect rect);
+		public void SetUrl (NSUrl url, CGRect region)
 		{
 			if (url == null)
 				throw new ArgumentNullException ("url");
@@ -289,8 +291,8 @@ namespace MonoMac.CoreGraphics {
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		extern static void CGPDFContextAddDestinationAtPoint (IntPtr handle, IntPtr cfstring, NSPoint point);
-		public void AddDestination (string name, NSPoint point)
+		extern static void CGPDFContextAddDestinationAtPoint (IntPtr handle, IntPtr cfstring, CGPoint point);
+		public void AddDestination (string name, CGPoint point)
 		{
 			if (name == null)
 				throw new ArgumentNullException ("name");
@@ -298,8 +300,8 @@ namespace MonoMac.CoreGraphics {
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		extern static void CGPDFContextSetDestinationForRect (IntPtr handle, IntPtr cfstr, NSRect rect);
-		public void SetDestination (string name, NSRect rect)
+		extern static void CGPDFContextSetDestinationForRect (IntPtr handle, IntPtr cfstr, CGRect rect);
+		public void SetDestination (string name, CGRect rect)
 		{
 			if (name == null)
 				throw new ArgumentNullException ("name");

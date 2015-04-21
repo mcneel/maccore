@@ -25,6 +25,21 @@
 //
 using System;
 
+#if MAC64
+using nint = System.Int64;
+using nuint = System.UInt64;
+using nfloat = System.Double;
+#else
+using nint = System.Int32;
+using nuint = System.UInt32;
+using nfloat = System.Single;
+#if SDCOMPAT
+using CGPoint = System.Drawing.PointF;
+using CGSize = System.Drawing.SizeF;
+using CGRect = System.Drawing.RectangleF;
+#endif
+#endif
+
 namespace MonoMac.Foundation {
 	public class NSErrorException : Exception {
 		NSError error;
@@ -44,13 +59,9 @@ namespace MonoMac.Foundation {
 			get { return error.Domain; }
 		}
 
-		public int Code
+		public nint Code
 		{
-#if MAC64
-			get { return (int)error.Code; }
-#else
 			get { return error.Code; }
-#endif
 		}
 
 		public NSDictionary UserInfo

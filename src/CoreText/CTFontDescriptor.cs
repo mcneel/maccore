@@ -36,6 +36,21 @@ using MonoMac.CoreFoundation;
 using MonoMac.CoreGraphics;
 using MonoMac.Foundation;
 
+#if MAC64
+using nint = System.Int64;
+using nuint = System.UInt64;
+using nfloat = System.Double;
+#else
+using nint = System.Int32;
+using nuint = System.UInt32;
+using nfloat = System.Single;
+#if SDCOMPAT
+using CGPoint = System.Drawing.PointF;
+using CGSize = System.Drawing.SizeF;
+using CGRect = System.Drawing.RectangleF;
+#endif
+#endif
+
 namespace MonoMac.CoreText {
 
 	[Since (3,2)]
@@ -391,8 +406,8 @@ namespace MonoMac.CoreText {
 
 #region Descriptor Creation
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern IntPtr CTFontDescriptorCreateWithNameAndSize (IntPtr name, float size);
-		public CTFontDescriptor (string name, float size)
+		static extern IntPtr CTFontDescriptorCreateWithNameAndSize (IntPtr name, nfloat size);
+		public CTFontDescriptor (string name, nfloat size)
 		{
 			if (name == null)
 				throw ConstructorError.ArgumentNull (this, "name");
@@ -439,8 +454,8 @@ namespace MonoMac.CoreText {
 		// TODO: is there a better type to use for variationIdentifier?  
 		// uint perhaps?  "This is the four character code of the variation axis"
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern IntPtr CTFontDescriptorCreateCopyWithVariation (IntPtr original, IntPtr variationIdentifier, float variationValue);
-		public CTFontDescriptor WithVariation (uint variationIdentifier, float variationValue)
+		static extern IntPtr CTFontDescriptorCreateCopyWithVariation (IntPtr original, IntPtr variationIdentifier, nfloat variationValue);
+		public CTFontDescriptor WithVariation (uint variationIdentifier, nfloat variationValue)
 		{
 			using (var id = new NSNumber (variationIdentifier))
 				return CreateDescriptor (CTFontDescriptorCreateCopyWithVariation  (handle, 

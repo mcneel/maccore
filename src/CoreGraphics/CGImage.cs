@@ -33,16 +33,18 @@ using MonoMac.ObjCRuntime;
 using MonoMac.Foundation;
 
 #if MAC64
-using NSInteger = System.Int64;
-using NSUInteger = System.UInt64;
-using CGFloat = System.Double;
+using nint = System.Int64;
+using nuint = System.UInt64;
+using nfloat = System.Double;
 #else
-using NSInteger = System.Int32;
-using NSUInteger = System.UInt32;
-using NSPoint = System.Drawing.PointF;
-using NSSize = System.Drawing.SizeF;
-using NSRect = System.Drawing.RectangleF;
-using CGFloat = System.Single;
+using nint = System.Int32;
+using nuint = System.UInt32;
+using nfloat = System.Single;
+#if SDCOMPAT
+using CGPoint = System.Drawing.PointF;
+using CGSize = System.Drawing.SizeF;
+using CGRect = System.Drawing.RectangleF;
+#endif
 #endif
 
 namespace MonoMac.CoreGraphics {
@@ -152,13 +154,13 @@ namespace MonoMac.CoreGraphics {
 						   IntPtr /* CGColorSpaceRef */ space,
 						   CGBitmapFlags bitmapInfo,
 						   IntPtr /* CGDataProviderRef */ provider,
-						   CGFloat [] decode,
+						   nfloat [] decode,
 						   bool shouldInterpolate,
 						   CGColorRenderingIntent intent);
 
-		public CGImage (NSInteger width, NSInteger height, NSInteger bitsPerComponent, NSInteger bitsPerPixel, NSInteger bytesPerRow,
+		public CGImage (nint width, nint height, nint bitsPerComponent, nint bitsPerPixel, nint bytesPerRow,
 				CGColorSpace colorSpace, CGBitmapFlags bitmapFlags, CGDataProvider provider,
-				CGFloat [] decode, bool shouldInterpolate, CGColorRenderingIntent intent)
+				nfloat [] decode, bool shouldInterpolate, CGColorRenderingIntent intent)
 		{
 			if (colorSpace == null)
 				throw new ArgumentNullException ("colorSpace");
@@ -180,9 +182,9 @@ namespace MonoMac.CoreGraphics {
 						shouldInterpolate, intent);
 		}
 
-		public CGImage (NSInteger width, NSInteger height, NSInteger bitsPerComponent, NSInteger bitsPerPixel, NSInteger bytesPerRow,
+		public CGImage (nint width, nint height, nint bitsPerComponent, nint bitsPerPixel, nint bytesPerRow,
 				CGColorSpace colorSpace, CGImageAlphaInfo alphaInfo, CGDataProvider provider,
-				CGFloat [] decode, bool shouldInterpolate, CGColorRenderingIntent intent)
+				nfloat [] decode, bool shouldInterpolate, CGColorRenderingIntent intent)
 		{
 			if (colorSpace == null)
 				throw new ArgumentNullException ("colorSpace");
@@ -206,9 +208,9 @@ namespace MonoMac.CoreGraphics {
 
 #if MONOMAC
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		static extern IntPtr CGWindowListCreateImage(NSRect screenBounds, CGWindowListOption windowOption, uint windowID, CGWindowImageOption imageOption);
+		static extern IntPtr CGWindowListCreateImage(CGRect screenBounds, CGWindowListOption windowOption, uint windowID, CGWindowImageOption imageOption);
         
-		public static CGImage ScreenImage (int windownumber, NSRect bounds)
+		public static CGImage ScreenImage (int windownumber, CGRect bounds)
 		{
 			IntPtr imageRef = CGWindowListCreateImage(bounds, CGWindowListOption.IncludingWindow, (uint)windownumber,
 								  CGWindowImageOption.Default);
@@ -227,11 +229,11 @@ namespace MonoMac.CoreGraphics {
 	
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static IntPtr CGImageCreateWithJPEGDataProvider(IntPtr /* CGDataProviderRef */ source,
-								       CGFloat [] decode,
+								       nfloat [] decode,
 								       bool shouldInterpolate,
 								       CGColorRenderingIntent intent);
 
-		public static CGImage FromJPEG (CGDataProvider provider, CGFloat [] decode, bool shouldInterpolate, CGColorRenderingIntent intent)
+		public static CGImage FromJPEG (CGDataProvider provider, nfloat [] decode, bool shouldInterpolate, CGColorRenderingIntent intent)
 		{
 			if (provider == null)
 				throw new ArgumentNullException ("provider");
@@ -245,10 +247,10 @@ namespace MonoMac.CoreGraphics {
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static IntPtr CGImageCreateWithPNGDataProvider(IntPtr /*CGDataProviderRef*/ source,
-								      CGFloat [] decode, bool shouldInterpolate,
+								      nfloat [] decode, bool shouldInterpolate,
 								      CGColorRenderingIntent intent);
 
-		public static CGImage FromPNG (CGDataProvider provider, CGFloat [] decode, bool shouldInterpolate, CGColorRenderingIntent intent)
+		public static CGImage FromPNG (CGDataProvider provider, nfloat [] decode, bool shouldInterpolate, CGColorRenderingIntent intent)
 		{
 			if (provider == null)
 				throw new ArgumentNullException ("provider");
@@ -262,9 +264,9 @@ namespace MonoMac.CoreGraphics {
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static IntPtr CGImageMaskCreate (IntPtr size_t_width, IntPtr size_t_height, IntPtr size_t_bitsPerComponent, IntPtr size_t_bitsPerPixel,
-							IntPtr size_t_bytesPerRow, IntPtr /* CGDataProviderRef */ provider, CGFloat [] decode, bool shouldInterpolate);
+							IntPtr size_t_bytesPerRow, IntPtr /* CGDataProviderRef */ provider, nfloat [] decode, bool shouldInterpolate);
 
-		public static CGImage CreateMask (NSInteger width, NSInteger height, NSInteger bitsPerComponent, NSInteger bitsPerPixel, NSInteger bytesPerRow, CGDataProvider provider, CGFloat [] decode, bool shouldInterpolate)
+		public static CGImage CreateMask (nint width, nint height, nint bitsPerComponent, nint bitsPerPixel, nint bytesPerRow, CGDataProvider provider, nfloat [] decode, bool shouldInterpolate)
 		{
 			if (width < 0)
 				throw new ArgumentException ("width");
@@ -286,8 +288,8 @@ namespace MonoMac.CoreGraphics {
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		extern static IntPtr CGImageCreateWithMaskingColors(IntPtr image, CGFloat [] components);
-		public CGImage WithMaskingColors (CGFloat[] components)
+		extern static IntPtr CGImageCreateWithMaskingColors(IntPtr image, nfloat [] components);
+		public CGImage WithMaskingColors (nfloat[] components)
 		{
 			int N = 2*ColorSpace.Components;
 			if (components == null)
@@ -312,8 +314,8 @@ namespace MonoMac.CoreGraphics {
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		extern static IntPtr CGImageCreateWithImageInRect(IntPtr image, NSRect rect);
-		public CGImage WithImageInRect (NSRect rect)
+		extern static IntPtr CGImageCreateWithImageInRect(IntPtr image, CGRect rect);
+		public CGImage WithImageInRect (CGRect rect)
 		{
 			return new CGImage (CGImageCreateWithImageInRect (handle, rect), true);
 		}
@@ -399,8 +401,8 @@ namespace MonoMac.CoreGraphics {
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		unsafe extern static CGFloat * CGImageGetDecode(IntPtr image);
-		public unsafe CGFloat *Decode {
+		unsafe extern static nfloat * CGImageGetDecode(IntPtr image);
+		public unsafe nfloat *Decode {
 			get {
 				return CGImageGetDecode (handle);
 			}

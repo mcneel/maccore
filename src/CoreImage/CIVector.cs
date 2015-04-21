@@ -29,46 +29,48 @@
 using System;
 
 #if MAC64
-using PointF = MonoMac.Foundation.NSPoint;
-using SizeF = MonoMac.Foundation.NSSize;
-using RectangleF = MonoMac.Foundation.NSRect;
-using NSInteger = System.Int64;
-using NSUInteger = System.UInt64;
-using CGFloat = System.Double;
+using nint = System.Int64;
+using nuint = System.UInt64;
+using nfloat = System.Double;
 #else
-using NSInteger = System.Int32;
-using NSUInteger = System.UInt32;
-using CGFloat = System.Single;
+using nint = System.Int32;
+using nuint = System.UInt32;
+using nfloat = System.Single;
+#if SDCOMPAT
+using CGPoint = System.Drawing.PointF;
+using CGSize = System.Drawing.SizeF;
+using CGRect = System.Drawing.RectangleF;
+#endif
 #endif
 
 namespace MonoMac.CoreImage {
 	public partial class CIVector {
-		CGFloat this [int index] {
+		nfloat this [int index] {
 			get {
 				return ValueAtIndex (index);
 			}
 		}
 		
-		static IntPtr GetPtr (CGFloat [] values)
+		static IntPtr GetPtr (nfloat [] values)
 		{
 			if (values == null)
 				throw new ArgumentNullException ("values");
 			unsafe {
-				fixed (CGFloat *ptr = &values [0])
+				fixed (nfloat *ptr = &values [0])
 					return (IntPtr) ptr;
 			}
 		}
 		
-		public CIVector (CGFloat [] values) : this (GetPtr (values), values.Length)
+		public CIVector (nfloat [] values) : this (GetPtr (values), values.Length)
 		{
 		}
 	
-		public static CIVector FromValues (CGFloat [] values)
+		public static CIVector FromValues (nfloat [] values)
 		{
 			if (values == null)
 				throw new ArgumentNullException ("values");
 			unsafe {
-				fixed (CGFloat *ptr = &values [0])
+				fixed (nfloat *ptr = &values [0])
 					return _FromValues ((IntPtr) ptr, values.Length);
 			}
 		}

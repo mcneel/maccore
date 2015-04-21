@@ -24,23 +24,25 @@
 using System;
 using System.Runtime.InteropServices;
 
-// For now, only support MAC64 for NSPoint in order to make sure
-// we didn't mess up the 32 bit build
-#if MAC64
+#if !SDCOMPAT
 
 #if MAC64
+using nint = System.Int64;
+using nuint = System.UInt64;
 using nfloat = System.Double;
 #else
+using nint = System.Int32;
+using nuint = System.UInt32;
 using nfloat = System.Single;
 #endif
 
-namespace MonoMac.Foundation {
+namespace MonoMac.CoreGraphics {
 	[StructLayout(LayoutKind.Sequential)]
-	public struct NSPoint {
+	public struct CGPoint {
 		
-		public static readonly NSPoint Empty;
+		public static readonly CGPoint Empty;
 		
-		public NSPoint(System.Drawing.PointF point)
+		public CGPoint(System.Drawing.PointF point)
 		{
 			X = point.X;
 			Y = point.Y;
@@ -51,43 +53,43 @@ namespace MonoMac.Foundation {
 			return X.GetHashCode() ^ Y.GetHashCode();
 		}
 
-		public static bool operator ==(NSPoint left, NSPoint right)
+		public static bool operator ==(CGPoint left, CGPoint right)
 		{
 			return left.X == right.X && left.Y == right.Y;
 		}
 
-		public static bool operator !=(NSPoint left, NSPoint right)
+		public static bool operator !=(CGPoint left, CGPoint right)
 		{
 			return left.X != right.X || left.Y != right.Y;
 		}
 		
-		public static NSPoint operator +(NSPoint pt, NSSize sz)
+		public static CGPoint operator +(CGPoint pt, CGSize sz)
 		{
-			return new NSPoint (pt.X + sz.Width, pt.Y + sz.Height);
+			return new CGPoint (pt.X + sz.Width, pt.Y + sz.Height);
 		}
 
-		public static NSPoint operator -(NSPoint pt, NSSize sz)
+		public static CGPoint operator -(CGPoint pt, CGSize sz)
 		{
-			return new NSPoint (pt.X - sz.Width, pt.Y - sz.Height);
+			return new CGPoint (pt.X - sz.Width, pt.Y - sz.Height);
 		}
 
-		public static implicit operator NSPoint (System.Drawing.PointF point)
+		public static implicit operator CGPoint (System.Drawing.PointF point)
 		{
-			return new NSPoint (point.X, point.Y);
+			return new CGPoint (point.X, point.Y);
 		}
 		
-		public static explicit operator System.Drawing.PointF (NSPoint point)
+		public static explicit operator System.Drawing.PointF (CGPoint point)
 		{
 			return new System.Drawing.PointF ((float)point.X, (float)point.Y);
 		}
 
-		public NSPoint(int x, int y)
+		public CGPoint(int x, int y)
 		{
 			X = (nfloat)x;
 			Y = (nfloat)y;
 		}
 
-		public NSPoint(nfloat x, nfloat y)
+		public CGPoint(nfloat x, nfloat y)
 		{
 			X = x;
 			Y = y;

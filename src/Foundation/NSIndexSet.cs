@@ -30,50 +30,52 @@ using System.Runtime.InteropServices;
 using MonoMac.ObjCRuntime;
 
 #if MAC64
-using NSInteger = System.Int64;
-using NSUInteger = System.UInt64;
-using CGFloat = System.Double;
+using nint = System.Int64;
+using nuint = System.UInt64;
+using nfloat = System.Double;
 #else
-using NSInteger = System.Int32;
-using NSUInteger = System.UInt32;
-using NSPoint = System.Drawing.PointF;
-using NSSize = System.Drawing.SizeF;
-using NSRect = System.Drawing.RectangleF;
-using CGFloat = System.Single;
+using nint = System.Int32;
+using nuint = System.UInt32;
+using nfloat = System.Single;
+#if SDCOMPAT
+using CGPoint = System.Drawing.PointF;
+using CGSize = System.Drawing.SizeF;
+using CGRect = System.Drawing.RectangleF;
+#endif
 #endif
 
 
 namespace MonoMac.Foundation {
 	
-	public partial class NSIndexSet : IEnumerable, IEnumerable<NSUInteger> {
+	public partial class NSIndexSet : IEnumerable, IEnumerable<nuint> {
 
 		IEnumerator IEnumerable.GetEnumerator ()
 		{
-			for (NSUInteger i = this.FirstIndex; i <= this.LastIndex;) {
+			for (nuint i = this.FirstIndex; i <= this.LastIndex;) {
 				yield return i;
 				i = this.IndexGreaterThan (i);
 			}
 		}
 
-		public IEnumerator<NSUInteger> GetEnumerator ()
+		public IEnumerator<nuint> GetEnumerator ()
 		{
-			for (NSUInteger i = this.FirstIndex; i <= this.LastIndex;) {
+			for (nuint i = this.FirstIndex; i <= this.LastIndex;) {
 				yield return i;
 				i = this.IndexGreaterThan (i);
 			}
 		}
 		
-		public NSUInteger[] ToArray ()
+		public nuint[] ToArray ()
 		{
-			NSUInteger [] indexes = new NSUInteger [Count];
+			nuint [] indexes = new nuint [Count];
 			int j = 0;
-			for (NSUInteger i = this.FirstIndex; i <= this.LastIndex;) {
+			for (nuint i = this.FirstIndex; i <= this.LastIndex;) {
 				indexes [j++] = i;
 				i = this.IndexGreaterThan (i);
 			}
 			return indexes;
 		}
-		public static NSIndexSet FromArray (NSUInteger[] items)
+		public static NSIndexSet FromArray (nuint[] items)
 		{
 			if (items == null)
 				return new NSIndexSet ();

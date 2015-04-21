@@ -24,23 +24,25 @@
 using System;
 using System.Runtime.InteropServices;
 
-// For now, only support MAC64 for NSRect in order to make sure
-// we didn't mess up the 32 bit build
-#if MAC64
+#if !SDCOMPAT
 
 #if MAC64
+using nint = System.Int64;
+using nuint = System.UInt64;
 using nfloat = System.Double;
 #else
+using nint = System.Int32;
+using nuint = System.UInt32;
 using nfloat = System.Single;
 #endif
 
-namespace MonoMac.Foundation {
+namespace MonoMac.CoreGraphics {
 	[StructLayout(LayoutKind.Sequential)]
-	public struct NSRect {
+	public struct CGRect {
 		
-		public static readonly NSRect Empty;
+		public static readonly CGRect Empty;
 	
-		public NSRect(System.Drawing.RectangleF rect)
+		public CGRect(System.Drawing.RectangleF rect)
 		{
 			Origin.X = rect.Left;
 			Origin.Y = rect.Top;
@@ -48,7 +50,7 @@ namespace MonoMac.Foundation {
 			Size.Height = rect.Height;
 		}
 
-		public NSRect(NSPoint location, NSSize size)
+		public CGRect(CGPoint location, CGSize size)
 		{
 			Origin.X = location.X;
 			Origin.Y = location.Y;
@@ -56,7 +58,7 @@ namespace MonoMac.Foundation {
 			Size.Height = size.Height;
 		}
 
-		public NSRect(System.Drawing.Point location, System.Drawing.Size size)
+		public CGRect(System.Drawing.Point location, System.Drawing.Size size)
 		{
 			Origin.X = location.X;
 			Origin.Y = location.Y;
@@ -64,7 +66,7 @@ namespace MonoMac.Foundation {
 			Size.Height = size.Height;
 		}
 
-		public NSRect(nfloat x, nfloat y, nfloat width, nfloat height)
+		public CGRect(nfloat x, nfloat y, nfloat width, nfloat height)
 		{
 			Origin.X = x;
 			Origin.Y = y;
@@ -72,10 +74,10 @@ namespace MonoMac.Foundation {
 			Size.Height = height;
 		}
 
-		public NSPoint Origin;
-		public NSSize Size;
+		public CGPoint Origin;
+		public CGSize Size;
 
-		public NSPoint Location {
+		public CGPoint Location {
 			get
 			{
 				return Origin;
@@ -89,7 +91,7 @@ namespace MonoMac.Foundation {
 		
 		public override bool Equals(object obj)
 		{
-			return obj is NSRect && this == (NSRect)obj;
+			return obj is CGRect && this == (CGRect)obj;
 		}
 
 		public override int GetHashCode()
@@ -97,22 +99,22 @@ namespace MonoMac.Foundation {
 			return Origin.GetHashCode() ^ Size.GetHashCode();
 		}
 		
-		public static bool operator ==(NSRect left, NSRect right)
+		public static bool operator ==(CGRect left, CGRect right)
 		{
 			return left.Origin == right.Origin && left.Size == right.Size;
 		}
 
-		public static bool operator !=(NSRect left, NSRect right)
+		public static bool operator !=(CGRect left, CGRect right)
 		{
 			return left.Origin != right.Origin || left.Size != right.Size;
 		}
 
-		public static implicit operator NSRect (System.Drawing.RectangleF rect)
+		public static implicit operator CGRect (System.Drawing.RectangleF rect)
 		{
-			return new NSRect (rect.Location, rect.Size);
+			return new CGRect (rect.Location, rect.Size);
 		}
 		
-		public static explicit operator System.Drawing.RectangleF (NSRect rect)
+		public static explicit operator System.Drawing.RectangleF (CGRect rect)
 		{
 			return new System.Drawing.RectangleF ((float)rect.X, (float)rect.Y, (float)rect.Width, (float)rect.Height);
 		}

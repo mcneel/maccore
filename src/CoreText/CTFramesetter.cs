@@ -33,6 +33,21 @@ using MonoMac.Foundation;
 using MonoMac.CoreFoundation;
 using MonoMac.CoreGraphics;
 
+#if MAC64
+using nint = System.Int64;
+using nuint = System.UInt64;
+using nfloat = System.Double;
+#else
+using nint = System.Int32;
+using nuint = System.UInt32;
+using nfloat = System.Single;
+#if SDCOMPAT
+using CGPoint = System.Drawing.PointF;
+using CGSize = System.Drawing.SizeF;
+using CGRect = System.Drawing.RectangleF;
+#endif
+#endif
+
 namespace MonoMac.CoreText {
 
 	[Since (3,2)]
@@ -113,9 +128,9 @@ namespace MonoMac.CoreText {
 
 #region Frame Sizing
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern SizeF CTFramesetterSuggestFrameSizeWithConstraints (
-				IntPtr framesetter, NSRange stringRange, IntPtr frameAttributes, SizeF constraints, out NSRange fitRange);
-		public SizeF SuggestFrameSize (NSRange stringRange, CTFrameAttributes frameAttributes, SizeF constraints, out NSRange fitRange)
+		static extern CGSize CTFramesetterSuggestFrameSizeWithConstraints (
+				IntPtr framesetter, NSRange stringRange, IntPtr frameAttributes, CGSize constraints, out NSRange fitRange);
+		public CGSize SuggestFrameSize (NSRange stringRange, CTFrameAttributes frameAttributes, CGSize constraints, out NSRange fitRange)
 		{
 			return CTFramesetterSuggestFrameSizeWithConstraints (
 					handle, stringRange,

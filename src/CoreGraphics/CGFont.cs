@@ -37,16 +37,18 @@ using MonoMac.CoreText;
 #endif
 
 #if MAC64
-using NSInteger = System.Int64;
-using NSUInteger = System.UInt64;
-using CGFloat = System.Double;
+using nint = System.Int64;
+using nuint = System.UInt64;
+using nfloat = System.Double;
 #else
-using NSInteger = System.Int32;
-using NSUInteger = System.UInt32;
-using NSPoint = System.Drawing.PointF;
-using NSSize = System.Drawing.SizeF;
-using NSRect = System.Drawing.RectangleF;
-using CGFloat = System.Single;
+using nint = System.Int32;
+using nuint = System.UInt32;
+using nfloat = System.Single;
+#if SDCOMPAT
+using CGPoint = System.Drawing.PointF;
+using CGSize = System.Drawing.SizeF;
+using CGRect = System.Drawing.RectangleF;
+#endif
 #endif
 
 namespace MonoMac.CoreGraphics {
@@ -196,24 +198,24 @@ namespace MonoMac.CoreGraphics {
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		extern static NSRect CGFontGetFontBBox(IntPtr font);
-		public NSRect FontBBox {
+		extern static CGRect CGFontGetFontBBox(IntPtr font);
+		public CGRect FontBBox {
 			get {
 				return CGFontGetFontBBox (handle);
 			}
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		extern static CGFloat CGFontGetItalicAngle(IntPtr font);
-		public CGFloat ItalicAngle {
+		extern static nfloat CGFontGetItalicAngle(IntPtr font);
+		public nfloat ItalicAngle {
 			get {
 				return CGFontGetItalicAngle (handle);
 			}
 		}
 			
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		extern static CGFloat CGFontGetStemV(IntPtr font);
-		public CGFloat StemV {
+		extern static nfloat CGFontGetStemV(IntPtr font);
+		public nfloat StemV {
 			get {
 				return CGFontGetStemV (handle);
 			}
@@ -228,7 +230,7 @@ namespace MonoMac.CoreGraphics {
 		//extern static bool CGFontGetGlyphAdvances(IntPtr font, ushort [] glyphs, int size_t_count, int [] advances);
 
 		//[DllImport (Constants.CoreGraphicsLibrary)]
-		//extern static bool CGFontGetGlyphBBoxes(IntPtr font, ushort [] glyphs, int size_t_count, RectangleF [] bboxes);
+		//extern static bool CGFontGetGlyphBBoxes(IntPtr font, ushort [] glyphs, int size_t_count, CGRect [] bboxes);
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static ushort CGFontGetGlyphWithGlyphName(IntPtr font, IntPtr CFStringRef_name);
@@ -265,17 +267,17 @@ namespace MonoMac.CoreGraphics {
 
 #if !(GENERATOR || MONOMAC)
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern IntPtr CTFontCreateWithGraphicsFont (IntPtr graphicsFont, CGFloat size, IntPtr matrix, IntPtr attributes);
+		static extern IntPtr CTFontCreateWithGraphicsFont (IntPtr graphicsFont, nfloat size, IntPtr matrix, IntPtr attributes);
 		[Since(3,2)]
-		public CTFont ToCTFont (float size)
+		public CTFont ToCTFont (nfloat size)
 		{
 			return new CTFont (CTFontCreateWithGraphicsFont (handle, size, IntPtr.Zero, IntPtr.Zero), true);
 		}
 
 		[Since (3,2)]
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern IntPtr CTFontCreateWithGraphicsFont (IntPtr graphicsFont, CGFloat size, ref CGAffineTransform matrix, IntPtr attributes);
-		public CTFont ToCTFont (float size, ref CGAffineTransform matrix)
+		static extern IntPtr CTFontCreateWithGraphicsFont (IntPtr graphicsFont, nfloat size, ref CGAffineTransform matrix, IntPtr attributes);
+		public CTFont ToCTFont (nfloat size, ref CGAffineTransform matrix)
 		{
 			return new CTFont (CTFontCreateWithGraphicsFont (handle, size, ref matrix, IntPtr.Zero), true);
 		}

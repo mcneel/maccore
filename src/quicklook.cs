@@ -39,6 +39,21 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 
+#if MAC64
+using nint = System.Int64;
+using nuint = System.UInt64;
+using nfloat = System.Double;
+#else
+using nint = System.Int32;
+using nuint = System.UInt32;
+using nfloat = System.Single;
+#if SDCOMPAT
+using CGPoint = System.Drawing.PointF;
+using CGSize = System.Drawing.SizeF;
+using CGRect = System.Drawing.RectangleF;
+#endif
+#endif
+
 namespace MonoMac.QuickLook {
 #if !MONOMAC
 	[Since (4,0)]
@@ -105,12 +120,12 @@ namespace MonoMac.QuickLook {
 		// UIView and UIImage do not exists in MonoMac
 		
 		[Since (4,2)]
-		[Export ("previewController:frameForPreviewItem:inSourceView:"), DelegateName ("QLFrame"), DefaultValue (typeof (System.Drawing.RectangleF))]
-		RectangleF FrameForPreviewItem (QLPreviewController controller, QLPreviewItem item, ref UIView view);
+		[Export ("previewController:frameForPreviewItem:inSourceView:"), DelegateName ("QLFrame"), DefaultValue (typeof (CGRect))]
+		CGRect FrameForPreviewItem (QLPreviewController controller, QLPreviewItem item, ref UIView view);
 		
 		[Since (4,2)]
 		[Export ("previewController:transitionImageForPreviewItem:contentRect:"), DelegateName ("QLTransition"), DefaultValue (null)]
-		UIImage TransitionImageForPreviewItem (QLPreviewController controller, QLPreviewItem item, RectangleF contentRect);
+		UIImage TransitionImageForPreviewItem (QLPreviewController controller, QLPreviewItem item, CGRect contentRect);
 #endif
 	}
 	

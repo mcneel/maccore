@@ -34,12 +34,27 @@ using MonoMac.CoreGraphics;
 using System.Drawing;
 using System.Runtime.InteropServices;
 
+#if MAC64
+using nint = System.Int64;
+using nuint = System.UInt64;
+using nfloat = System.Double;
+#else
+using nint = System.Int32;
+using nuint = System.UInt32;
+using nfloat = System.Single;
+#if SDCOMPAT
+using CGPoint = System.Drawing.PointF;
+using CGSize = System.Drawing.SizeF;
+using CGRect = System.Drawing.RectangleF;
+#endif
+#endif
+
 namespace MonoMac.QuickLook {
 	public static partial class QLThumbnailImage {
 		[DllImport(Constants.QuickLookLibrary)]
-		extern static IntPtr QLThumbnailImageCreate (IntPtr allocator, IntPtr url, System.Drawing.SizeF maxThumbnailSize, IntPtr options);		
+		extern static IntPtr QLThumbnailImageCreate (IntPtr allocator, IntPtr url, CGSize maxThumbnailSize, IntPtr options);		
 
-		public static CGImage Create (NSUrl url, SizeF maxThumbnailSize, float scaleFactor = 1, bool iconMode = false)
+		public static CGImage Create (NSUrl url, CGSize maxThumbnailSize, nfloat scaleFactor = 1, bool iconMode = false)
 		{
 			NSMutableDictionary dictionary = null;
 

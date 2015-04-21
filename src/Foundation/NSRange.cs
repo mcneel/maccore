@@ -22,20 +22,30 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 using System;
+
 #if MAC64
-using NSUInteger = System.UInt64;
+using nint = System.Int64;
+using nuint = System.UInt64;
+using nfloat = System.Double;
 #else
-using NSUInteger = System.UInt32;
+using nint = System.Int32;
+using nuint = System.UInt32;
+using nfloat = System.Single;
+#if SDCOMPAT
+using CGPoint = System.Drawing.PointF;
+using CGSize = System.Drawing.SizeF;
+using CGRect = System.Drawing.RectangleF;
+#endif
 #endif
 
 namespace MonoMac.Foundation {
 	public struct NSRange {
-		public NSUInteger Location;
-		public NSUInteger Length;
+		public nuint Location;
+		public nuint Length;
 
-		public const NSUInteger NotFound = NSUInteger.MaxValue;
+		public const nuint NotFound = nuint.MaxValue;
 		
-		public NSRange (NSUInteger start, NSUInteger len)
+		public NSRange (nuint start, nuint len)
 		{
 			Location = start;
 			Length = len;
@@ -43,8 +53,8 @@ namespace MonoMac.Foundation {
 		
 		public NSRange (int start, int len)
 		{
-			Location = (NSUInteger)start;
-			Length = (NSUInteger)len;
+			Location = (nuint)start;
+			Length = (nuint)len;
 		}
 
 		public override string ToString ()

@@ -14,11 +14,27 @@ using System;
 using System.Runtime.InteropServices;
 using System.Drawing;
 using MonoMac;
+using MonoMac.CoreGraphics;
 using MonoMac.Foundation;
 using MonoMac.CoreFoundation;
 using MonoMac.ObjCRuntime;
 using MonoMac.CoreVideo;
 using MonoMac.AudioToolbox;
+
+#if MAC64
+using nint = System.Int64;
+using nuint = System.UInt64;
+using nfloat = System.Double;
+#else
+using nint = System.Int32;
+using nuint = System.UInt32;
+using nfloat = System.Single;
+#if SDCOMPAT
+using CGPoint = System.Drawing.PointF;
+using CGSize = System.Drawing.SizeF;
+using CGRect = System.Drawing.RectangleF;
+#endif
+#endif
 
 namespace MonoMac.CoreMedia {
 
@@ -302,10 +318,10 @@ namespace MonoMac.CoreMedia {
 		}
 
 		[DllImport (Constants.CoreMediaLibrary)]
-		internal extern static RectangleF CMVideoFormatDescriptionGetCleanAperture (IntPtr handle, bool originIsAtTopLeft);
+		internal extern static CGRect CMVideoFormatDescriptionGetCleanAperture (IntPtr handle, bool originIsAtTopLeft);
 
 		[Advice ("Use CMVideoFormatDescription")]
-		public RectangleF GetVideoCleanAperture (bool originIsAtTopLeft)
+		public CGRect GetVideoCleanAperture (bool originIsAtTopLeft)
 		{
 			return CMVideoFormatDescriptionGetCleanAperture (handle, originIsAtTopLeft);
 		}
@@ -321,10 +337,10 @@ namespace MonoMac.CoreMedia {
 		}
 
 		[DllImport (Constants.CoreMediaLibrary)]
-		internal extern static SizeF CMVideoFormatDescriptionGetPresentationDimensions (IntPtr handle, bool usePixelAspectRatio, bool useCleanAperture);
+		internal extern static CGSize CMVideoFormatDescriptionGetPresentationDimensions (IntPtr handle, bool usePixelAspectRatio, bool useCleanAperture);
 
 		[Advice ("Use CMVideoFormatDescription")]
-		public SizeF GetVideoPresentationDimensions (bool usePixelAspectRatio, bool useCleanAperture)
+		public CGSize GetVideoPresentationDimensions (bool usePixelAspectRatio, bool useCleanAperture)
 		{
 			return CMVideoFormatDescriptionGetPresentationDimensions (handle, usePixelAspectRatio, useCleanAperture);
 		}
@@ -412,14 +428,14 @@ namespace MonoMac.CoreMedia {
 		}
 
 		[DllImport (Constants.CoreMediaLibrary)]
-		extern static RectangleF CMVideoFormatDescriptionGetCleanAperture (IntPtr handle, bool originIsAtTopLeft);
+		extern static CGRect CMVideoFormatDescriptionGetCleanAperture (IntPtr handle, bool originIsAtTopLeft);
 
-		public RectangleF GetCleanAperture (bool originIsAtTopLeft)
+		public CGRect GetCleanAperture (bool originIsAtTopLeft)
 		{
 			return CMVideoFormatDescriptionGetCleanAperture (handle, originIsAtTopLeft);
 		}
 
-		public SizeF GetPresentationDimensions (bool usePixelAspectRatio, bool useCleanAperture)
+		public CGSize GetPresentationDimensions (bool usePixelAspectRatio, bool useCleanAperture)
 		{
 			return CMVideoFormatDescriptionGetPresentationDimensions (handle, usePixelAspectRatio, useCleanAperture);
 		}

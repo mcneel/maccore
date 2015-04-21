@@ -29,7 +29,23 @@
 using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using MonoMac.CoreGraphics;
 using MonoMac.Foundation;
+
+#if MAC64
+using nint = System.Int64;
+using nuint = System.UInt64;
+using nfloat = System.Double;
+#else
+using nint = System.Int32;
+using nuint = System.UInt32;
+using nfloat = System.Single;
+#if SDCOMPAT
+using CGPoint = System.Drawing.PointF;
+using CGSize = System.Drawing.SizeF;
+using CGRect = System.Drawing.RectangleF;
+#endif
+#endif
 
 namespace MonoMac.CoreAnimation {
 	public unsafe partial class CAMediaTimingFunction {
@@ -48,7 +64,7 @@ namespace MonoMac.CoreAnimation {
 				return FromName (s);
 		}
 
-		public PointF GetControlPoint (int index)
+		public CGPoint GetControlPoint (int index)
 		{
 			if ((index < 0) || (index > 3))
 				throw new ArgumentOutOfRangeException ("index");
@@ -56,7 +72,7 @@ namespace MonoMac.CoreAnimation {
 			float [] values = new float [2];
 			fixed (float *p = &values [0])
 				GetControlPointAtIndex (index, (IntPtr) p);
-			return new PointF (values [0], values [1]);
+			return new CGPoint (values [0], values [1]);
 		}
 	}
 }

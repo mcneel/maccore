@@ -34,16 +34,18 @@ using MonoMac.ObjCRuntime;
 using MonoMac.Foundation;
 
 #if MAC64
-using NSInteger = System.Int64;
-using NSUInteger = System.UInt64;
-using CGFloat = System.Double;
+using nint = System.Int64;
+using nuint = System.UInt64;
+using nfloat = System.Double;
 #else
-using NSInteger = System.Int32;
-using NSUInteger = System.UInt32;
-using NSPoint = System.Drawing.PointF;
-using NSSize = System.Drawing.SizeF;
-using NSRect = System.Drawing.RectangleF;
-using CGFloat = System.Single;
+using nint = System.Int32;
+using nuint = System.UInt32;
+using nfloat = System.Single;
+#if SDCOMPAT
+using CGPoint = System.Drawing.PointF;
+using CGSize = System.Drawing.SizeF;
+using CGRect = System.Drawing.RectangleF;
+#endif
 #endif
 
 namespace MonoMac.CoreGraphics {
@@ -99,9 +101,9 @@ namespace MonoMac.CoreGraphics {
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		extern static NSSize CGLayerGetSize (IntPtr layer);
+		extern static CGSize CGLayerGetSize (IntPtr layer);
 
-		public NSSize Size {
+		public CGSize Size {
 			get {
 				return CGLayerGetSize (handle);
 			}
@@ -117,9 +119,9 @@ namespace MonoMac.CoreGraphics {
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		extern static IntPtr CGLayerCreateWithContext (IntPtr context, NSSize size, IntPtr dictionary);
+		extern static IntPtr CGLayerCreateWithContext (IntPtr context, CGSize size, IntPtr dictionary);
 
-		public static CGLayer Create (CGContext context, NSSize size) {
+		public static CGLayer Create (CGContext context, CGSize size) {
 			return new CGLayer (CGLayerCreateWithContext (context.Handle, size, IntPtr.Zero), true);
 		}
 

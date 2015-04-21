@@ -41,6 +41,21 @@ using System.Drawing;
 using MonoTouch.MediaToolbox;
 #endif
 
+#if MAC64
+using nint = System.Int64;
+using nuint = System.UInt64;
+using nfloat = System.Double;
+#else
+using nint = System.Int32;
+using nuint = System.UInt32;
+using nfloat = System.Single;
+#if SDCOMPAT
+using CGPoint = System.Drawing.PointF;
+using CGSize = System.Drawing.SizeF;
+using CGRect = System.Drawing.RectangleF;
+#endif
+#endif
+
 namespace MonoMac.AVFoundation {
 
 	delegate void AVAssetImageGeneratorCompletionHandler (CMTime requestedTime, IntPtr imageRef, CMTime actualTime, AVAssetImageGeneratorResult result, NSError error);
@@ -873,7 +888,7 @@ namespace MonoMac.AVFoundation {
 		CGAffineTransform PreferredTransform { get;  }
 
 		[Export ("naturalSize"), Obsolete ("Deprecated in iOS 5.0. Use NaturalSize/PreferredTransform as appropriate on the video track")]
-		SizeF NaturalSize { get;  }
+		CGSize NaturalSize { get;  }
 
 		[Export ("providesPreciseDurationAndTiming")]
 		bool ProvidesPreciseDurationAndTiming { get;  }
@@ -977,7 +992,7 @@ namespace MonoMac.AVFoundation {
 	[DisableDefaultCtor]
 	interface AVAssetImageGenerator {
 		[Export ("maximumSize")]
-		SizeF MaximumSize { get; set;  }
+		CGSize MaximumSize { get; set;  }
 
 		[Export ("apertureMode")]
 		NSString ApertureMode { get; set;  }
@@ -1518,7 +1533,7 @@ namespace MonoMac.AVFoundation {
 		string ExtendedLanguageTag { get;  }
 
 		[Export ("naturalSize")]
-		SizeF NaturalSize { get;  }
+		CGSize NaturalSize { get;  }
 
 		[Export ("preferredVolume")]
 		float PreferredVolume { get;  }
@@ -2462,7 +2477,7 @@ namespace MonoMac.AVFoundation {
 		CMTime Duration { get;  }
 
 		[Export ("bounds")]
-		RectangleF Bounds { get;  }
+		CGRect Bounds { get;  }
 
 		[Export ("type")]
 		string Type { get;  }
@@ -2594,7 +2609,7 @@ namespace MonoMac.AVFoundation {
 
 		[Obsolete ("Deprecated in iOS 5.0 and OSX 10.8")]
 		[Export ("naturalSize")]
-		SizeF NaturalSize { get; [NotImplemented] set; }
+		CGSize NaturalSize { get; [NotImplemented] set; }
 	}
 
 	[Since (4,0)]
@@ -2627,7 +2642,7 @@ namespace MonoMac.AVFoundation {
 		[Obsolete ("Deprecated in iOS 5.0 and OSX 10.8")]
 		[Export ("naturalSize")]
 		[Override]
-		SizeF NaturalSize { get; set; }
+		CGSize NaturalSize { get; set; }
 	}
 	
 	[Since (4,0)]
@@ -2831,7 +2846,7 @@ namespace MonoMac.AVFoundation {
 		CMTime FrameDuration { get;  }
 
 		[Export ("renderSize")]
-		SizeF RenderSize { get;  }
+		CGSize RenderSize { get;  }
 
 		[Export ("instructions", ArgumentSemantic.Copy)]
 		AVVideoCompositionInstruction [] Instructions { get;  }
@@ -2878,7 +2893,7 @@ namespace MonoMac.AVFoundation {
 		CMTime FrameDuration { get; set;  }
 
 		[Export ("renderSize")]
-		SizeF RenderSize { get; set;  }
+		CGSize RenderSize { get; set;  }
 
 		[Export ("instructions", ArgumentSemantic.Copy)]
 		AVVideoCompositionInstruction [] Instructions { get; set;  }
@@ -3278,11 +3293,11 @@ namespace MonoMac.AVFoundation {
 #if !MONOMAC
 		[Since (6,0)]
 		[Export ("captureDevicePointOfInterestForPoint:")]
-		PointF CaptureDevicePointOfInterestForPoint (PointF pointInLayer);
+		CGPoint CaptureDevicePointOfInterestForPoint (CGPoint pointInLayer);
 
 		[Since (6,0)]
 		[Export ("pointForCaptureDevicePointOfInterest:")]
-		PointF PointForCaptureDevicePointOfInterest (PointF captureDevicePointOfInterest);
+		CGPoint PointForCaptureDevicePointOfInterest (CGPoint captureDevicePointOfInterest);
 
 		[Since (6,0)]
 		[Export ("transformedMetadataObjectForMetadataObject:")]
@@ -3546,7 +3561,7 @@ namespace MonoMac.AVFoundation {
 		bool FocusPointOfInterestSupported { [Bind ("isFocusPointOfInterestSupported")] get;  }
 
 		[Export ("focusPointOfInterest")]
-		PointF FocusPointOfInterest { get; set;  }
+		CGPoint FocusPointOfInterest { get; set;  }
 
 		[Export ("adjustingFocus")]
 		bool AdjustingFocus { [Bind ("isAdjustingFocus")] get;  }
@@ -3561,7 +3576,7 @@ namespace MonoMac.AVFoundation {
 		bool ExposurePointOfInterestSupported { [Bind ("isExposurePointOfInterestSupported")] get;  }
 
 		[Export ("exposurePointOfInterest")]
-		PointF ExposurePointOfInterest { get; set;  }
+		CGPoint ExposurePointOfInterest { get; set;  }
 
 		[Export ("adjustingExposure")]
 		bool AdjustingExposure { [Bind ("isAdjustingExposure")] get;  }
@@ -3870,7 +3885,7 @@ namespace MonoMac.AVFoundation {
 		AVPlayerItemTrack [] Tracks { get;  }
 
 		[Export ("presentationSize")]
-		SizeF PresentationSize { get;  }
+		CGSize PresentationSize { get;  }
 
 		[Export ("forwardPlaybackEndTime")]
 		CMTime ForwardPlaybackEndTime { get; set;  }

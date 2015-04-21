@@ -30,16 +30,18 @@ using System.Drawing;
 using MonoMac.CoreFoundation;
 
 #if MAC64
-using PointF = MonoMac.Foundation.NSPoint;
-using SizeF = MonoMac.Foundation.NSSize;
-using RectangleF = MonoMac.Foundation.NSRect;
-using NSInteger = System.Int64;
-using NSUInteger = System.UInt64;
-using CGFloat = System.Double;
+using nint = System.Int64;
+using nuint = System.UInt64;
+using nfloat = System.Double;
 #else
-using NSInteger = System.Int32;
-using NSUInteger = System.UInt32;
-using CGFloat = System.Single;
+using nint = System.Int32;
+using nuint = System.UInt32;
+using nfloat = System.Single;
+#if SDCOMPAT
+using CGPoint = System.Drawing.PointF;
+using CGSize = System.Drawing.SizeF;
+using CGRect = System.Drawing.RectangleF;
+#endif
 #endif
 
 namespace MonoMac.CoreImage {
@@ -79,7 +81,7 @@ namespace MonoMac.CoreImage {
 			return FromContext (ctx, (CIContextOptions) null);
 		}
 
-		public CGLayer CreateCGLayer (SizeF size)
+		public CGLayer CreateCGLayer (CGSize size)
 		{
 			return CreateCGLayer (size, null);
 		}
@@ -89,7 +91,7 @@ namespace MonoMac.CoreImage {
 			return FromOptions (options == null ? null : options.ToDictionary ());
 		}
 		
-		public CGImage CreateCGImage (CIImage image, System.Drawing.RectangleF fromRect, CIFormat ciImageFormat, CGColorSpace colorSpace)
+		public CGImage CreateCGImage (CIImage image, CGRect fromRect, CIFormat ciImageFormat, CGColorSpace colorSpace)
 		{
 			return CreateCGImage (image, fromRect, CIImage.CIFormatToInt (ciImageFormat), colorSpace);
 		}

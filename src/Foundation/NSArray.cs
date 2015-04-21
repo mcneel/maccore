@@ -30,16 +30,18 @@ using System.Runtime.InteropServices;
 using MonoMac.ObjCRuntime;
 
 #if MAC64
-using NSInteger = System.Int64;
-using NSUInteger = System.UInt64;
-using CGFloat = System.Double;
+using nint = System.Int64;
+using nuint = System.UInt64;
+using nfloat = System.Double;
 #else
-using NSInteger = System.Int32;
-using NSUInteger = System.UInt32;
-using NSPoint = System.Drawing.PointF;
-using NSSize = System.Drawing.SizeF;
-using NSRect = System.Drawing.RectangleF;
-using CGFloat = System.Single;
+using nint = System.Int32;
+using nuint = System.UInt32;
+using nfloat = System.Single;
+#if SDCOMPAT
+using CGPoint = System.Drawing.PointF;
+using CGSize = System.Drawing.SizeF;
+using CGRect = System.Drawing.RectangleF;
+#endif
 #endif
 
 
@@ -99,7 +101,7 @@ namespace MonoMac.Foundation {
 
 		public static NSArray FromObjects (IntPtr array, int count)
 		{
-			return FromObjects (array, (NSUInteger)count);
+			return FromObjects (array, (nuint)count);
 		}
 
 		internal static NSArray FromNSObjects (IList<NSObject> items)
@@ -226,9 +228,9 @@ namespace MonoMac.Foundation {
 			if (weakArray == null || weakArray.Handle == IntPtr.Zero)
 				return null;
 			try {
-				NSUInteger n = weakArray.Count;
+				nuint n = weakArray.Count;
 				T [] ret = new T [n];
-				for (NSUInteger i = 0; i < n; i++){
+				for (nuint i = 0; i < n; i++){
 					ret [i] = (T) Runtime.GetNSObject (weakArray.ValueAt (i));
 				}
 				return ret;

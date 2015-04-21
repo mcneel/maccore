@@ -34,6 +34,21 @@ using MonoMac.ObjCRuntime;
 using System.Drawing;
 using MonoMac.CoreFoundation;
 
+#if MAC64
+using nint = System.Int64;
+using nuint = System.UInt64;
+using nfloat = System.Double;
+#else
+using nint = System.Int32;
+using nuint = System.UInt32;
+using nfloat = System.Single;
+#if SDCOMPAT
+using CGPoint = System.Drawing.PointF;
+using CGSize = System.Drawing.SizeF;
+using CGRect = System.Drawing.RectangleF;
+#endif
+#endif
+
 namespace MonoMac.CoreGraphics {
 	public class CGPDFDictionary : INativeObject {
 		internal IntPtr handle;
@@ -78,9 +93,9 @@ namespace MonoMac.CoreGraphics {
 		}
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
-		extern static bool CGPDFDictionaryGetNumber (IntPtr handle, string key, out float result);
+		extern static bool CGPDFDictionaryGetNumber (IntPtr handle, string key, out nfloat result);
 
-		public bool GetFloat (string key, out float result)
+		public bool GetFloat (string key, out nfloat result)
 		{
 			if (key == null)
 				throw new ArgumentNullException ("key");
