@@ -30,7 +30,6 @@ using MonoMac.ObjCRuntime;
 using MonoMac.Foundation;
 using MonoMac.CoreFoundation;
 using System;
-using System.Drawing;
 
 namespace MonoMac.ImageIO {
 

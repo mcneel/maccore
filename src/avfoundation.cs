@@ -36,7 +36,6 @@ using MonoMac.CoreGraphics;
 using MonoMac.CoreAnimation;
 using MonoMac.CoreVideo;
 using System;
-using System.Drawing;
 #if !MONOMAC
 using MonoTouch.MediaToolbox;
 #endif
@@ -1502,7 +1501,7 @@ namespace MonoMac.AVFoundation {
 		[Export ("formatDescriptions")]
 		NSObject [] FormatDescriptionsAsObjects { get;  }
 
-		[Wrap ("Array.ConvertAll (FormatDescriptionsAsObjects, l => CMFormatDescription.Create (l.Handle, false))")]
+		[Wrap ("FormatDescriptionsAsObjects.Select (l => CMFormatDescription.Create (l.Handle, false)).ToArray ()")]
 		CMFormatDescription[] FormatDescriptions { get; }
 
 		[Export ("enabled")]

@@ -44,7 +44,6 @@ using MonoMac.UIKit;
 #endif
 
 using System;
-using System.Drawing;
 using System.ComponentModel;
 
 #if MAC64

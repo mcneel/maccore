@@ -39,16 +39,10 @@ using nfloat = System.Single;
 #endif
 
 namespace MonoMac.CoreGraphics {
-	[StructLayout(LayoutKind.Sequential)]
+	[StructLayout(LayoutKind.Sequential, Pack = 1)]
 	public struct CGSize {
 	
 		public static readonly CGSize Empty;
-		
-		public CGSize(System.Drawing.SizeF size)
-		{
-			Width = size.Width;
-			Height = size.Height;
-		}
 		
 		public CGSize(nfloat width, nfloat height)
 		{
@@ -80,6 +74,13 @@ namespace MonoMac.CoreGraphics {
 		{
 			return new CGSize (size1.Width - size2.Width, size1.Height - size2.Height);
 		}
+
+#if !COREFX		
+		public CGSize(System.Drawing.SizeF size)
+		{
+			Width = size.Width;
+			Height = size.Height;
+		}
 		
 		public static implicit operator CGSize (System.Drawing.SizeF size)
 		{
@@ -90,6 +91,7 @@ namespace MonoMac.CoreGraphics {
 		{
 			return new System.Drawing.SizeF ((float)size.Width, (float)size.Height);
 		}
+#endif
 
 		public nfloat Width;
 		public nfloat Height;

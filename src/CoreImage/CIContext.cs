@@ -26,7 +26,6 @@
 //
 using MonoMac.Foundation;
 using MonoMac.CoreGraphics;
-using System.Drawing;
 using MonoMac.CoreFoundation;
 
 #if MAC64

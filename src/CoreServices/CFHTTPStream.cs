@@ -82,6 +82,22 @@ namespace MonoMac.CoreServices {
 		{
 		}
 
+#if COREFX
+		public CFUrl FinalURL {
+			get {
+				var handle = GetProperty (_FinalURL);
+				if (handle == IntPtr.Zero)
+					return null;
+
+				if (CFType.GetTypeID (handle) != CFUrl.GetTypeID ()) {
+					CFObject.CFRelease (handle);
+					throw new InvalidCastException ();
+				}
+
+				return new CFUrl (handle);
+			}
+		}
+#else
 		public Uri FinalURL {
 			get {
 				var handle = GetProperty (_FinalURL);
@@ -97,6 +113,7 @@ namespace MonoMac.CoreServices {
 					return new Uri (url.ToString ());
 			}
 		}
+#endif
 
 		public CFHTTPMessage GetFinalRequest ()
 		{

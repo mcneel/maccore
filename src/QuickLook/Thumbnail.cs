@@ -31,7 +31,6 @@ using System;
 using MonoMac.Foundation;
 using MonoMac.CoreFoundation;
 using MonoMac.CoreGraphics;
-using System.Drawing;
 using System.Runtime.InteropServices;
 
 #if MAC64

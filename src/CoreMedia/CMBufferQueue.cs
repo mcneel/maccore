@@ -10,7 +10,6 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Drawing;
 using MonoMac;
 using MonoMac.Foundation;
 using MonoMac.CoreFoundation;

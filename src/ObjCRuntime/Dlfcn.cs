@@ -32,7 +32,6 @@ using System;
 using System.Runtime.InteropServices;
 using MonoMac.Foundation;
 using MonoMac.CoreFoundation;
-using System.Drawing;
 
 namespace MonoMac.ObjCRuntime {
 	
@@ -165,18 +164,19 @@ namespace MonoMac.ObjCRuntime {
 			Marshal.WriteIntPtr (indirect, value);
 		}
 
-		public static SizeF GetSizeF (IntPtr handle, string symbol)
+		#if !COREFX
+		public static System.Drawing.SizeF GetSizeF (IntPtr handle, string symbol)
 		{
 			var indirect = dlsym (handle, symbol);
 			if (indirect == IntPtr.Zero)
-				return SizeF.Empty;
+				return System.Drawing.SizeF.Empty;
 			unsafe {
 				float *ptr = (float *) indirect;
-				return new SizeF (ptr [0], ptr [1]);
+				return new System.Drawing.SizeF (ptr [0], ptr [1]);
 			}
 		}
 
-		public static void SetSizeF (IntPtr handle, string symbol, SizeF value)
+		public static void SetSizeF (IntPtr handle, string symbol, System.Drawing.SizeF value)
 		{
 			var indirect = dlsym (handle, symbol);
 			if (indirect == IntPtr.Zero)
@@ -187,6 +187,7 @@ namespace MonoMac.ObjCRuntime {
 				ptr [1] = value.Height;
 			}
 		}
+		#endif
 
 		public static double GetDouble (IntPtr handle, string symbol)
 		{

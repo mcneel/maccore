@@ -8,7 +8,6 @@
 // Copyright 2012, Xamarin Inc.
 //
 using System;
-using System.Drawing;
 using System.Runtime.InteropServices;
 using MonoMac.CoreFoundation;
 using MonoMac.ObjCRuntime;

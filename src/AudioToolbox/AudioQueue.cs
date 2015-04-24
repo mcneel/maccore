@@ -711,7 +711,7 @@ namespace MonoMac.AudioToolbox {
 
 		delegate void AudioQueuePropertyListenerProc (IntPtr userData, IntPtr AQ, AudioQueueProperty id);
 
-		Hashtable listeners;
+		Dictionary<AudioQueueProperty, List<AudioQueuePropertyChanged>> listeners;
 		
 		[MonoPInvokeCallback(typeof(AudioQueuePropertyListenerProc))]
 		static void property_changed (IntPtr userData, IntPtr AQ, AudioQueueProperty id)
@@ -719,8 +719,8 @@ namespace MonoMac.AudioToolbox {
 			GCHandle gch = GCHandle.FromIntPtr (userData);
 			var aq = gch.Target as AudioQueue;
 			lock (aq.listeners){
-				ArrayList a = (ArrayList)aq.listeners [id];
-				if (a == null)
+				List<AudioQueuePropertyChanged> a;
+				if (!aq.listeners.TryGetValue(id, out a))
 					return;
 				foreach (AudioQueuePropertyChanged cback in a){
 					cback (id);
@@ -735,17 +735,17 @@ namespace MonoMac.AudioToolbox {
 			if (callback == null)
 				throw new ArgumentNullException ("callback");
 			if (listeners == null)
-				listeners = new Hashtable ();
+				listeners = new Dictionary<AudioQueueProperty, List<AudioQueuePropertyChanged>> ();
 			
 			AudioQueueStatus res = AudioQueueStatus.Ok;
 			lock (listeners){
-				var a = (ArrayList) listeners [property];
-				if (a == null){
+				List<AudioQueuePropertyChanged> a;
+				if (!listeners.TryGetValue(property, out a)) {
 					res = AudioQueueAddPropertyListener (handle, property, property_changed, GCHandle.ToIntPtr (gch));
 					if (res != AudioQueueStatus.Ok)
 						return res;
 
-					listeners [property] = a = new ArrayList ();
+					listeners [property] = a = new List<AudioQueuePropertyChanged> ();
 				}
 				a.Add (callback);
 			}
@@ -760,8 +760,8 @@ namespace MonoMac.AudioToolbox {
 			if (listeners == null)
 				return;
 			lock (listeners){
-				var a = (ArrayList) listeners [property];
-				if (a == null)
+				List<AudioQueuePropertyChanged> a;
+				if (!listeners.TryGetValue(property, out a))
 					return;
 				a.Remove (callback);
 				if (a.Count == 0){

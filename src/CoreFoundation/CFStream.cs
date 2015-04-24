@@ -144,6 +144,7 @@ namespace MonoMac.CoreFoundation {
 		extern static void CFStreamCreatePairWithSocket (IntPtr allocator, CFSocketNativeHandle socket,
 		                                                 out IntPtr read, out IntPtr write);
 
+#if !COREFX
 		public static void CreatePairWithSocket (CFSocket socket, out CFReadStream readStream,
 		                                         out CFWriteStream writeStream)
 		{
@@ -186,6 +187,8 @@ namespace MonoMac.CoreFoundation {
 				writeStream = new CFWriteStream (write);
 			}
 		}
+#endif
+		
 
 		[DllImport (Constants.CFNetworkLibrary)]
 		extern static void CFStreamCreatePairWithSocketToHost (IntPtr allocator, IntPtr host, int port,

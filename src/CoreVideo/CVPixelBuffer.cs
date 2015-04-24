@@ -7,7 +7,6 @@
 // Copyright 2011, 2012 Xamarin Inc
 //
 using System;
-using System.Drawing;
 using System.Runtime.InteropServices;
 using MonoMac.CoreFoundation;
 using MonoMac.ObjCRuntime;
@@ -79,15 +78,22 @@ namespace MonoMac.CoreVideo {
 		[DllImport (Constants.CoreVideoLibrary)]
 		extern static CVReturn CVPixelBufferCreate (IntPtr allocator, IntPtr width, IntPtr height, CVPixelFormatType pixelFormatType, IntPtr pixelBufferAttributes, IntPtr pixelBufferOut);
 
-		public CVPixelBuffer (Size size, CVPixelFormatType pixelFormat)
+#if !COREFX
+		public CVPixelBuffer (System.Drawing.Size size, CVPixelFormatType pixelFormat)
 			: this (size.Width, size.Height, pixelFormat, null)
 		{
 		}
 
-		public CVPixelBuffer (Size size, CVPixelFormatType pixelFormatType, CVPixelBufferAttributes attributes)
+		public CVPixelBuffer (System.Drawing.Size size, CVPixelFormatType pixelFormatType, CVPixelBufferAttributes attributes)
 			: this (size.Width, size.Height, pixelFormatType, attributes == null ? null : attributes.Dictionary)
 		{
 		}
+#else
+		public CVPixelBuffer (int width, int height, CVPixelFormatType pixelFormatType, CVPixelBufferAttributes attributes)
+			: this (width, height, pixelFormatType, attributes == null ? null : attributes.Dictionary)
+		{
+		}
+#endif
 
 		[Advice ("Use constructor with CVPixelBufferAttributes")]
 		public CVPixelBuffer (int width, int height, CVPixelFormatType pixelFormatType, NSDictionary pixelBufferAttributes)

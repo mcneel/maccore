@@ -27,7 +27,6 @@
 //
 
 using System;
-using System.Drawing;
 using System.Runtime.InteropServices;
 using MonoMac.CoreGraphics;
 using MonoMac.Foundation;

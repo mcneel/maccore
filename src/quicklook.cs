@@ -37,7 +37,6 @@ using MonoMac.UIKit;
 #endif
 using System;
 using System.ComponentModel;
-using System.Drawing;
 
 #if MAC64
 using nint = System.Int64;

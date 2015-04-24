@@ -23,7 +23,6 @@ using System;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Drawing;
 
 using MonoMac.ObjCRuntime;
 #if !MONOMAC
@@ -446,12 +445,12 @@ namespace MonoMac.Foundation {
 				else if (t == typeof (CGPoint))
 					return NSValue.FromPoint ((CGPoint) obj);
 #else
-				if (t == typeof (SizeF))
-					return NSValue.FromSizeF ((SizeF) obj);
-				else if (t == typeof (RectangleF))
-					return NSValue.FromRectangleF ((RectangleF) obj);
-				else if (t == typeof (PointF))
-					return NSValue.FromPointF ((PointF) obj);
+				if (t == typeof (System.Drawing.SizeF))
+					return NSValue.FromSizeF ((System.Drawing.SizeF) obj);
+				else if (t == typeof (System.Drawing.RectangleF))
+					return NSValue.FromRectangleF ((System.Drawing.RectangleF) obj);
+				else if (t == typeof (System.Drawing.PointF))
+					return NSValue.FromPointF ((System.Drawing.PointF) obj);
 #endif
 #if !MONOMAC
 				if (t == typeof (CGAffineTransform))

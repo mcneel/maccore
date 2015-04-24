@@ -707,8 +707,8 @@ namespace MonoMac.AudioToolbox {
 		[MonoPInvokeCallback (typeof (_PropertyListener))]
 		static void Listener (IntPtr userData, AudioSessionProperty prop, int size, IntPtr data)
 		{
-			ArrayList a = (ArrayList) listeners [prop];
-			if (a == null){
+			List<PropertyListener> a;
+			if (!listeners.TryGetValue (prop, out a)) {
 				// Should never happen
 				return;
 			}
@@ -721,7 +721,7 @@ namespace MonoMac.AudioToolbox {
 		[DllImport (Constants.AudioToolboxLibrary)]
 		extern static AudioSessionErrors AudioSessionAddPropertyListener(AudioSessionProperty id, _PropertyListener inProc, IntPtr userData);
 
-		static Hashtable listeners;
+		static Dictionary<AudioSessionProperty, List<PropertyListener>> listeners;
 
 		public static AudioSessionErrors AddListener (AudioSessionProperty property, PropertyListener listener)
 		{
@@ -732,11 +732,11 @@ namespace MonoMac.AudioToolbox {
 				throw new ArgumentNullException ("listener");
 
 			if (listeners == null)
-				listeners = new Hashtable ();
+				listeners = new Dictionary<AudioSessionProperty, List<PropertyListener>> ();
 
-			ArrayList a = (ArrayList) listeners [property];
-			if (a == null)
-				listeners [property] = a = new ArrayList ();
+			List<PropertyListener> a;
+			if (!listeners.TryGetValue (property, out a));
+				listeners [property] = a = new List<PropertyListener> ();
 
 			a.Add (listener);
 
@@ -752,20 +752,20 @@ namespace MonoMac.AudioToolbox {
 			if (listener == null)
 				throw new ArgumentNullException ("listener");
 
-			ArrayList a = (ArrayList) listeners [property];
-			if (a == null)
+			List<PropertyListener> a;
+			if (!listeners.TryGetValue (property, out a));
 				return;
 			a.Remove (listener);
 			if (a.Count == 0)
 				listeners [property] = null;
 		}
 
-               static Hashtable strongListenerHash;
+		static Dictionary<object, PropertyListener> strongListenerHash;
 
 		static void AddListenerEvent (AudioSessionProperty property, object handler, PropertyListener listener)
 		{
 			if (strongListenerHash == null)
-				Interlocked.CompareExchange (ref strongListenerHash, new Hashtable (), null);
+				Interlocked.CompareExchange (ref strongListenerHash, new Dictionary<object, PropertyListener> (), null);
 
 			lock (strongListenerHash) {
 				strongListenerHash [handler] = listener;
@@ -781,8 +781,7 @@ namespace MonoMac.AudioToolbox {
 
 			PropertyListener listener;
 			lock (strongListenerHash) {
-				listener = (PropertyListener) strongListenerHash [handler]; 
-				if (listener == null)
+				if (!strongListenerHash.TryGetValue (handler, out listener))
 					return;
 
 				strongListenerHash.Remove (handler);

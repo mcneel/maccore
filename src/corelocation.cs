@@ -16,7 +16,6 @@ using MonoMac.CoreLocation;
 using MonoMac.UIKit;
 #endif
 using System;
-using System.Drawing;
 
 namespace MonoMac.CoreLocation {
 

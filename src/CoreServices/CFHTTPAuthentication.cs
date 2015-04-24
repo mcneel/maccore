@@ -27,7 +27,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 using System;
-using System.Net;
 using System.Runtime.InteropServices;
 using MonoMac.Foundation;
 using MonoMac.CoreFoundation;

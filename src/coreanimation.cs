@@ -30,7 +30,6 @@
 //
 
 using System;
-using System.Drawing;
 #if MONOMAC
 using MonoMac.AppKit;
 using MonoMac.CoreVideo;

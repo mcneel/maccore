@@ -37,17 +37,11 @@ using nfloat = System.Single;
 #endif
 
 namespace MonoMac.CoreGraphics {
-	[StructLayout(LayoutKind.Sequential)]
+	[StructLayout(LayoutKind.Sequential, Pack = 8)]
 	public struct CGPoint {
 		
 		public static readonly CGPoint Empty;
 		
-		public CGPoint(System.Drawing.PointF point)
-		{
-			X = point.X;
-			Y = point.Y;
-		}
-
 		public override int GetHashCode()
 		{
 			return X.GetHashCode() ^ Y.GetHashCode();
@@ -73,6 +67,13 @@ namespace MonoMac.CoreGraphics {
 			return new CGPoint (pt.X - sz.Width, pt.Y - sz.Height);
 		}
 
+#if !COREFX
+		public CGPoint(System.Drawing.PointF point)
+		{
+			X = point.X;
+			Y = point.Y;
+		}
+
 		public static implicit operator CGPoint (System.Drawing.PointF point)
 		{
 			return new CGPoint (point.X, point.Y);
@@ -82,6 +83,7 @@ namespace MonoMac.CoreGraphics {
 		{
 			return new System.Drawing.PointF ((float)point.X, (float)point.Y);
 		}
+#endif
 
 		public CGPoint(int x, int y)
 		{

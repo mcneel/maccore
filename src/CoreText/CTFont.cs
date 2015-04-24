@@ -27,8 +27,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 using System;
+using System.Linq;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Runtime.InteropServices;
 
 using MonoMac.ObjCRuntime;
@@ -297,7 +297,7 @@ namespace MonoMac.CoreText {
 					return;
 				}
 				Adapter.SetValue (Dictionary, CTFontFeatureKey.Selectors,
-						NSArray.FromNSObjects (v.ConvertAll (e => (NSObject) e.Dictionary)));
+						NSArray.FromNSObjects (v.Select (e => (NSObject) e.Dictionary).ToList()));
 			}
 		}
 	}

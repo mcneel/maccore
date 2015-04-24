@@ -8,7 +8,6 @@
 // Copyright 2012-2013 Xamarin Inc
 //
 using System;
-using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
 

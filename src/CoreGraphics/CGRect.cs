@@ -37,28 +37,12 @@ using nfloat = System.Single;
 #endif
 
 namespace MonoMac.CoreGraphics {
-	[StructLayout(LayoutKind.Sequential)]
+	[StructLayout(LayoutKind.Sequential, Pack = 8)]
 	public struct CGRect {
 		
 		public static readonly CGRect Empty;
 	
-		public CGRect(System.Drawing.RectangleF rect)
-		{
-			Origin.X = rect.Left;
-			Origin.Y = rect.Top;
-			Size.Width = rect.Width;
-			Size.Height = rect.Height;
-		}
-
 		public CGRect(CGPoint location, CGSize size)
-		{
-			Origin.X = location.X;
-			Origin.Y = location.Y;
-			Size.Width = size.Width;
-			Size.Height = size.Height;
-		}
-
-		public CGRect(System.Drawing.Point location, System.Drawing.Size size)
 		{
 			Origin.X = location.X;
 			Origin.Y = location.Y;
@@ -109,6 +93,23 @@ namespace MonoMac.CoreGraphics {
 			return left.Origin != right.Origin || left.Size != right.Size;
 		}
 
+#if !COREFX
+		public CGRect(System.Drawing.RectangleF rect)
+		{
+			Origin.X = rect.Left;
+			Origin.Y = rect.Top;
+			Size.Width = rect.Width;
+			Size.Height = rect.Height;
+		}
+
+		public CGRect(System.Drawing.Point location, System.Drawing.Size size)
+		{
+			Origin.X = location.X;
+			Origin.Y = location.Y;
+			Size.Width = size.Width;
+			Size.Height = size.Height;
+		}
+
 		public static implicit operator CGRect (System.Drawing.RectangleF rect)
 		{
 			return new CGRect (rect.Location, rect.Size);
@@ -118,6 +119,7 @@ namespace MonoMac.CoreGraphics {
 		{
 			return new System.Drawing.RectangleF ((float)rect.X, (float)rect.Y, (float)rect.Width, (float)rect.Height);
 		}
+#endif
 
 		public nfloat X { get { return Origin.X; } set { Origin.X=value; } }
 		public nfloat Y { get { return Origin.Y; } set { Origin.Y=value; } }

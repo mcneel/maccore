@@ -88,6 +88,7 @@ namespace MonoMac.CoreFoundation {
 		}
 	}
 
+#if !COREFX
 	struct CFSocketSignature {
 		int protocolFamily;
 		int socketType;
@@ -515,4 +516,5 @@ namespace MonoMac.CoreFoundation {
 			}
 		}
 	}
+#endif
 }

@@ -12,7 +12,6 @@
 //
 using System;
 using System.Runtime.InteropServices;
-using System.Drawing;
 using MonoMac;
 using MonoMac.CoreGraphics;
 using MonoMac.Foundation;
@@ -36,7 +35,21 @@ using CGRect = System.Drawing.RectangleF;
 #endif
 #endif
 
+#if !COREFX
+using CMVideoDimensions = System.Drawing.Size;
+#endif
+
 namespace MonoMac.CoreMedia {
+
+	#if COREFX
+	[StructLayout(LayoutKind.Sequential)]
+	public struct CMVideoDimensions
+	{
+		public int Width;
+		public int Height;
+	}
+	
+	#endif
 
 	public enum CMFormatDescriptionError {
 		None				= 0,
@@ -308,10 +321,10 @@ namespace MonoMac.CoreMedia {
 		}
 
 		[DllImport (Constants.CoreMediaLibrary)]
-		internal extern static Size CMVideoFormatDescriptionGetDimensions (IntPtr handle);
+		internal extern static CMVideoDimensions CMVideoFormatDescriptionGetDimensions (IntPtr handle);
 
 		[Advice ("Use CMVideoFormatDescription")]
-		public Size  VideoDimensions {
+		public CMVideoDimensions  VideoDimensions {
 			get {
 				return CMVideoFormatDescriptionGetDimensions (handle);
 			}
@@ -394,7 +407,7 @@ namespace MonoMac.CoreMedia {
 			IntPtr extensions,
 			out IntPtr outDesc);
 
-		public CMVideoFormatDescription (CMVideoCodecType codecType, Size size)
+		public CMVideoFormatDescription (CMVideoCodecType codecType, CMVideoDimensions size)
 			: base (IntPtr.Zero)
 		{
 			var error = CMVideoFormatDescriptionCreate (IntPtr.Zero, codecType, size.Width, size.Height, IntPtr.Zero, out handle);
@@ -403,7 +416,7 @@ namespace MonoMac.CoreMedia {
 		}
 
 #if !COREBUILD
-		public Size Dimensions {
+		public CMVideoDimensions Dimensions {
 			get {
 				return CMVideoFormatDescriptionGetDimensions (handle);
 			}

@@ -36,7 +36,6 @@
 // CIVector
 //
 using System;
-using System.Drawing;
 using MonoMac.Foundation;
 using MonoMac.ObjCRuntime;
 using MonoMac.CoreGraphics;
