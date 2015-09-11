@@ -1907,7 +1907,7 @@ public class Generator {
 		print ("namespace MonoTouch {"); indent++;
 #endif
 		print ("");
-		print ("[CompilerGenerated]");
+		//print ("[CompilerGenerated]");
 		print ("static class Trampolines {"); indent++;
 		foreach (var ti in trampolines.Values) {
 			print ("");
@@ -1962,7 +1962,7 @@ public class Generator {
 #else
 		print ("namespace MonoTouch {"); indent++;
 #endif
-		print ("[CompilerGenerated]");
+		//print ("[CompilerGenerated]");
 		print ("static class Libraries {"); indent++;
 		foreach (string library_name in libraries) {
 			print ("static public class {0} {{", library_name); indent++;
@@ -2122,7 +2122,7 @@ public class Generator {
 	{
 		for (int i=0; i < tabs; i++)
 			sw.Write ('\t');
-		sw.WriteLine ("[CompilerGenerated]");
+		//sw.WriteLine ("[CompilerGenerated]");
 	}
 	
 	public void print_generated_code ()
@@ -3034,7 +3034,7 @@ public class Generator {
 			if (!is_model && DoesPropertyNeedBackingField (pi)) {
 				var_name = string.Format ("__mt_{0}_var{1}", pi.Name, minfo.is_static ? "_static" : "");
 
-				print ("[CompilerGenerated]");
+				//print ("[CompilerGenerated]");
 
 				if (minfo.is_thread_static)
 					print ("[ThreadStatic]");
@@ -3504,8 +3504,8 @@ public class Generator {
 					var selectorField = SelectorField (ea, true);
 					if (!InlineSelectors)
 						selectorField = selectorField.Substring (0, selectorField.Length - 6 /* Handle */);
-					print ("[CompilerGenerated]");
-					print ("const string {0} = \"{1}\";", selectorField, ea);
+					//print ("[CompilerGenerated]");
+					//print ("const string {0} = \"{1}\";", selectorField, ea);
 					if (!InlineSelectors)
 						print ("static readonly IntPtr {0} = Selector.GetHandle (\"{1}\");", SelectorField (ea), ea);
 				}
@@ -3518,7 +3518,7 @@ public class Generator {
 					objc_type_name = FormatType (null, bta.BaseType);
 				
 				if (!is_model && !external) {
-					print ("[CompilerGenerated]");
+					//print ("[CompilerGenerated]");
 					print ("static readonly IntPtr class_ptr = Class.GetHandle (\"{0}\");\n", objc_type_name);
 				}
 			}
@@ -3705,7 +3705,7 @@ public class Generator {
 					string fieldTypeName = FormatType (field_pi.DeclaringType, field_pi.PropertyType);
 					// Value types we dont cache for now, to avoid Nullable<T>
 					if (!field_pi.PropertyType.IsValueType) {
-						print ("[CompilerGenerated]");
+						//print ("[CompilerGenerated]");
 						print ("static {0} _{1};", fieldTypeName, field_pi.Name);
 					}
 
@@ -4028,7 +4028,7 @@ public class Generator {
 			if (!is_static_class){
 				object [] disposeAttr = type.GetCustomAttributes (typeof (DisposeAttribute), true);
 				if (disposeAttr.Length > 0 || instance_fields_to_clear_on_dispose.Count > 0){
-					print ("[CompilerGenerated]");
+					//print ("[CompilerGenerated]");
 					print ("protected override void Dispose (bool disposing)");
 					print ("{");
 					indent++;

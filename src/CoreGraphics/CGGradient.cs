@@ -49,7 +49,7 @@ using CGRect = System.Drawing.RectangleF;
 
 namespace MonoMac.CoreGraphics {
 
-
+	[Flags]
 	public enum CGGradientDrawingOptions {
 		DrawsBeforeStartLocation = (1 << 0),
 		DrawsAfterEndLocation = (1 << 1)

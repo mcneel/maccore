@@ -37,7 +37,7 @@ using nfloat = System.Single;
 #endif
 
 namespace MonoMac.CoreGraphics {
-	[StructLayout(LayoutKind.Sequential, Pack = 8)]
+	[StructLayout(LayoutKind.Sequential)]
 	public struct CGRect {
 		
 		public static readonly CGRect Empty;

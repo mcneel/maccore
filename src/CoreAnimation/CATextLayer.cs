@@ -46,9 +46,9 @@ namespace MonoMac.CoreAnimation {
 			get {
 				IntPtr h;
 				if (IsDirectBinding)
-					h = ObjCRuntime.Messaging.IntPtr_objc_msgSend (this.Handle, Selector.GetHandle (selString));
+					h = ObjCRuntime.Messaging.IntPtr_objc_msgSend (this.Handle, selStringHandle);
 				else
-					h = ObjCRuntime.Messaging.IntPtr_objc_msgSendSuper (this.SuperHandle, Selector.GetHandle (selString));
+					h = ObjCRuntime.Messaging.IntPtr_objc_msgSendSuper (this.SuperHandle, selStringHandle);
 				
 				return Runtime.GetNSObject (h) as NSAttributedString;
 			}
@@ -57,9 +57,9 @@ namespace MonoMac.CoreAnimation {
 					throw new ArgumentNullException ("value");
 				
 				if (IsDirectBinding)
-					ObjCRuntime.Messaging.void_objc_msgSend_IntPtr (this.Handle, Selector.GetHandle (selSetString_), value.Handle);
+					ObjCRuntime.Messaging.void_objc_msgSend_IntPtr (this.Handle, selSetString_Handle, value.Handle);
 				else
-					ObjCRuntime.Messaging.void_objc_msgSendSuper_IntPtr (this.SuperHandle, Selector.GetHandle (selSetString_), value.Handle);
+					ObjCRuntime.Messaging.void_objc_msgSendSuper_IntPtr (this.SuperHandle, selSetString_Handle, value.Handle);
 				
 			}
 		}
