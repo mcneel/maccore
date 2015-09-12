@@ -495,7 +495,7 @@ namespace MonoMac.CoreGraphics {
 			CGPathElement element = new CGPathElement (Marshal.ReadInt32 (element_ptr, 0));
 			ApplierFunction func = (ApplierFunction) gch.Target;
 
-			IntPtr ptr = Marshal.ReadIntPtr (element_ptr, 4);
+			IntPtr ptr = Marshal.ReadIntPtr (element_ptr, sizeof(IntPtr));
 			int ptsize = Marshal.SizeOf (typeof (CGPoint));
 
 			switch (element.Type){
