@@ -383,13 +383,9 @@ namespace MonoMac.CoreGraphics {
 
 		[DllImport (Constants.CoreGraphicsLibrary)]
 		extern static IntPtr CGImageCreateWithImageInRect(IntPtr image, NSRect rect);
-		public CGImage WithImageInRect (RectangleF rect)
+		public CGImage WithImageInRect (NSRect rect)
 		{
-#if MAC64
-			return new CGImage (CGImageCreateWithImageInRect (handle, new NSRect(rect)), true);
-#else
 			return new CGImage (CGImageCreateWithImageInRect (handle, rect), true);
-#endif
 		}
 		
 		[DllImport (Constants.CoreGraphicsLibrary)]

@@ -105,8 +105,8 @@ namespace MonoMac.CoreText {
 		}
 
 		[DllImport (Constants.CoreTextLibrary)]
-		extern static void CTRunGetAdvances (IntPtr h, NSRange range, [In, Out] SizeF [] buffer);
-		public SizeF[] GetAdvances (NSRange range, SizeF[] buffer)
+		extern static void CTRunGetAdvances (IntPtr h, NSRange range, [In, Out] NSSize [] buffer);
+		public NSSize[] GetAdvances (NSRange range, NSSize[] buffer)
 		{
 			buffer = GetBuffer (range, buffer);
 
@@ -127,11 +127,11 @@ namespace MonoMac.CoreText {
 			return buffer ?? new T [range.Length == 0 ? glyphCount : (int)range.Length];
 		}
 
-		public SizeF [] GetAdvances (NSRange range) {
+		public NSSize [] GetAdvances (NSRange range) {
 			return GetAdvances (range, null);
 		}
 
-		public SizeF [] GetAdvances ()
+		public NSSize [] GetAdvances ()
 		{
 			return GetAdvances (new NSRange (0, 0), null);
 		}
@@ -175,14 +175,14 @@ namespace MonoMac.CoreText {
 		}
 
 		[DllImport (Constants.CoreTextLibrary)]
-		extern static RectangleF CTRunGetImageBounds (IntPtr h, IntPtr context, NSRange range);
-		public RectangleF GetImageBounds (CGContext context, NSRange range) {
+		extern static NSRect CTRunGetImageBounds (IntPtr h, IntPtr context, NSRange range);
+		public NSRect GetImageBounds (CGContext context, NSRange range) {
 			return CTRunGetImageBounds (handle, context.Handle, range);
 		}
 
 		[DllImport (Constants.CoreTextLibrary)]
-		extern static void CTRunGetPositions (IntPtr h, NSRange range, [In, Out] PointF [] buffer);
-		public PointF [] GetPositions (NSRange range, PointF[] buffer)
+		extern static void CTRunGetPositions (IntPtr h, NSRange range, [In, Out] NSPoint [] buffer);
+		public NSPoint [] GetPositions (NSRange range, NSPoint[] buffer)
 		{
 			buffer = GetBuffer (range, buffer);
 
@@ -191,11 +191,11 @@ namespace MonoMac.CoreText {
 			return buffer;
 		}
 
-		public PointF [] GetPositions (NSRange range) {
+		public NSPoint [] GetPositions (NSRange range) {
 			return GetPositions (range, null);
 		}
 
-		public PointF [] GetPositions ()
+		public NSPoint [] GetPositions ()
 		{
 			return GetPositions (new NSRange (0, 0), null);
 		}

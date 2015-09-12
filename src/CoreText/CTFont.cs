@@ -38,6 +38,19 @@ using MonoMac.Foundation;
 
 using CGGlyph = System.UInt16;
 
+#if MAC64
+using NSInteger = System.Int64;
+using NSUInteger = System.UInt64;
+using CGFloat = System.Double;
+#else
+using NSInteger = System.Int32;
+using NSUInteger = System.UInt32;
+using NSPoint = System.Drawing.PointF;
+using NSSize = System.Drawing.SizeF;
+using NSRect = System.Drawing.RectangleF;
+using CGFloat = System.Single;
+#endif
+
 namespace MonoMac.CoreText {
 
 	[Since (3,2)]
@@ -1532,8 +1545,8 @@ namespace MonoMac.CoreText {
 
 #region Font Creation
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern IntPtr CTFontCreateWithName (IntPtr name, float size, IntPtr matrix);
-		public CTFont (string name, float size)
+		static extern IntPtr CTFontCreateWithName (IntPtr name, CGFloat size, IntPtr matrix);
+		public CTFont (string name, CGFloat size)
 		{
 			if (name == null)
 				throw ConstructorError.ArgumentNull (this, "name");
@@ -1544,8 +1557,8 @@ namespace MonoMac.CoreText {
 		}
 
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern IntPtr CTFontCreateWithName (IntPtr name, float size, ref CGAffineTransform matrix);
-		public CTFont (string name, float size, ref CGAffineTransform matrix)
+		static extern IntPtr CTFontCreateWithName (IntPtr name, CGFloat size, ref CGAffineTransform matrix);
+		public CTFont (string name, CGFloat size, ref CGAffineTransform matrix)
 		{
 			if (name == null)
 				throw ConstructorError.ArgumentNull (this, "name");
@@ -1556,8 +1569,8 @@ namespace MonoMac.CoreText {
 		}
 
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern IntPtr CTFontCreateWithFontDescriptor (IntPtr descriptor, float size, IntPtr matrix);
-		public CTFont (CTFontDescriptor descriptor, float size)
+		static extern IntPtr CTFontCreateWithFontDescriptor (IntPtr descriptor, CGFloat size, IntPtr matrix);
+		public CTFont (CTFontDescriptor descriptor, CGFloat size)
 		{
 			if (descriptor == null)
 				throw ConstructorError.ArgumentNull (this, "descriptor");
@@ -1567,8 +1580,8 @@ namespace MonoMac.CoreText {
 		}
 
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern IntPtr CTFontCreateWithFontDescriptor (IntPtr descriptor, float size, ref CGAffineTransform matrix);
-		public CTFont (CTFontDescriptor descriptor, float size, ref CGAffineTransform matrix)
+		static extern IntPtr CTFontCreateWithFontDescriptor (IntPtr descriptor, CGFloat size, ref CGAffineTransform matrix);
+		public CTFont (CTFontDescriptor descriptor, CGFloat size, ref CGAffineTransform matrix)
 		{
 			if (descriptor == null)
 				throw ConstructorError.ArgumentNull (this, "descriptor");
@@ -1578,8 +1591,8 @@ namespace MonoMac.CoreText {
 		}
 
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern IntPtr CTFontCreateWithNameAndOptions (IntPtr name, float size, IntPtr matrix, CTFontOptions options);
-		public CTFont (string name, float size, CTFontOptions options)
+		static extern IntPtr CTFontCreateWithNameAndOptions (IntPtr name, CGFloat size, IntPtr matrix, CTFontOptions options);
+		public CTFont (string name, CGFloat size, CTFontOptions options)
 		{
 			if (name == null)
 				throw ConstructorError.ArgumentNull (this, "name");
@@ -1590,8 +1603,8 @@ namespace MonoMac.CoreText {
 		}
 
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern IntPtr CTFontCreateWithNameAndOptions (IntPtr name, float size, ref CGAffineTransform matrix, CTFontOptions options);
-		public CTFont (string name, float size, ref CGAffineTransform matrix, CTFontOptions options)
+		static extern IntPtr CTFontCreateWithNameAndOptions (IntPtr name, CGFloat size, ref CGAffineTransform matrix, CTFontOptions options);
+		public CTFont (string name, CGFloat size, ref CGAffineTransform matrix, CTFontOptions options)
 		{
 			if (name == null)
 				throw ConstructorError.ArgumentNull (this, "name");
@@ -1602,8 +1615,8 @@ namespace MonoMac.CoreText {
 		}
 
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern IntPtr CTFontCreateWithFontDescriptorAndOptions (IntPtr descriptor, float size, IntPtr matrix, CTFontOptions options);
-		public CTFont (CTFontDescriptor descriptor, float size, CTFontOptions options)
+		static extern IntPtr CTFontCreateWithFontDescriptorAndOptions (IntPtr descriptor, CGFloat size, IntPtr matrix, CTFontOptions options);
+		public CTFont (CTFontDescriptor descriptor, CGFloat size, CTFontOptions options)
 		{
 			if (descriptor == null)
 				throw ConstructorError.ArgumentNull (this, "descriptor");
@@ -1614,8 +1627,8 @@ namespace MonoMac.CoreText {
 		}
 
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern IntPtr CTFontCreateWithFontDescriptorAndOptions (IntPtr descriptor, float size, ref CGAffineTransform matrix, CTFontOptions options);
-		public CTFont (CTFontDescriptor descriptor, float size, CTFontOptions options, ref CGAffineTransform matrix)
+		static extern IntPtr CTFontCreateWithFontDescriptorAndOptions (IntPtr descriptor, CGFloat size, ref CGAffineTransform matrix, CTFontOptions options);
+		public CTFont (CTFontDescriptor descriptor, CGFloat size, CTFontOptions options, ref CGAffineTransform matrix)
 		{
 			if (descriptor == null)
 				throw ConstructorError.ArgumentNull (this, "descriptor");
@@ -1626,12 +1639,12 @@ namespace MonoMac.CoreText {
 		}
 
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern IntPtr CTFontCreateWithGraphicsFont (IntPtr cgfontRef, float size, ref CGAffineTransform affine, IntPtr attrs);
+		static extern IntPtr CTFontCreateWithGraphicsFont (IntPtr cgfontRef, CGFloat size, ref CGAffineTransform affine, IntPtr attrs);
 
 		[DllImport (Constants.CoreTextLibrary, EntryPoint="CTFontCreateWithGraphicsFont")]
-		static extern IntPtr CTFontCreateWithGraphicsFont2 (IntPtr cgfontRef, float size, IntPtr affine, IntPtr attrs);
+		static extern IntPtr CTFontCreateWithGraphicsFont2 (IntPtr cgfontRef, CGFloat size, IntPtr affine, IntPtr attrs);
 		
-		public CTFont (CGFont font, float size, CGAffineTransform transform, CTFontDescriptor descriptor)
+		public CTFont (CGFont font, CGFloat size, CGAffineTransform transform, CTFontDescriptor descriptor)
 		{
 			if (font == null)
 				throw new ArgumentNullException ("font");
@@ -1640,7 +1653,7 @@ namespace MonoMac.CoreText {
 				throw ConstructorError.Unknown (this);
 		}
 
-		public CTFont (CGFont font, float size, CTFontDescriptor descriptor)
+		public CTFont (CGFont font, CGFloat size, CTFontDescriptor descriptor)
 		{
 			if (font == null)
 				throw new ArgumentNullException ("font");
@@ -1649,7 +1662,7 @@ namespace MonoMac.CoreText {
 				throw ConstructorError.Unknown (this);
 		}
 
-		public CTFont (CGFont font, float size, CGAffineTransform transform)
+		public CTFont (CGFont font, CGFloat size, CGAffineTransform transform)
 		{
 			if (font == null)
 				throw new ArgumentNullException ("font");
@@ -1659,8 +1672,8 @@ namespace MonoMac.CoreText {
 		}
 		
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern IntPtr CTFontCreateUIFontForLanguage (CTFontUIFontType uiType, float size, IntPtr language);
-		public CTFont (CTFontUIFontType uiType, float size, string language)
+		static extern IntPtr CTFontCreateUIFontForLanguage (CTFontUIFontType uiType, CGFloat size, IntPtr language);
+		public CTFont (CTFontUIFontType uiType, CGFloat size, string language)
 		{
 			if (language == null)
 				throw ConstructorError.ArgumentNull (this, "language");
@@ -1671,8 +1684,8 @@ namespace MonoMac.CoreText {
 		}
 
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern IntPtr CTFontCreateCopyWithAttributes (IntPtr font, float size, IntPtr matrix, IntPtr attributues);
-		public CTFont WithAttributes (float size, CTFontDescriptor attributes)
+		static extern IntPtr CTFontCreateCopyWithAttributes (IntPtr font, CGFloat size, IntPtr matrix, IntPtr attributues);
+		public CTFont WithAttributes (CGFloat size, CTFontDescriptor attributes)
 		{
 			if (attributes == null)
 				throw new ArgumentNullException ("attributes");
@@ -1687,8 +1700,8 @@ namespace MonoMac.CoreText {
 		}
 
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern IntPtr CTFontCreateCopyWithAttributes (IntPtr font, float size, ref CGAffineTransform matrix, IntPtr attributues);
-		public CTFont WithAttributes (float size, CTFontDescriptor attributes, ref CGAffineTransform matrix)
+		static extern IntPtr CTFontCreateCopyWithAttributes (IntPtr font, CGFloat size, ref CGAffineTransform matrix, IntPtr attributues);
+		public CTFont WithAttributes (CGFloat size, CTFontDescriptor attributes, ref CGAffineTransform matrix)
 		{
 			if (attributes == null)
 				throw new ArgumentNullException ("attributes");
@@ -1696,24 +1709,24 @@ namespace MonoMac.CoreText {
 		}
 
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern IntPtr CTFontCreateCopyWithSymbolicTraits (IntPtr font, float size, IntPtr matrix, CTFontSymbolicTraits symTraitValue, CTFontSymbolicTraits symTraitMask);
-		public CTFont WithSymbolicTraits (float size, CTFontSymbolicTraits symTraitValue, CTFontSymbolicTraits symTraitMask)
+		static extern IntPtr CTFontCreateCopyWithSymbolicTraits (IntPtr font, CGFloat size, IntPtr matrix, CTFontSymbolicTraits symTraitValue, CTFontSymbolicTraits symTraitMask);
+		public CTFont WithSymbolicTraits (CGFloat size, CTFontSymbolicTraits symTraitValue, CTFontSymbolicTraits symTraitMask)
 		{
 			return CreateFont (
 					CTFontCreateCopyWithSymbolicTraits (handle, size, IntPtr.Zero, symTraitValue, symTraitMask));
 		}
 
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern IntPtr CTFontCreateCopyWithSymbolicTraits (IntPtr font, float size, ref CGAffineTransform matrix, CTFontSymbolicTraits symTraitValue, CTFontSymbolicTraits symTraitMask);
-		public CTFont WithSymbolicTraits (float size, CTFontSymbolicTraits symTraitValue, CTFontSymbolicTraits symTraitMask, ref CGAffineTransform matrix)
+		static extern IntPtr CTFontCreateCopyWithSymbolicTraits (IntPtr font, CGFloat size, ref CGAffineTransform matrix, CTFontSymbolicTraits symTraitValue, CTFontSymbolicTraits symTraitMask);
+		public CTFont WithSymbolicTraits (CGFloat size, CTFontSymbolicTraits symTraitValue, CTFontSymbolicTraits symTraitMask, ref CGAffineTransform matrix)
 		{
 			return CreateFont (
 					CTFontCreateCopyWithSymbolicTraits (handle, size, ref matrix, symTraitValue, symTraitMask));
 		}
 
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern IntPtr CTFontCreateCopyWithFamily (IntPtr font, float size, IntPtr matrix, IntPtr family);
-		public CTFont WithFamily (float size, string family)
+		static extern IntPtr CTFontCreateCopyWithFamily (IntPtr font, CGFloat size, IntPtr matrix, IntPtr family);
+		public CTFont WithFamily (CGFloat size, string family)
 		{
 			if (family == null)
 				throw new ArgumentNullException ("family");
@@ -1722,8 +1735,8 @@ namespace MonoMac.CoreText {
 		}
 
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern IntPtr CTFontCreateCopyWithFamily (IntPtr font, float size, ref CGAffineTransform matrix, IntPtr family);
-		public CTFont WithFamily (float size, string family, ref CGAffineTransform matrix)
+		static extern IntPtr CTFontCreateCopyWithFamily (IntPtr font, CGFloat size, ref CGAffineTransform matrix, IntPtr family);
+		public CTFont WithFamily (CGFloat size, string family, ref CGAffineTransform matrix)
 		{
 			if (family == null)
 				throw new ArgumentNullException ("family");
@@ -1769,8 +1782,8 @@ namespace MonoMac.CoreText {
 		}
 
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern float CTFontGetSize (IntPtr font);
-		public float Size {
+		static extern CGFloat CTFontGetSize (IntPtr font);
+		public CGFloat Size {
 			get {return CTFontGetSize (handle);}
 		}
 
@@ -1918,20 +1931,20 @@ namespace MonoMac.CoreText {
 
 #region Font Metrics
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern float CTFontGetAscent (IntPtr font);
-		public float AscentMetric {
+		static extern CGFloat CTFontGetAscent (IntPtr font);
+		public CGFloat AscentMetric {
 			get {return CTFontGetAscent (handle);}
 		}
 
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern float CTFontGetDescent (IntPtr font);
-		public float DescentMetric {
+		static extern CGFloat CTFontGetDescent (IntPtr font);
+		public CGFloat DescentMetric {
 			get {return CTFontGetDescent (handle);}
 		}
 
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern float CTFontGetLeading (IntPtr font);
-		public float LeadingMetric {
+		static extern CGFloat CTFontGetLeading (IntPtr font);
+		public CGFloat LeadingMetric {
 			get {return CTFontGetLeading (handle);}
 		}
 
@@ -1948,20 +1961,20 @@ namespace MonoMac.CoreText {
 		}
 
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern RectangleF CTFontGetBoundingBox (IntPtr font);
-		public RectangleF BoundingBox {
+		static extern NSRect CTFontGetBoundingBox (IntPtr font);
+		public NSRect BoundingBox {
 			get {return CTFontGetBoundingBox (handle);}
 		}
 
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern float CTFontGetUnderlinePosition (IntPtr font);
-		public float UnderlinePosition {
+		static extern CGFloat CTFontGetUnderlinePosition (IntPtr font);
+		public CGFloat UnderlinePosition {
 			get {return CTFontGetUnderlinePosition (handle);}
 		}
 
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern float CTFontGetUnderlineThickness (IntPtr font);
-		public float UnderlineThickness {
+		static extern CGFloat CTFontGetUnderlineThickness (IntPtr font);
+		public CGFloat UnderlineThickness {
 			get {return CTFontGetUnderlineThickness (handle);}
 		}
 
@@ -1972,14 +1985,14 @@ namespace MonoMac.CoreText {
 		}
 
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern float CTFontGetCapHeight (IntPtr font);
-		public float CapHeightMetric {
+		static extern CGFloat CTFontGetCapHeight (IntPtr font);
+		public CGFloat CapHeightMetric {
 			get {return CTFontGetCapHeight (handle);}
 		}
 
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern float CTFontGetXHeight (IntPtr font);
-		public float XHeightMetric {
+		static extern CGFloat CTFontGetXHeight (IntPtr font);
+		public CGFloat XHeightMetric {
 			get {return CTFontGetXHeight (handle);}
 		}
 #endregion
@@ -1996,8 +2009,8 @@ namespace MonoMac.CoreText {
 		}
 
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern RectangleF CTFontGetBoundingRectsForGlyphs (IntPtr font, CTFontOrientation orientation, [In] CGGlyph[] glyphs, [Out] RectangleF[] boundingRects, int count);
-		public RectangleF GetBoundingRects (CTFontOrientation orientation, CGGlyph[] glyphs, RectangleF[] boundingRects, int count)
+		static extern NSRect CTFontGetBoundingRectsForGlyphs (IntPtr font, CTFontOrientation orientation, [In] CGGlyph[] glyphs, [Out] NSRect[] boundingRects, int count);
+		public NSRect GetBoundingRects (CTFontOrientation orientation, CGGlyph[] glyphs, NSRect[] boundingRects, int count)
 		{
 			AssertCount (count);
 			AssertLength ("glyphs",         glyphs, count);
@@ -2007,9 +2020,9 @@ namespace MonoMac.CoreText {
 		}
 
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern RectangleF CTFontGetOpticalBoundsForGlyphs (IntPtr font, [In] CGGlyph[] glyphs, [Out] RectangleF[] boundingRects, int count, CTFontOptions options);
+		static extern NSRect CTFontGetOpticalBoundsForGlyphs (IntPtr font, [In] CGGlyph[] glyphs, [Out] NSRect[] boundingRects, int count, CTFontOptions options);
 		[Since (6,0)]
-		public RectangleF GetOpticalBounds (CGGlyph[] glyphs, RectangleF[] boundingRects, int count, CTFontOptions options = 0)
+		public NSRect GetOpticalBounds (CGGlyph[] glyphs, NSRect[] boundingRects, int count, CTFontOptions options = 0)
 		{
 			AssertCount (count);
 			AssertLength ("glyphs",         glyphs, count);
@@ -2018,7 +2031,7 @@ namespace MonoMac.CoreText {
 			return CTFontGetOpticalBoundsForGlyphs (handle, glyphs, boundingRects, count, 0);
 		}
 
-		public RectangleF GetBoundingRects (CTFontOrientation orientation, CGGlyph[] glyphs)
+		public NSRect GetBoundingRects (CTFontOrientation orientation, CGGlyph[] glyphs)
 		{
 			if (glyphs == null)
 				throw new ArgumentNullException ("glyphs");
@@ -2026,8 +2039,8 @@ namespace MonoMac.CoreText {
 		}
 
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern double CTFontGetAdvancesForGlyphs (IntPtr font, CTFontOrientation orientation, [In] CGGlyph[] glyphs, [Out] SizeF[] advances, int count);
-		public double GetAdvancesForGlyphs (CTFontOrientation orientation, CGGlyph[] glyphs, SizeF[] advances, int count)
+		static extern double CTFontGetAdvancesForGlyphs (IntPtr font, CTFontOrientation orientation, [In] CGGlyph[] glyphs, [Out] NSSize[] advances, int count);
+		public double GetAdvancesForGlyphs (CTFontOrientation orientation, CGGlyph[] glyphs, NSSize[] advances, int count)
 		{
 			AssertCount (count);
 			AssertLength ("glyphs",   glyphs, count);
@@ -2044,8 +2057,8 @@ namespace MonoMac.CoreText {
 		}
 
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern void CTFontGetVerticalTranslationsForGlyphs (IntPtr font, [In] CGGlyph[] glyphs, [Out] SizeF[] translations, int count);
-		public void GetVerticalTranslationsForGlyphs (CGGlyph[] glyphs, SizeF[] translations, int count)
+		static extern void CTFontGetVerticalTranslationsForGlyphs (IntPtr font, [In] CGGlyph[] glyphs, [Out] NSSize[] translations, int count);
+		public void GetVerticalTranslationsForGlyphs (CGGlyph[] glyphs, NSSize[] translations, int count)
 		{
 			AssertCount (count);
 			AssertLength ("glyphs",       glyphs, count);
@@ -2075,10 +2088,10 @@ namespace MonoMac.CoreText {
 		}
 
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern void CTFontDrawGlyphs (IntPtr font, [In] CGGlyph [] glyphs, [In] PointF [] positions, int count, IntPtr context);
+		static extern void CTFontDrawGlyphs (IntPtr font, [In] CGGlyph [] glyphs, [In] NSPoint [] positions, int count, IntPtr context);
 
 		[Since(4,2)]
-		public void DrawGlyphs (CGContext context, CGGlyph [] glyphs, PointF [] positions)
+		public void DrawGlyphs (CGContext context, CGGlyph [] glyphs, NSPoint [] positions)
 		{
 			if (context == null)
 				throw new ArgumentNullException ("context");
@@ -2093,10 +2106,10 @@ namespace MonoMac.CoreText {
 		}
 
 		[DllImport (Constants.CoreTextLibrary)]
-		static extern int CTFontGetLigatureCaretPositions (IntPtr handle, CGGlyph glyph, [Out] float [] positions, int max);
+		static extern int CTFontGetLigatureCaretPositions (IntPtr handle, CGGlyph glyph, [Out] CGFloat [] positions, int max);
 
 		[Since(4,2)]
-		public int GetLigatureCaretPositions (CGGlyph glyph, float [] positions)
+		public int GetLigatureCaretPositions (CGGlyph glyph, CGFloat [] positions)
 		{
 			if (positions == null)
 				throw new ArgumentNullException ("positions");

@@ -201,7 +201,7 @@ namespace MonoMac.CoreGraphics {
                                 (int)this.x0 ^ (int)this.y0;
                 }
                 
-		public NSPoint TransformPoint (PointF point)
+		public NSPoint TransformPoint (NSPoint point)
 		{
 			return new NSPoint ((xx * point.X + xy * point.Y + x0),
 					   (yx * point.X + yy * point.Y + y0));

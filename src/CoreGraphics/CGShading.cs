@@ -70,7 +70,7 @@ namespace MonoMac.CoreGraphics {
 		[DllImport(Constants.CoreGraphicsLibrary)]
 		extern static IntPtr CGShadingCreateAxial(IntPtr space, NSPoint start, NSPoint end, IntPtr functionHandle, bool extendStart, bool extendEnd);
 
-		public static CGShading CreateAxial (CGColorSpace colorspace, PointF start, PointF end, CGFunction function, bool extendStart, bool extendEnd)
+		public static CGShading CreateAxial (CGColorSpace colorspace, NSPoint start, NSPoint end, CGFunction function, bool extendStart, bool extendEnd)
 		{
 			if (colorspace == null)
 				throw new ArgumentNullException ("colorspace");
@@ -81,18 +81,14 @@ namespace MonoMac.CoreGraphics {
 			if (function.Handle == IntPtr.Zero)
 				throw new ObjectDisposedException ("function");
 
-#if MAC64
-			return new CGShading (CGShadingCreateAxial (colorspace.Handle, new NSPoint(start), new NSPoint(end), function.Handle, extendStart, extendEnd), true);
-#else
 			return new CGShading (CGShadingCreateAxial (colorspace.Handle, start, end, function.Handle, extendStart, extendEnd), true);
-#endif
 		}
 		
 		[DllImport(Constants.CoreGraphicsLibrary)]
 		extern static IntPtr CGShadingCreateRadial(IntPtr space, NSPoint start, CGFloat startRadius, NSPoint end, CGFloat endRadius,
 							   IntPtr function, bool extendStart, bool extendEnd);
 
-		public static CGShading CreateRadial (CGColorSpace colorspace, PointF start, float startRadius, PointF end, float endRadius,
+		public static CGShading CreateRadial (CGColorSpace colorspace, NSPoint start, float startRadius, NSPoint end, float endRadius,
 						      CGFunction function, bool extendStart, bool extendEnd)
 		{
 			if (colorspace == null)
@@ -104,13 +100,8 @@ namespace MonoMac.CoreGraphics {
 			if (function.Handle == IntPtr.Zero)
 				throw new ObjectDisposedException ("function");
 
-#if MAC64
-			return new CGShading (CGShadingCreateRadial (colorspace.Handle, new NSPoint(start), startRadius, new NSPoint(end), endRadius,
-			                                             function.Handle, extendStart, extendEnd), true);
-#else
 			return new CGShading (CGShadingCreateRadial (colorspace.Handle, start, startRadius, end, endRadius,
 								     function.Handle, extendStart, extendEnd), true);
-#endif
 		}
 
 		~CGShading ()
