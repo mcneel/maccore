@@ -30,4 +30,10 @@ namespace MonoMac.ObjCRuntime {
 	}
 	public class MountainLionAttribute : Attribute {
 	}
+	public class MavericksAttribute : Attribute {
+	}
+	public class YosemiteAttribute : Attribute {
+	}
+	public class ElCapitanAttribute : Attribute {
+	}
 }
