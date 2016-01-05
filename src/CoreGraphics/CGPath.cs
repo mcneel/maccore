@@ -489,7 +489,7 @@ namespace MonoMac.CoreGraphics {
 #if !MONOMAC
 		[MonoPInvokeCallback (typeof (CGPathApplierFunction))]
 #endif
-		static void ApplierCallback (IntPtr info, IntPtr element_ptr)
+		unsafe static void ApplierCallback (IntPtr info, IntPtr element_ptr)
 		{
 			GCHandle gch = GCHandle.FromIntPtr (info);
 			CGPathElement element = new CGPathElement (Marshal.ReadInt32 (element_ptr, 0));
