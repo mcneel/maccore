@@ -22,6 +22,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 using System;
+using System.Globalization;
 using System.Runtime.InteropServices;
 
 #if !SDCOMPAT
@@ -65,6 +66,11 @@ namespace MonoMac.CoreGraphics {
 		public static CGPoint operator -(CGPoint pt, CGSize sz)
 		{
 			return new CGPoint (pt.X - sz.Width, pt.Y - sz.Height);
+		}
+
+		public override string ToString ()
+		{
+			return string.Format(CultureInfo.CurrentCulture, "{{X={0},Y={1}}}", X, Y);
 		}
 
 #if !COREFX

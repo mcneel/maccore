@@ -22,6 +22,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 using System;
+using System.Globalization;
 using System.Runtime.InteropServices;
 
 #if !SDCOMPAT
@@ -91,6 +92,11 @@ namespace MonoMac.CoreGraphics {
 		public static bool operator !=(CGRect left, CGRect right)
 		{
 			return left.Origin != right.Origin || left.Size != right.Size;
+		}
+		
+		public override string ToString ()
+		{
+			return string.Format(CultureInfo.CurrentCulture, "{{X={0},Y={1},Width={2},Height={3}}}", X, Y, Width, Height);
 		}
 
 #if !COREFX

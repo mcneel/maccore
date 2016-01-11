@@ -22,6 +22,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 using System;
+using System.Globalization;
 using System.Runtime.InteropServices;
 
 // For now, only support MAC64 for CGSize in order to make sure
@@ -73,6 +74,11 @@ namespace MonoMac.CoreGraphics {
 		public static CGSize operator -(CGSize size1, CGSize size2)
 		{
 			return new CGSize (size1.Width - size2.Width, size1.Height - size2.Height);
+		}
+
+		public override string ToString ()
+		{
+			return string.Format(CultureInfo.CurrentCulture, "{{Width={0},Height={1}}}", Width, Height);
 		}
 
 #if !COREFX		
